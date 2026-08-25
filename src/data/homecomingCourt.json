@@ -1,0 +1,37 @@
+{
+  "_note": "SAMPLE DATA \u2014 names are fictional. Set active: true (or connect the Google Sheet in sources.js) when you have real candidates.",
+  "active": false,
+  "cycle": "Homecoming 2026",
+  "candidates": [
+    {
+      "name": "Maya Okafor",
+      "photoUrl": "/sample/portrait-1.jpg",
+      "bio": "Varsity soccer captain, three years of ASB, and the person who will absolutely out-dance you at the BTS rally."
+    },
+    {
+      "name": "Daniel Reyes",
+      "photoUrl": "/sample/portrait-2.jpg",
+      "bio": "Marching band section leader. Runs the Friday crossword club nobody knew existed until now."
+    },
+    {
+      "name": "Priya Natarajan",
+      "photoUrl": "/sample/portrait-3.jpg",
+      "bio": "Robotics driver, link crew leader, and unofficial photographer of every senior sunrise."
+    },
+    {
+      "name": "Ethan Liu",
+      "photoUrl": "/sample/portrait-4.jpg",
+      "bio": "Theater tech lead. Has personally built four homecoming floats and would like that acknowledged."
+    },
+    {
+      "name": "Sofia Alvarez",
+      "photoUrl": "",
+      "bio": "Cross country, Key Club, and the reason the library finally has a puzzle table."
+    },
+    {
+      "name": "Jordan Kim",
+      "photoUrl": "/sample/portrait-6.jpg",
+      "bio": "FremontTV host since sophomore year. Will campaign entirely through 15-second videos."
+    }
+  ]
+}

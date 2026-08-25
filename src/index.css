@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Reusable brand classes. Tokens come from tailwind.config.js — see THEME.md. */
+@layer base {
+  body { @apply bg-paper text-body font-sans antialiased; }
+  h1, h2, h3, h4 { @apply font-display text-ink; }
+  :focus-visible { @apply outline-none ring-2 ring-brand ring-offset-2 ring-offset-paper; }
+}
+
+@layer components {
+  .container-site { @apply mx-auto w-full max-w-site px-5 sm:px-8; }
+
+  /* Page title: bold, centered, short rust underline divider */
+  .page-title { @apply font-display text-4xl sm:text-5xl font-extrabold tracking-tight text-ink text-center; }
+  .rule-accent { @apply mx-auto mt-4 h-1 w-14 bg-brand; }
+  .rule-accent-left { @apply mt-3 h-1 w-12 bg-brand; }
+
+  /* Subtext under titles */
+  .subtext { @apply text-body italic text-base sm:text-lg leading-relaxed; }
+
+  /* Buttons */
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-btn px-5 py-2.5 font-display font-bold text-base leading-none transition-colors duration-150 select-none min-h-[44px]; }
+  .btn-primary { @apply btn bg-brand text-white hover:bg-brand-dark; }
+  .btn-secondary { @apply btn bg-brand-tint text-brand hover:bg-brand hover:text-white; }
+  .btn-disabled { @apply btn bg-rule text-body cursor-not-allowed; }
+  .btn-inverse { @apply btn bg-paper text-brand hover:bg-brand-tint; }
+
+  .tagline { @apply font-display font-bold italic text-brand; }
+
+  .section-space { @apply py-section-sm sm:py-section; }
+  .eyebrow { @apply font-display text-xs font-bold uppercase tracking-[0.18em] text-brand; }
+  .eyebrow-on-dark { @apply font-display text-xs font-bold uppercase tracking-[0.18em] text-white/80; }
+  .card-surface { @apply rounded-lg border border-rule bg-paper; }
+  .link-brand { @apply text-brand underline underline-offset-4 decoration-brand/40 hover:decoration-brand; }
+}

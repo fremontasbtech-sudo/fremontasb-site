@@ -1,0 +1,86 @@
+[
+  {
+    "section": "ASB Cabinet",
+    "active": false,
+    "name": "Aisha Rahman",
+    "photoUrl": "/sample/portrait-7.jpg",
+    "bio": "Running for ASB President. Two years on the Spirit & Marketing commission; wants every rally to start on time."
+  },
+  {
+    "section": "ASB Cabinet",
+    "active": false,
+    "name": "Marcus Chen",
+    "photoUrl": "/sample/portrait-8.jpg",
+    "bio": "Running for ASB Vice President. Led the 2025 club fair and has a plan to double Grub Day turnout."
+  },
+  {
+    "section": "ASB Cabinet",
+    "active": false,
+    "name": "Leah Goldberg",
+    "photoUrl": "",
+    "bio": "Running for ASB Treasurer. Wants a public spending dashboard so every club knows where the money goes."
+  },
+  {
+    "section": "Freshman Cabinet",
+    "active": false,
+    "name": "Noah Williams",
+    "photoUrl": "/sample/portrait-9.jpg",
+    "bio": "Running for Freshman President. Wants a class group chat that actually gets used."
+  },
+  {
+    "section": "Freshman Cabinet",
+    "active": false,
+    "name": "Isabela Santos",
+    "photoUrl": "/sample/portrait-10.jpg",
+    "bio": "Running for Freshman Vice President. Middle-school student council, two years."
+  },
+  {
+    "section": "Sophomore Cabinet",
+    "active": false,
+    "name": "Kenji Watanabe",
+    "photoUrl": "/sample/portrait-11.jpg",
+    "bio": "Running for Sophomore President. Organized last year's freshman float build."
+  },
+  {
+    "section": "Sophomore Cabinet",
+    "active": false,
+    "name": "Grace Nguyen",
+    "photoUrl": "/sample/portrait-1.jpg",
+    "bio": "Running for Sophomore Secretary. Promises minutes posted within 24 hours."
+  },
+  {
+    "section": "Junior Cabinet",
+    "active": false,
+    "name": "Omar Haddad",
+    "photoUrl": "/sample/portrait-2.jpg",
+    "bio": "Running for Junior President. Prom committee lead; has venue quotes already."
+  },
+  {
+    "section": "Junior Cabinet",
+    "active": false,
+    "name": "Zoe Martin",
+    "photoUrl": "/sample/portrait-3.jpg",
+    "bio": "Running for Junior Treasurer. Ran the class fundraiser that paid for the 2025 float."
+  },
+  {
+    "section": "Senior Cabinet",
+    "active": false,
+    "name": "Tyler Brooks",
+    "photoUrl": "/sample/portrait-4.jpg",
+    "bio": "Running for Senior President. Senior sunrise, senior sunset, and a grad night that isn't a bus ride."
+  },
+  {
+    "section": "Senior Cabinet",
+    "active": false,
+    "name": "Ananya Iyer",
+    "photoUrl": "/sample/portrait-5.jpg",
+    "bio": "Running for Senior Vice President. Three years on the Technology & Content Creation commission."
+  },
+  {
+    "section": "Senior Cabinet",
+    "active": false,
+    "name": "Archived Example",
+    "photoUrl": "",
+    "bio": "SAMPLE: all rows in this file ship with active false so fictional names never reach the live site. Set active true (or connect the Sheet) for a real cycle."
+  }
+]
