@@ -1,6 +1,7 @@
 #!/bin/bash
-# Double-click this file to run the Fremont ASB site locally.
-# First run takes a minute (installs packages); after that it's instant.
+# Double-click to run the Fremont ASB site in the BACKGROUND.
+# You can close the Terminal window afterwards — the site keeps running.
+# To stop it, double-click stop-site.command.
 cd "$(dirname "$0")"
 
 if ! command -v npm >/dev/null 2>&1; then
@@ -17,6 +18,19 @@ if [ ! -d node_modules ]; then
   npm install
 fi
 
-echo "Starting the site... your browser will open at http://localhost:5173"
-( sleep 2 && open http://localhost:5173 ) &
-npm run dev
+# Already running? Just open the browser.
+if [ -f .site.pid ] && kill -0 "$(cat .site.pid)" 2>/dev/null; then
+  echo "Site is already running."
+  open http://localhost:5173
+  exit 0
+fi
+
+echo "Starting the site in the background..."
+nohup npm run dev > .site.log 2>&1 &
+echo $! > .site.pid
+sleep 3
+open http://localhost:5173
+echo ""
+echo "Done — the site is at http://localhost:5173"
+echo "You can CLOSE this window. It keeps running until you log out,"
+echo "restart the Mac, or double-click stop-site.command."
