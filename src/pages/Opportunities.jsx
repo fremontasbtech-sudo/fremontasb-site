@@ -19,7 +19,7 @@ export default function Opportunities() {
       <PageHero
         title="Opportunities"
         eyebrow="Internships, programs, and scholarships"
-        subtext="Postings shared by the college and career counselors. New ones are added to the deck below."
+        subtext="Postings shared by the college and career counselors. New ones are added to the document below."
       />
 
       <section className="container-site section-space">
@@ -27,7 +27,7 @@ export default function Opportunities() {
           <div className="min-w-0">
             <Embed
               src={embeds.opportunitiesSlides}
-              title="Opportunities slide deck"
+              title="Opportunities document"
               ratio={wide ? '16 / 9' : '4 / 3'}
               fallback="The opportunities deck isn't posted yet — check with the College & Career Center."
             />
@@ -37,13 +37,13 @@ export default function Opportunities() {
             <p className="eyebrow mb-2">About these postings</p>
             <div className="rule-accent-left mb-4" />
             <p className="text-sm leading-relaxed text-body">
-              The college and career counselors share these postings. The deck updates whenever they
+              The college and career counselors share these postings. The document updates whenever they
               add to it. For questions about a specific posting, ask the College &amp; Career Center.
             </p>
             {links.opportunitiesDeck ? (
               <div className="mt-6">
                 <Button href={links.opportunitiesDeck} variant="primary" external>
-                  Open the deck in Google Slides
+                  Open the document in Google Docs
                 </Button>
               </div>
             ) : (

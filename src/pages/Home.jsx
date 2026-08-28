@@ -55,8 +55,8 @@ function Hero() {
           </h1>
           <div className="mt-5 h-1 w-14 bg-brand" aria-hidden="true" />
           <p className="mt-5 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">
-            The student government at Fremont High. We run the rallies, the clubs, FremontTV, and the spirit points
-            race between the four classes.
+            We're the students behind the rallies, the clubs, and FremontTV — plus the spirit points race that keeps
+            all four grades going. Glad you're here.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
             <Button to="/media" text="Watch FremontTV" />

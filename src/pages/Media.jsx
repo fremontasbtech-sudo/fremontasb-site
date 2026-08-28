@@ -2,8 +2,9 @@ import { useMemo, useState } from 'react'
 import PageHero from '../components/PageHero'
 import SectionHeader from '../components/SectionHeader'
 import Button, { ExternalIcon } from '../components/Button'
-import { links } from '../data/sources'
-import episodes from '../data/media.json'
+import { links, youtubeFeed } from '../data/sources'
+import overlay from '../data/media.json'
+import { useYouTube } from '../data/useYouTube'
 
 /**
  * Media — FremontTV + rally/event videos in one place.
@@ -24,9 +25,10 @@ function formatDate(iso) {
 }
 
 export default function Media() {
+  const { rows: episodes } = useYouTube(youtubeFeed, overlay)
   const sorted = useMemo(
     () => [...episodes].sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0)),
-    [],
+    [episodes],
   )
   const latest = sorted[0]
   // The featured episode is not repeated in the archive.

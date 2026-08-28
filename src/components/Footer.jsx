@@ -16,6 +16,9 @@ export default function Footer() {
           <p className="mt-4 text-sm text-body max-w-sm">
             The Associated Student Body of Fremont High School — rallies, clubs, FremontTV, dances, and everything in between.
           </p>
+          <p className="mt-3 text-sm text-body max-w-sm">
+            Website designed and maintained by ASB Tech.
+          </p>
         </div>
         <div className="text-sm">
           <p className="eyebrow mb-2">Find us</p>

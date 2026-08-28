@@ -9,7 +9,6 @@ import Elections from './pages/Elections'
 import Opportunities from './pages/Opportunities'
 import Resources from './pages/Resources'
 import Contact from './pages/Contact'
-import SchoolStore from './pages/SchoolStore'
 import DownloadApp from './pages/DownloadApp'
 import NotFound from './pages/NotFound'
 
@@ -27,7 +26,6 @@ const router = createBrowserRouter([
       { path: '/opportunities', element: <Opportunities /> },
       { path: '/resources', element: <Resources /> },
       { path: '/contact', element: <Contact /> },
-      { path: '/school-store', element: <SchoolStore /> },
       { path: '/download-app', element: <DownloadApp /> },
       // old Wix URLs
       { path: '/fremonttv', element: <Navigate to="/media" replace /> },

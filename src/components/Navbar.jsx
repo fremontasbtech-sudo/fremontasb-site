@@ -9,7 +9,6 @@ const primary = [
   { to: '/media', label: 'Media' },
   { to: '/photos', label: 'Photos' },
   { to: '/clubs', label: 'Clubs' },
-  { to: '/school-store', label: 'School Store' },
   { to: '/resources', label: 'Resources' },
   { to: '/contact', label: 'Contact' },
 ]
