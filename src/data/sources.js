@@ -79,23 +79,17 @@ export const embeds = {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// YOUTUBE AUTO-PULL (Media page) — OPT-IN.
-//   Leave apiKey null and the Media page keeps using the hand-maintained list in
-//   src/data/media.json (current behavior — nothing changes on the page).
-//   To auto-pull the newest uploads from the channel:
-//     1. YouTube Data API v3 key: console.cloud.google.com → new project → enable
-//        "YouTube Data API v3" → Credentials → API key. Paste it as apiKey.
-//     2. channelId (starts with "UC…"): on youtube.com/@fremonthighschoolasb,
-//        View Source → search channelId. Paste it as channelId.
-//   media.json then acts as the OVERLAY: any videoId listed there supplies the
-//   "hosts" and "kind" (FremontTV/Rally/Event) the API can't return. Videos not
-//   listed still appear — kind is guessed from the title, hosts left blank.
+// YOUTUBE AUTO-PULL (Media page) — LIVE, via the channel's public RSS feed.
+//   The Media page auto-pulls the newest uploads (no API key, no secrets). The
+//   feed is fetched server-side by /api/youtube (api/youtube.js on Vercel in
+//   production; the dev middleware in vite.config.js on localhost), both reading
+//   the channelId below. media.json is the OVERLAY: it supplies "hosts" and
+//   "kind" (FremontTV/Rally/Event) the feed can't provide, and keeps older
+//   episodes in the archive after they scroll out of the feed.
+//   To point at a different channel, change channelId (the "UC…" id).
 // ─────────────────────────────────────────────────────────────────────────────
 export const youtubeFeed = {
-  apiKey: null,
-  channelId: null,          // "UC…" channel ID (not the @handle)
-  uploadsPlaylistId: null,  // optional "UU…" — set to skip the channel lookup
-  maxResults: 50,
+  channelId: 'UC6n36BKoWwrJhwwGobgJSqw',   // youtube.com/@fremonthighschoolasb
 }
 
 export const school = {

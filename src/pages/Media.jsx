@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import PageHero from '../components/PageHero'
 import SectionHeader from '../components/SectionHeader'
 import Button, { ExternalIcon } from '../components/Button'
-import { links, youtubeFeed } from '../data/sources'
+import { links } from '../data/sources'
 import overlay from '../data/media.json'
 import { useYouTube } from '../data/useYouTube'
 
@@ -25,7 +25,7 @@ function formatDate(iso) {
 }
 
 export default function Media() {
-  const { rows: episodes } = useYouTube(youtubeFeed, overlay)
+  const { rows: episodes } = useYouTube(overlay)
   const sorted = useMemo(
     () => [...episodes].sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0)),
     [episodes],

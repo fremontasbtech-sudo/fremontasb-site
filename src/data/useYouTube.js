@@ -1,86 +1,63 @@
 import { useEffect, useState } from 'react'
 
 /**
- * useYouTube(config, overlayRows)
+ * useYouTube(overlayRows)
  *
- * OPT-IN auto-pull of the channel's latest uploads for the Media page.
+ * Auto-pulls the channel's newest uploads from /api/youtube (a keyless proxy of
+ * the channel's public RSS feed — see api/youtube.js and vite.config.js).
  *
- *  - If config.apiKey is null (default): returns overlayRows unchanged — the
- *    hand-maintained src/data/media.json. Nothing fetches; behavior is identical
- *    to the old static page.
- *  - If config.apiKey + a channelId (or uploadsPlaylistId) are set: fetches the
- *    newest uploads from the YouTube Data API v3. Since the API can't provide the
- *    site's custom "hosts" / "kind" fields, overlayRows (media.json) is used as an
- *    OVERLAY keyed by youtubeId: any listed video supplies hosts + kind (and can
- *    override the title/date). Videos not listed still show — kind is guessed from
- *    the title, hosts left blank.
- *  - On any fetch/parse error it falls back to overlayRows so the page never empties.
+ *  - Live videos come from the feed; media.json (overlayRows) is the OVERLAY:
+ *    it supplies "hosts" and "kind" (FremontTV/Rally/Event) the feed can't give,
+ *    and its older episodes are kept in the archive after they age out of the feed.
+ *  - New uploads appear automatically. A video not listed in media.json still shows;
+ *    its kind is guessed from the title and hosts are left blank.
+ *  - If the feed is unreachable it falls back to media.json, so the page never empties.
  *
- * Returns { rows, loading, error, source }  (source: 'youtube' | 'local').
+ * Returns { rows, loading, source }  (source: 'youtube' | 'local').
  */
-export function useYouTube(config = {}, overlayRows = []) {
-  const enabled = Boolean(config.apiKey && (config.channelId || config.uploadsPlaylistId))
-  const [state, setState] = useState({
-    rows: overlayRows,
-    loading: enabled,
-    error: null,
-    source: 'local',
-  })
+export function useYouTube(overlayRows = []) {
+  const [state, setState] = useState({ rows: overlayRows, loading: true, source: 'local' })
 
   useEffect(() => {
-    if (!enabled) return
     let cancelled = false
-    const key = config.apiKey
-    const max = config.maxResults || 50
-
-    async function run() {
-      try {
-        let uploads = config.uploadsPlaylistId
-        if (!uploads) {
-          const chUrl =
-            `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${config.channelId}&key=${key}`
-          const chRes = await fetch(chUrl)
-          if (!chRes.ok) throw new Error(`channels ${chRes.status}`)
-          const chJson = await chRes.json()
-          uploads = chJson.items?.[0]?.contentDetails?.relatedPlaylists?.uploads
-          if (!uploads) throw new Error('no uploads playlist for channel')
+    fetch('/api/youtube')
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`http ${r.status}`))))
+      .then((data) => {
+        if (cancelled) return
+        const live = Array.isArray(data && data.videos) ? data.videos : []
+        if (!live.length) {
+          setState({ rows: overlayRows, loading: false, source: 'local' })
+          return
         }
-
-        const plUrl =
-          `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=${max}&playlistId=${uploads}&key=${key}`
-        const plRes = await fetch(plUrl)
-        if (!plRes.ok) throw new Error(`playlistItems ${plRes.status}`)
-        const plJson = await plRes.json()
-
         const overlayById = Object.fromEntries(overlayRows.map((r) => [r.youtubeId, r]))
-        const rows = (plJson.items || [])
-          .map((it) => {
-            const s = it.snippet || {}
-            const id = s.resourceId?.videoId
-            if (!id) return null
-            const o = overlayById[id] || {}
-            const title = o.title || s.title || 'Untitled'
-            return {
-              youtubeId: id,
-              title,
-              date: o.date || (s.publishedAt ? s.publishedAt.slice(0, 10) : ''),
-              hosts: o.hosts ?? '',
-              kind: o.kind || guessKind(title),
-            }
-          })
-          .filter(Boolean)
-          // Private/deleted uploads come back with title "Private video" — drop them.
-          .filter((v) => v.title !== 'Private video' && v.title !== 'Deleted video')
+        const liveIds = new Set(live.map((v) => v.youtubeId))
 
-        if (!cancelled) setState({ rows, loading: false, error: null, source: 'youtube' })
-      } catch (err) {
-        if (!cancelled) setState({ rows: overlayRows, loading: false, error: err.message, source: 'local' })
-      }
-    }
-    run()
+        // Live uploads, enriched with hosts/kind from the overlay where available.
+        const merged = live.map((v) => {
+          const o = overlayById[v.youtubeId] || {}
+          return {
+            youtubeId: v.youtubeId,
+            title: o.title || v.title,
+            date: o.date || v.date,
+            hosts: o.hosts ?? '',
+            kind: o.kind || guessKind(o.title || v.title),
+          }
+        })
+        // Older curated episodes that have scrolled out of the feed.
+        const older = overlayRows
+          .filter((r) => !liveIds.has(r.youtubeId))
+          .map((r) => ({ hosts: '', kind: guessKind(r.title), ...r }))
+
+        const rows = [...merged, ...older].sort((a, b) =>
+          a.date < b.date ? 1 : a.date > b.date ? -1 : 0,
+        )
+        setState({ rows, loading: false, source: 'youtube' })
+      })
+      .catch(() => {
+        if (!cancelled) setState({ rows: overlayRows, loading: false, source: 'local' })
+      })
     return () => { cancelled = true }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled, config.apiKey, config.channelId, config.uploadsPlaylistId])
+  }, [])
 
   return state
 }
