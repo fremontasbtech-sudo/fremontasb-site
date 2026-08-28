@@ -37,7 +37,7 @@ export default function Contact() {
             />
           </div>
 
-          <aside className="lg:sticky lg:top-24 lg:self-start">
+          <aside>
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-1">
               <div className="min-w-0 sm:col-span-2 lg:col-span-1">
                 <p className="eyebrow mb-2">Email</p>

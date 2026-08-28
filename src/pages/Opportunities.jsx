@@ -33,7 +33,7 @@ export default function Opportunities() {
             />
           </div>
 
-          <aside className="lg:sticky lg:top-24 lg:self-start">
+          <aside>
             <p className="eyebrow mb-2">About these postings</p>
             <div className="rule-accent-left mb-4" />
             <p className="text-sm leading-relaxed text-body">

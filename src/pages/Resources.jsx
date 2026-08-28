@@ -73,7 +73,7 @@ export default function Resources() {
       {GROUPS.map((group, i) => (
         <section key={group.eyebrow} className={`container-site section-space ${i > 0 ? 'border-t border-rule' : ''}`}>
           <div className="grid gap-8 lg:grid-cols-12 lg:gap-14">
-            <div className="lg:col-span-4 lg:sticky lg:top-24 lg:self-start">
+            <div className="lg:col-span-4">
               <p className="eyebrow mb-2">{group.eyebrow}</p>
               <h2 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-ink">{group.title}</h2>
               <div className="rule-accent-left" />

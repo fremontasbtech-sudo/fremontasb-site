@@ -66,8 +66,7 @@ export default function HomecomingCourt() {
 
       <section className="container-site section-space">
         <div className="grid gap-8 lg:grid-cols-[13rem_1fr] lg:gap-14">
-          {/* Left rail: sticky on desktop, plain header on mobile */}
-          <div className="lg:sticky lg:top-24 lg:self-start">
+          <div>
             <p className="eyebrow mb-2">The court</p>
             <h2 className="font-display text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">
               {candidates.length} {candidates.length === 1 ? 'nominee' : 'nominees'}

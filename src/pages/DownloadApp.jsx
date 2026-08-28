@@ -44,7 +44,7 @@ export default function DownloadApp() {
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
             {/* Store buttons */}
             <div className="lg:col-span-5">
-              <div className="card-surface p-6 sm:p-8 lg:sticky lg:top-24">
+              <div className="card-surface p-6 sm:p-8">
                 <p className="eyebrow">Get the app</p>
                 <h2 className="mt-2 font-display text-2xl font-extrabold tracking-tight text-ink">
                   {anyLive ? 'Available now' : 'Coming soon'}

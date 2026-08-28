@@ -100,7 +100,7 @@ export default function Clubs() {
       <section id="club-list" className="container-site section-space scroll-mt-20">
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
           {/* Side rail: search + count */}
-          <aside className="lg:col-span-4 lg:sticky lg:top-24 lg:self-start">
+          <aside className="lg:col-span-4">
             <p className="eyebrow mb-2">Club list</p>
             <h2 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-ink">Find a club</h2>
             <div className="rule-accent-left" />
@@ -203,7 +203,7 @@ export default function Clubs() {
       <section id="start-a-club" className="border-t border-rule bg-paper scroll-mt-20">
         <div className="container-site section-space">
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
-            <div className="lg:col-span-4 lg:sticky lg:top-24 lg:self-start">
+            <div className="lg:col-span-4">
               <SectionHeader eyebrow="Start a club" title="How to start a club" className="mb-4 sm:mb-5" />
               <p className="text-body leading-relaxed">
                 Three steps to get on the Official Clubs List, then the things every club does during the year to stay on it.

@@ -199,9 +199,8 @@ function LatestNews() {
           {!loading && items.length === 0 && <Notice>Nothing posted yet. News goes up here once school starts.</Notice>}
         </div>
 
-        {/* 4/12 — sticky side rail of real destinations */}
         <aside className="lg:col-span-4">
-          <div className="lg:sticky lg:top-24">
+          <div>
             {/* The one on-white instance of the brand tagline style (bold italic rust). */}
             <p className="tagline text-xl sm:text-2xl">Fremont You Know!</p>
             <p className="eyebrow mt-6">Around the site</p>

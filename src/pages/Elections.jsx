@@ -74,8 +74,7 @@ export default function Elections() {
 
       <div className="container-site section-space">
         <div className="grid gap-10 lg:grid-cols-[13rem_1fr] lg:gap-14">
-          {/* Jump list: horizontal scroll below sm, wrapping chips sm–md, sticky left rail on lg */}
-          <nav aria-label="Election sections" className="min-w-0 lg:sticky lg:top-24 lg:self-start">
+          <nav aria-label="Election sections" className="min-w-0">
             <p className="eyebrow mb-3">Jump to</p>
             <ul className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-2 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0 lg:flex-col lg:gap-1">
               {sections.map((s) => (
