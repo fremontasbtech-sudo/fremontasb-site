@@ -94,6 +94,7 @@ export default function Clubs() {
         <Button href={links.clubAccountabilityTracker} variant="primary" external>Club Accountability Tracker</Button>
         <Button href={links.clubHandbook} variant="primary" external>Club Handbook</Button>
         <Button href="#club-list" variant="secondary">Browse the club list</Button>
+        <Button href="#start-a-club" variant="secondary">How to start a club</Button>
       </PageHero>
 
       {/* ── Club list ──────────────────────────────────────────────────────── */}
