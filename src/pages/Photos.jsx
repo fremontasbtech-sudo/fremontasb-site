@@ -1,7 +1,8 @@
 import PageHero from '../components/PageHero'
 import Button, { ExternalIcon } from '../components/Button'
 import { links, school } from '../data/sources'
-import events from '../data/photos.json'
+import fallbackAlbums from '../data/photos.json'
+import { useFlickr } from '../data/useFlickr'
 
 /**
  * Photos — event albums on Flickr.
@@ -20,6 +21,7 @@ function slot(i) {
 }
 
 export default function Photos() {
+  const { albums: events } = useFlickr(fallbackAlbums)
   return (
     <>
       <PageHero

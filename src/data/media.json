@@ -1,11 +1,12 @@
 [
-  { "title": "Fremont TV | Episode 3: Homecoming", "date": "2025-10-17", "youtubeId": "HkVm_rRrwoc", "hosts": "Saisha, Ella & Yomna", "kind": "FremontTV" },
-  { "title": "Fremont TV | Episode 2", "date": "2025-10-03", "youtubeId": "34v0SodxfhQ", "hosts": "Saanvi & Natalie", "kind": "FremontTV" },
-  { "title": "FremontTV | Episode 1", "date": "2025-09-19", "youtubeId": "eipE0qLDtJk", "hosts": "Ryan & Ayush", "kind": "FremontTV" },
-  { "title": "Class of 2025 Graduation Student Speeches", "date": "2025-06-05", "youtubeId": "QQ8mErNy-FQ", "hosts": "Jaidyn Balsara & Zaynab Mohiuddeen", "kind": "Event" },
-  { "title": "Class of 2025 Senior Goodbye Rally", "date": "2025-05-30", "youtubeId": "8MMU50PMpnE", "hosts": "", "kind": "Rally" },
-  { "title": "Class of 2025 Senior Goodbye Video", "date": "2025-05-30", "youtubeId": "DWX5YeWS-JY", "hosts": "", "kind": "Event" },
-  { "title": "FremontTV | Episode 15", "date": "2025-04-11", "youtubeId": "Lit3nRx-gmU", "hosts": "Kendall & Jaidyn", "kind": "FremontTV" },
-  { "title": "FremontTV | Episode 14", "date": "2025-03-27", "youtubeId": "T1ga4mm9e8U", "hosts": "Neebir & Aryav", "kind": "FremontTV" },
-  { "title": "2025 Hall of Fame Rally", "date": "2025-03-14", "youtubeId": "dwAu5V0muAI", "hosts": "", "kind": "Rally" }
+  {"title": "Fremont TV | '26-'27: Episode 1", "date": "2026-08-28", "youtubeId": "vVi-gCcv79E", "hosts": "Sanuga, Ava, Josh & Vid", "kind": "FremontTV"},
+  {"title": "Fremont TV | Episode 3: Homecoming", "date": "2025-10-17", "youtubeId": "HkVm_rRrwoc", "hosts": "Saisha, Ella & Yomna", "kind": "FremontTV"},
+  {"title": "Fremont TV | Episode 2", "date": "2025-10-03", "youtubeId": "34v0SodxfhQ", "hosts": "Saanvi & Natalie", "kind": "FremontTV"},
+  {"title": "FremontTV | Episode 1", "date": "2025-09-19", "youtubeId": "eipE0qLDtJk", "hosts": "Ryan & Ayush", "kind": "FremontTV"},
+  {"title": "Class of 2025 Graduation Student Speeches", "date": "2025-06-05", "youtubeId": "QQ8mErNy-FQ", "hosts": "Jaidyn Balsara & Zaynab Mohiuddeen", "kind": "Event"},
+  {"title": "Class of 2025 Senior Goodbye Rally", "date": "2025-05-30", "youtubeId": "8MMU50PMpnE", "hosts": "", "kind": "Rally"},
+  {"title": "Class of 2025 Senior Goodbye Video", "date": "2025-05-30", "youtubeId": "DWX5YeWS-JY", "hosts": "", "kind": "Event"},
+  {"title": "FremontTV | Episode 15", "date": "2025-04-11", "youtubeId": "Lit3nRx-gmU", "hosts": "Kendall & Jaidyn", "kind": "FremontTV"},
+  {"title": "FremontTV | Episode 14", "date": "2025-03-27", "youtubeId": "T1ga4mm9e8U", "hosts": "Neebir & Aryav", "kind": "FremontTV"},
+  {"title": "2025 Hall of Fame Rally", "date": "2025-03-14", "youtubeId": "dwAu5V0muAI", "hosts": "", "kind": "Rally"}
 ]

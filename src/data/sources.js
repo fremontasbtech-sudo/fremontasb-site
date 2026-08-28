@@ -92,6 +92,21 @@ export const youtubeFeed = {
   channelId: 'UC6n36BKoWwrJhwwGobgJSqw',   // youtube.com/@fremonthighschoolasb
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// FLICKR AUTO-PULL (Photos page) — LIVE albums via the Flickr API.
+//   The Photos page auto-pulls every album (photoset) from the ASB Flickr.
+//   Needs two things (see .env.example / README):
+//     • nsid below — the ASB Flickr account's user id (already filled in).
+//     • a free Flickr API key, kept SERVER-SIDE as the FLICKR_API_KEY env var —
+//       never in this file or the client bundle. Locally: put it in .env
+//       (FLICKR_API_KEY=...). On Vercel: Project → Settings → Environment Variables.
+//   Served by /api/flickr (api/flickr.js on Vercel; dev middleware in vite.config.js).
+//   Until the key is set, the page falls back to the sample albums in photos.json.
+// ─────────────────────────────────────────────────────────────────────────────
+export const flickrFeed = {
+  nsid: '199104771@N02',   // flickr.com/people/fremonthighschoolasb
+}
+
 export const school = {
   name: 'Fremont High School ASB',
   year: '2026–27',            // shown on Clubs etc. Update every August.
