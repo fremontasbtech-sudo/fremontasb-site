@@ -37,6 +37,7 @@ export async function fetchAlbums(apiKey, userId) {
       coverImageUrl: cover,
       flickrUrl: `https://www.flickr.com/photos/${userId}/albums/${s.id}`,
       count: Number(s.photos || 0),
+      date: s.date_create ? new Date(Number(s.date_create) * 1000).toISOString().slice(0, 10) : '',
     }
   })
 }

@@ -2,10 +2,14 @@ import { Link } from 'react-router-dom'
 import Button from '../components/Button'
 import SectionHeader from '../components/SectionHeader'
 import { Loading, Notice, DevNote } from '../components/DataState'
-import { useSheetData } from '../data/useSheetData'
+import { useSheetData, isTrue } from '../data/useSheetData'
+import { useYouTube } from '../data/useYouTube'
+import { useFlickr } from '../data/useFlickr'
 import { sheets, embeds, school } from '../data/sources'
 import spiritPointsJson from '../data/spiritPoints.json'
 import newsJson from '../data/news.json'
+import mediaOverlay from '../data/media.json'
+import photoAlbums from '../data/photos.json'
 
 /**
  * Home — hero video, Spirit Points ladder, Latest News, Download-the-App band.
@@ -158,45 +162,34 @@ const quickLinks = [
 ]
 
 function LatestNews() {
-  const { rows, loading, error, source } = useSheetData(sheets.news, newsJson)
+  const { rows, loading: newsLoading, source } = useSheetData(sheets.news, newsJson)
+  const { rows: videos, loading: vLoading } = useYouTube(mediaOverlay)
+  const { albums, loading: aLoading } = useFlickr(photoAlbums)
 
-  const items = rows
-    .filter((n) => n.title)
-    .map((n) => ({ ...n, when: parseDate(n.date) }))
-    .sort((a, b) => (b.when?.getTime() ?? 0) - (a.when?.getTime() ?? 0))
-    .slice(0, 5)
+  const items = buildNews(rows, source, videos, albums)
+  const loading = (newsLoading || vLoading || aLoading) && items.length === 0
 
   return (
     <section id="news" className="border-t border-rule bg-paper section-space scroll-mt-16">
       <div className="container-site grid gap-12 lg:grid-cols-12 lg:gap-16">
-        {/* 8/12 — the list */}
+        {/* 8/12 — the feed: written announcements (when a news sheet is connected) blended
+            with the newest FremontTV episodes + photo albums, freshest first. */}
         <div className="lg:col-span-8">
           <SectionHeader eyebrow="From ASB" title="Latest News" />
           {source !== 'sheet' && (
-            <DevNote>Showing local sample posts. Connect the news Google Sheet in sources.js to go live.</DevNote>
+            <DevNote>Auto-feed: newest FremontTV episodes + photo albums. Connect sheets.news in sources.js to add written announcements on top.</DevNote>
           )}
-          {loading && <Loading label="Loading news…" />}
-          {error && <Notice>Couldn't reach the Google Sheet ({error}). Showing saved posts.</Notice>}
+          {loading && <Loading label="Loading the latest…" />}
           {!loading && items.length > 0 && (
             <ol className="divide-y divide-rule border-t border-rule">
-              {items.map((n, i) => (
-                <li key={`${n.title}-${n.date}`} className="grid grid-cols-[4.25rem_1fr] gap-x-5 py-6 sm:grid-cols-[6rem_1fr] sm:gap-x-8 sm:py-7">
-                  <DateRail date={n.when} raw={n.date} featured={i === 0} />
-                  <div className="min-w-0">
-                    <h3 className={`font-display font-bold leading-snug text-ink ${i === 0 ? 'text-2xl sm:text-3xl' : 'text-lg sm:text-xl'}`}>
-                      {n.title}
-                    </h3>
-                    {n.blurb && (
-                      <p className={`mt-2 leading-relaxed text-body ${i === 0 ? 'text-base sm:text-lg' : 'text-sm sm:text-base'}`}>
-                        {n.blurb}
-                      </p>
-                    )}
-                  </div>
+              {items.map((item, i) => (
+                <li key={item.key}>
+                  <NewsItem item={item} featured={i === 0} />
                 </li>
               ))}
             </ol>
           )}
-          {!loading && items.length === 0 && <Notice>Nothing posted yet. News goes up here once school starts.</Notice>}
+          {!loading && items.length === 0 && <Notice>Nothing posted yet — check back once school events get going.</Notice>}
         </div>
 
         <aside className="lg:col-span-4">
@@ -225,6 +218,105 @@ function LatestNews() {
         </aside>
       </div>
     </section>
+  )
+}
+
+const TYPE_STYLES = {
+  Announcement: 'bg-brand-tint text-brand',
+  Event: 'bg-brand-tint text-brand',
+  Rally: 'bg-brand-tint text-brand',
+  FremontTV: 'bg-ink/5 text-ink',
+  Photos: 'bg-ink/5 text-ink',
+}
+
+function TypeBadge({ type }) {
+  const cls = TYPE_STYLES[type] || 'bg-ink/5 text-ink'
+  return (
+    <span className={`inline-flex items-center rounded-btn px-2 py-0.5 font-display text-[0.65rem] font-bold uppercase tracking-[0.12em] ${cls}`}>
+      {type}
+    </span>
+  )
+}
+
+/**
+ * Latest News feed — blends, freshest first:
+ *  - Written announcements from the news Google Sheet, but ONLY when one is connected
+ *    (source === 'sheet'); we never render the local sample as if it were real news.
+ *    Optional sheet columns: type, link, pinned (pinned rows stay on top).
+ *  - Auto items from the already-live feeds: newest FremontTV episodes + photo albums.
+ * Result: the section is always real and current, even before anyone writes an announcement.
+ */
+function buildNews(newsRows, source, videos, albums) {
+  const manual = source === 'sheet'
+    ? newsRows.filter((n) => n.title).map((n) => ({
+        key: `a-${n.title}-${n.date || ''}`,
+        type: n.type && String(n.type).trim() ? String(n.type).trim() : 'Announcement',
+        title: n.title,
+        blurb: n.blurb || '',
+        href: n.link || n.href || null,
+        when: parseDate(n.date),
+        pinned: isTrue(n.pinned),
+      }))
+    : []
+
+  const vids = (videos || []).slice(0, 3).map((v) => {
+    const kind = v.kind || 'FremontTV'
+    return {
+      key: `v-${v.youtubeId}`,
+      type: kind,
+      title: v.title,
+      blurb: v.hosts
+        ? `Hosted by ${v.hosts}`
+        : kind === 'FremontTV' ? 'New FremontTV episode' : `New ${kind.toLowerCase()} video`,
+      href: `https://www.youtube.com/watch?v=${v.youtubeId}`,
+      when: parseDate(v.date),
+      pinned: false,
+    }
+  })
+
+  const albs = (albums || []).slice(0, 3).map((a) => ({
+    key: `f-${a.flickrUrl || a.name}`,
+    type: 'Photos',
+    title: a.name,
+    blurb: a.count ? `${a.count} new photos on Flickr` : 'New album on Flickr',
+    href: a.flickrUrl || null,
+    when: parseDate(a.date),
+    pinned: false,
+  }))
+
+  return [...manual, ...vids, ...albs]
+    .filter((it) => it.title)
+    .sort((x, y) => (Number(y.pinned) - Number(x.pinned)) || ((y.when?.getTime() ?? 0) - (x.when?.getTime() ?? 0)))
+    .slice(0, 6)
+}
+
+function NewsItem({ item, featured }) {
+  const rowCls = `grid grid-cols-[4.25rem_1fr] gap-x-5 py-6 sm:grid-cols-[6rem_1fr] sm:gap-x-8 sm:py-7${item.href ? ' group' : ''}`
+  const inner = (
+    <>
+      <DateRail date={item.when} raw="New" featured={featured} />
+      <div className="min-w-0">
+        <TypeBadge type={item.type} />
+        <h3 className={`mt-2 font-display font-bold leading-snug text-ink ${featured ? 'text-2xl sm:text-3xl' : 'text-lg sm:text-xl'}${item.href ? ' transition-colors group-hover:text-brand' : ''}`}>
+          {item.title}
+        </h3>
+        {item.blurb && (
+          <p className={`mt-2 leading-relaxed text-body ${featured ? 'text-base sm:text-lg' : 'text-sm sm:text-base'}`}>
+            {item.blurb}
+          </p>
+        )}
+        {item.href && (
+          <span className="mt-3 inline-flex min-h-[24px] items-center gap-1.5 font-display text-sm font-bold text-brand">
+            View <Arrow />
+          </span>
+        )}
+      </div>
+    </>
+  )
+  return item.href ? (
+    <a href={item.href} target="_blank" rel="noopener noreferrer" className={rowCls}>{inner}</a>
+  ) : (
+    <div className={rowCls}>{inner}</div>
   )
 }
 
