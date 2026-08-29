@@ -68,6 +68,7 @@ export default function Clubs() {
   const { rows, loading, error, source } = useSheetData(sheets.clubs, clubsJson, { map: normalizeClub })
   const [query, setQuery] = useState('')
   const [showDisbanded, setShowDisbanded] = useState(false)
+  const [showAll, setShowAll] = useState(false)
 
   const clubs = useMemo(
     () => rows.map(normalizeClub).filter((c) => c.name).sort((a, b) => a.name.localeCompare(b.name)),
@@ -83,6 +84,10 @@ export default function Clubs() {
       [c.name, c.purpose, c.studentAdvisors, c.teacherAdvisor, c.meetingInfo].join(' ').toLowerCase().includes(q),
     )
   }, [active, q])
+
+  // Keep the page short: show a first batch, reveal the rest on demand. A search shows every match.
+  const INITIAL_COUNT = 12
+  const visibleResults = q || showAll ? results : results.slice(0, INITIAL_COUNT)
 
   return (
     <>
@@ -162,11 +167,26 @@ export default function Clubs() {
                 </p>
               </div>
             ) : (
-              <ul className="border-t border-rule">
-                {results.map((club, index) => (
-                  <ClubRow key={`${club.name}-${index}`} club={club} />
-                ))}
-              </ul>
+              <>
+                <ul className="border-t border-rule">
+                  {visibleResults.map((club, index) => (
+                    <ClubRow key={`${club.name}-${index}`} club={club} />
+                  ))}
+                </ul>
+                {!q && results.length > INITIAL_COUNT && (
+                  <div className="mt-6 flex justify-center border-t border-rule pt-6">
+                    <button
+                      type="button"
+                      onClick={() => setShowAll((v) => !v)}
+                      aria-expanded={showAll}
+                      className={`inline-flex min-h-[44px] items-center gap-2 rounded-btn border border-rule px-6 font-display text-sm font-bold text-ink ${HOVER_BRAND} [@media(hover:hover)]:hover:border-brand`}
+                    >
+                      {showAll ? 'Show fewer' : `Show all ${results.length} clubs`}
+                      <Chevron open={showAll} />
+                    </button>
+                  </div>
+                )}
+              </>
             )}
 
             {!loading && disbanded.length > 0 && !q && (
