@@ -86,7 +86,7 @@ export default function Clubs() {
   }, [active, q])
 
   // Keep the page short: show a first batch, reveal the rest on demand. A search shows every match.
-  const INITIAL_COUNT = 12
+  const INITIAL_COUNT = 6
   const visibleResults = q || showAll ? results : results.slice(0, INITIAL_COUNT)
 
   return (
