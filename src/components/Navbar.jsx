@@ -10,12 +10,12 @@ const primary = [
   { to: '/photos', label: 'Photos' },
   { to: '/clubs', label: 'Clubs' },
   { to: '/resources', label: 'Resources' },
+  { to: '/opportunities', label: 'Opportunities' },
   { to: '/contact', label: 'Contact' },
 ]
 const more = [
   { to: '/homecoming-court', label: 'Homecoming Court' },
   { to: '/elections', label: 'Elections' },
-  { to: '/opportunities', label: 'Opportunities' },
   { to: '/download-app', label: 'Download the App' },
 ]
 

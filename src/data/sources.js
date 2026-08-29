@@ -53,10 +53,10 @@ export const links = {
 
   // Resources page (placeholders until ASB Tech confirms the real links)
   communityResources: '#',
-  studentWellness: '#',
+  studentWellness: 'https://fhs.fuhsd.org/guidance-student-support/student-wellness-resources',
   fundraiserApproval: '#',
   reimbursements: '#',
-  incomeEligibility: '#',
+  incomeEligibility: 'https://app.informedk12.com/link_campaigns/fuhsd-income-eligibility-form?token=8N8nQUcZx2jhd2HM2dwH4QZr',
 
   // App store links — leave null to show "Coming soon"
   appStore: null,
@@ -74,7 +74,7 @@ export const embeds = {
     'https://docs.google.com/document/d/1Eejgl40HokOrwIrHIZB21hpTecIMvW_AmEOnn9ex7kw/preview',
 
   // Home hero video. Put a file in /public and reference it as "/hero.mp4", or keep the current Wix-hosted URL.
-  heroVideo: 'https://video.wixstatic.com/video/b35fac_b0d9c758e6a044bd86a375a3f74f8bde/1080p/mp4/file.mp4',
+  heroVideo: '/hero.mp4',
   heroPoster: '/photos-neon-nights-2024.jpg',
 }
 
@@ -113,6 +113,6 @@ export const school = {
   address: '575 W Fremont Ave, Sunnyvale, CA 94087',
   mapsUrl: 'https://www.google.com/maps/place/575+W+Fremont+Ave,+Sunnyvale,+CA+94087',
   email: 'fremonthighschoolasb@gmail.com',
-  tagline: 'Fremont You Know!',
+  tagline: 'Fremont! You Know!',
   credit: 'Created and maintained by Fremont ASB Tech',
 }

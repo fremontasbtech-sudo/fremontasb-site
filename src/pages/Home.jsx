@@ -51,7 +51,7 @@ function Hero() {
         <div className="max-w-3xl">
           <p className="eyebrow-on-dark">Fremont High School ASB</p>
           <h1 className="mt-4 font-display text-5xl font-extrabold italic leading-[0.95] tracking-tight text-white sm:text-7xl lg:text-8xl">
-            Fremont<br />You Know!
+            Fremont!<br />You Know!
           </h1>
           <div className="mt-5 h-1 w-14 bg-brand" aria-hidden="true" />
           <p className="mt-5 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">
@@ -154,7 +154,7 @@ const quickLinks = [
   { to: '/media', label: 'Media', note: 'FremontTV episodes and rally videos' },
   { to: '/photos', label: 'Photos', note: 'Event albums on Flickr' },
   { to: '/clubs', label: 'Clubs', note: 'Official list, handbook, renewal forms' },
-  { to: '/school-store', label: 'School Store', note: 'ASB cards, dance tickets, gear' },
+  { to: '/resources', label: 'School Store', note: 'ASB cards, dance tickets, gear' },
 ]
 
 function LatestNews() {
@@ -202,7 +202,7 @@ function LatestNews() {
         <aside className="lg:col-span-4">
           <div>
             {/* The one on-white instance of the brand tagline style (bold italic rust). */}
-            <p className="tagline text-xl sm:text-2xl">Fremont You Know!</p>
+            <p className="tagline text-xl sm:text-2xl">{school.tagline}</p>
             <p className="eyebrow mt-6">Around the site</p>
             <ul className="mt-4 border-t border-rule sm:grid sm:grid-cols-2 sm:gap-x-8 lg:block">
               {quickLinks.map((q) => (
