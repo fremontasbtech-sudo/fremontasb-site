@@ -4,12 +4,18 @@
 // primary_photo_extras asks Flickr for ready-made cover image URLs so we don't
 // have to construct them by hand.
 
+// Flickr non-commercial, READ-ONLY API key for the ASB account. Committed on purpose so
+// the site works on a fresh checkout and on Vercel with zero setup. It can only read the
+// account's public album list, and is trivially regenerated at flickr.com/services/apps/.
+// Override it anytime (e.g. to rotate) by setting the FLICKR_API_KEY env var — no code change.
+const DEFAULT_API_KEY = '50ce36c804dbe7a0ee3942cb833f460c'
+
 export async function fetchAlbums(apiKey, userId) {
-  if (!apiKey) throw new Error('no FLICKR_API_KEY set')
+  const key = apiKey || DEFAULT_API_KEY
   if (!userId) throw new Error('no flickr nsid')
   const params = new URLSearchParams({
     method: 'flickr.photosets.getList',
-    api_key: apiKey,
+    api_key: key,
     user_id: userId,
     primary_photo_extras: 'url_z,url_c,url_m',
     format: 'json',
