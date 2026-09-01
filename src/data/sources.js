@@ -107,6 +107,17 @@ export const flickrFeed = {
   nsid: '199104771@N02',   // flickr.com/people/fremonthighschoolasb
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// MORNING ANNOUNCEMENTS (Home page) — pulled live from the ASB announcements sheet.
+//   The sheet is a weekly Wed/Fri grid holding the whole year. The site pulls it
+//   server-side (/api/announcements, no embed, no key) and shows ONLY announcements
+//   whose morning has passed (8:30 AM cutoff) — so each appears on its Wed/Fri
+//   automatically, no scheduler. To point at a different sheet, change the URL
+//   (must be shared "anyone with the link — Viewer").
+// ─────────────────────────────────────────────────────────────────────────────
+export const announcementsSheet =
+  'https://docs.google.com/spreadsheets/d/1S4-AYwuZXewRqtRoMeHWgITXbuQH7R8r74RmTMegCqQ/edit'
+
 export const school = {
   name: 'Fremont High School ASB',
   year: '2026–27',            // shown on Clubs etc. Update every August.

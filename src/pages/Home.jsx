@@ -10,6 +10,8 @@ import spiritPointsJson from '../data/spiritPoints.json'
 import newsJson from '../data/news.json'
 import mediaOverlay from '../data/media.json'
 import photoAlbums from '../data/photos.json'
+import { useAnnouncements } from '../data/useAnnouncements'
+import { cleanAlbumTitle } from '../data/albumTitle'
 
 /**
  * Home — hero video, Spirit Points ladder, Latest News, Download-the-App band.
@@ -24,6 +26,7 @@ export default function Home() {
     <>
       <Hero />
       <SpiritPoints />
+      <MorningAnnouncements />
       <LatestNews />
       <AppBanner />
     </>
@@ -277,7 +280,7 @@ function buildNews(newsRows, source, videos, albums) {
   const albs = (albums || []).slice(0, 3).map((a) => ({
     key: `f-${a.flickrUrl || a.name}`,
     type: 'Photos',
-    title: a.name,
+    title: cleanAlbumTitle(a.name),
     blurb: a.count ? `${a.count} new photos on Flickr` : 'New album on Flickr',
     href: a.flickrUrl || null,
     when: parseDate(a.date),
@@ -349,6 +352,58 @@ function Arrow({ className = 'text-brand' }) {
       <path d="M4 10h12M11 5l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
+}
+
+/* ─────────────────── 3.5 Morning Announcements ─────────────────── */
+
+/**
+ * Morning Announcements — the recap of what went out over the PA on Wednesday and
+ * Friday mornings, pulled live from the ASB sheet via /api/announcements (never embedded).
+ * Only past mornings show (8:30 AM cutoff, handled in useAnnouncements), so each appears
+ * on its day on its own. We surface the two most recent announcement days.
+ */
+function MorningAnnouncements() {
+  const { days, loading } = useAnnouncements()
+  const recent = days.slice(0, 2)
+  if (!loading && recent.length === 0) return null
+
+  return (
+    <section id="announcements" className="border-t border-rule bg-paper section-space scroll-mt-16">
+      <div className="container-site">
+        <SectionHeader eyebrow="Read on the PA" title="Morning Announcements" />
+        <p className="-mt-3 mb-8 max-w-2xl leading-relaxed text-body sm:mb-10">
+          What went out over the announcements on Wednesday and Friday mornings. Missed them? Here's the recap.
+        </p>
+        {loading && <Loading label="Loading announcements…" />}
+        {recent.length > 0 && (
+          <div className="grid gap-10 md:grid-cols-2 lg:gap-14">
+            {recent.map((day) => (
+              <div key={day.date}>
+                <h3 className="font-display text-xl font-extrabold tracking-tight text-ink sm:text-2xl">
+                  {formatAnnDate(day.date)}
+                </h3>
+                <div className="rule-accent-left" />
+                <ul className="mt-5 space-y-5">
+                  {day.items.map((text, i) => (
+                    <li key={i} className="border-t border-rule pt-5 leading-relaxed text-body first:border-t-0 first:pt-0">
+                      {text}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
+function formatAnnDate(iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso)
+  if (!m) return iso
+  const d = new Date(+m[1], +m[2] - 1, +m[3])
+  return Number.isNaN(d.getTime()) ? iso : d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
 }
 
 /* ───────────────────────── 4. Download the App ───────────────────────── */

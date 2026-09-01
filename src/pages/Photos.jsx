@@ -1,6 +1,7 @@
 import PageHero from '../components/PageHero'
 import Button, { ExternalIcon } from '../components/Button'
 import { links, school } from '../data/sources'
+import { cleanAlbumTitle, formatAlbumMonth } from '../data/albumTitle'
 import fallbackAlbums from '../data/photos.json'
 import { useFlickr } from '../data/useFlickr'
 
@@ -68,16 +69,19 @@ function AlbumCard({ event, featured, ratio }) {
       <div className={`relative aspect-[4/3] w-full grow overflow-hidden bg-rule ${ratio}`}>
         <img
           src={event.coverImageUrl}
-          alt={`${event.name} cover photo`}
+          alt={`${cleanAlbumTitle(event.name)} cover photo`}
           loading={featured ? 'eager' : 'lazy'}
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
         />
       </div>
-      <div className="mt-auto flex items-center justify-between gap-3 p-4 sm:p-5">
-        <h2 className={`font-display text-lg font-bold leading-snug text-ink transition-colors group-hover:text-brand ${featured ? 'lg:text-2xl' : ''}`}>
-          {event.name}
-        </h2>
-        <ExternalIcon className="h-4 w-4 shrink-0 text-brand/70" />
+      <div className="mt-auto flex items-end justify-between gap-3 p-4 sm:p-5">
+        <div className="min-w-0">
+          {event.date && <p className="eyebrow mb-1 text-[0.6rem]">{formatAlbumMonth(event.date)}</p>}
+          <h2 className={`font-display text-lg font-bold leading-snug text-ink transition-colors group-hover:text-brand ${featured ? 'lg:text-2xl' : ''}`}>
+            {cleanAlbumTitle(event.name)}
+          </h2>
+        </div>
+        <ExternalIcon className="mb-1 h-4 w-4 shrink-0 text-brand/70" />
       </div>
     </a>
   )
