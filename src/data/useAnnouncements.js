@@ -7,10 +7,10 @@ import { useEffect, useState } from 'react'
  * The sheet holds the whole year up front, so the site reveals each announcement only
  * once its morning has arrived: we keep entries whose date is in the PAST, using an
  * 8:30 AM local cutoff (when announcements are read Wed/Fri). No cron — the date does it.
- * Returns { days: [{ date, items: [text] }] } newest-first, and { loading }.
+ * Returns { items: [{ date, title, text }] } newest-first (capped), and { loading }.
  */
 export function useAnnouncements() {
-  const [state, setState] = useState({ days: [], loading: true })
+  const [state, setState] = useState({ items: [], loading: true })
 
   useEffect(() => {
     let cancelled = false
@@ -26,17 +26,13 @@ export function useAnnouncements() {
           d.setHours(8, 30, 0, 0) // read over the PA at ~8:30 AM
           return d <= now
         })
-        const map = new Map()
-        for (const a of past) {
-          if (!map.has(a.date)) map.set(a.date, [])
-          map.get(a.date).push(a.text)
-        }
-        const days = [...map.entries()]
-          .map(([date, items]) => ({ date, items }))
+        const items = past
           .sort((x, y) => (x.date < y.date ? 1 : x.date > y.date ? -1 : 0))
-        setState({ days, loading: false })
+          .slice(0, 12)
+          .map((a, i) => ({ ...a, key: `${a.date}-${i}` }))
+        setState({ items, loading: false })
       })
-      .catch(() => { if (!cancelled) setState({ days: [], loading: false }) })
+      .catch(() => { if (!cancelled) setState({ items: [], loading: false }) })
     return () => { cancelled = true }
   }, [])
 

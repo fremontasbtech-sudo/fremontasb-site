@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Button from '../components/Button'
 import SectionHeader from '../components/SectionHeader'
@@ -26,8 +27,8 @@ export default function Home() {
     <>
       <Hero />
       <SpiritPoints />
-      <MorningAnnouncements />
       <LatestNews />
+      <MorningAnnouncements />
       <AppBanner />
     </>
   )
@@ -346,6 +347,14 @@ function parseDate(value) {
 }
 const toIso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 
+function Chevron({ open }) {
+  return (
+    <svg className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <path d="M5 8l5 5 5-5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 function Arrow({ className = 'text-brand' }) {
   return (
     <svg className={`h-5 w-5 shrink-0 transition-transform group-hover:translate-x-0.5 ${className}`} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -359,43 +368,61 @@ function Arrow({ className = 'text-brand' }) {
 /**
  * Morning Announcements — the recap of what went out over the PA on Wednesday and
  * Friday mornings, pulled live from the ASB sheet via /api/announcements (never embedded).
- * Only past mornings show (8:30 AM cutoff, handled in useAnnouncements), so each appears
- * on its day on its own. We surface the two most recent announcement days.
+ * Only past mornings show (8:30 AM cutoff, in useAnnouncements). Collapsed by default:
+ * each row shows a topic title + date, and expands on click — read only the ones you want.
  */
 function MorningAnnouncements() {
-  const { days, loading } = useAnnouncements()
-  const recent = days.slice(0, 2)
-  if (!loading && recent.length === 0) return null
+  const { items, loading } = useAnnouncements()
+  if (!loading && items.length === 0) return null
 
   return (
     <section id="announcements" className="border-t border-rule bg-paper section-space scroll-mt-16">
       <div className="container-site">
         <SectionHeader eyebrow="Read on the PA" title="Morning Announcements" />
-        <p className="-mt-3 mb-8 max-w-2xl leading-relaxed text-body sm:mb-10">
-          What went out over the announcements on Wednesday and Friday mornings. Missed them? Here's the recap.
+        <p className="-mt-3 mb-6 max-w-2xl leading-relaxed text-body sm:mb-8">
+          What went out over the announcements on Wednesday and Friday mornings. Tap one to read it.
         </p>
         {loading && <Loading label="Loading announcements…" />}
-        {recent.length > 0 && (
-          <div className="grid gap-10 md:grid-cols-2 lg:gap-14">
-            {recent.map((day) => (
-              <div key={day.date}>
-                <h3 className="font-display text-xl font-extrabold tracking-tight text-ink sm:text-2xl">
-                  {formatAnnDate(day.date)}
-                </h3>
-                <div className="rule-accent-left" />
-                <ul className="mt-5 space-y-5">
-                  {day.items.map((text, i) => (
-                    <li key={i} className="border-t border-rule pt-5 leading-relaxed text-body first:border-t-0 first:pt-0">
-                      {text}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+        {items.length > 0 && (
+          <ul className="mx-auto max-w-3xl border-t border-rule">
+            {items.map((a) => (
+              <li key={a.key} className="border-b border-rule">
+                <AnnouncementRow item={a} />
+              </li>
             ))}
-          </div>
+          </ul>
         )}
       </div>
     </section>
+  )
+}
+
+function AnnouncementRow({ item }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="group flex w-full min-h-[44px] items-center justify-between gap-4 py-4 text-left"
+      >
+        <span className="min-w-0">
+          <span className="block font-display text-lg font-bold leading-snug text-ink transition-colors group-hover:text-brand">
+            {item.title}
+          </span>
+          <span className="mt-0.5 block text-sm text-body">{formatAnnDate(item.date)}</span>
+        </span>
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-btn text-brand ring-1 ring-inset ring-rule [@media(hover:hover)]:group-hover:bg-brand-tint">
+          <Chevron open={open} />
+        </span>
+      </button>
+      {open && (
+        <div className="pb-5 pr-12">
+          <p className="leading-relaxed text-body [overflow-wrap:anywhere]">{item.text}</p>
+        </div>
+      )}
+    </>
   )
 }
 
