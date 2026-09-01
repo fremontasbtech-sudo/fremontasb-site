@@ -11,8 +11,11 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const sheets = {
-  // Home → Spirit Points Tracker.  Columns: grade | points
-  spiritPoints: null,
+  // Home → Spirit Points Tracker.
+  // Sheet is a matrix: first column = class (Freshmen/Sophomores/Juniors/Seniors),
+  // each following column = an event (BTS Rally, Homecoming, ...). A class's total
+  // is the sum of its row, so adding an event = adding a column. Nothing else to do.
+  spiritPoints: 'https://docs.google.com/spreadsheets/d/1gS0bbOGgpjMpCfeYOUBI4B39oPEtNU-1Y2n1nEWkZ7o/edit?gid=0#gid=0',
 
   // Home → Latest News.  Columns: title | date | blurb   (newest rows first or last — we sort by date)
   news: null,

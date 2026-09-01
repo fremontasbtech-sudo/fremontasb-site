@@ -4,6 +4,7 @@ import Button from '../components/Button'
 import SectionHeader from '../components/SectionHeader'
 import { Loading, Notice, DevNote } from '../components/DataState'
 import { useSheetData, isTrue } from '../data/useSheetData'
+import { useSpiritPoints } from '../data/useSpiritPoints'
 import { useYouTube } from '../data/useYouTube'
 import { useFlickr } from '../data/useFlickr'
 import { sheets, embeds, school } from '../data/sources'
@@ -85,7 +86,7 @@ function Hero() {
 /* ───────────────────────── 2. Spirit Points ───────────────────────── */
 
 function SpiritPoints() {
-  const { rows, loading, error, source } = useSheetData(sheets.spiritPoints, spiritPointsJson)
+  const { rows, loading, error, source } = useSpiritPoints(sheets.spiritPoints, spiritPointsJson)
 
   const classes = rows
     .map((r) => ({ grade: r.grade, classOf: r.classOf, points: Number(String(r.points ?? '').replace(/[^\d.-]/g, '')) || 0 }))
