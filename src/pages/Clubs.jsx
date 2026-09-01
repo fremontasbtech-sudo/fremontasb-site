@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react'
 import PageHero from '../components/PageHero'
 import Button from '../components/Button'
+import Embed from '../components/Embed'
 import SectionHeader from '../components/SectionHeader'
 import { Loading, DevNote } from '../components/DataState'
 import { useSheetData } from '../data/useSheetData'
-import { sheets, links, school } from '../data/sources'
+import { sheets, links, school, embeds } from '../data/sources'
 import clubsJson from '../data/clubs.json'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -96,7 +97,7 @@ export default function Clubs() {
         eyebrow={school.year}
         subtext="Every club that is official this year, who runs it, and where it meets. Officers: the tracker and handbook are your two links."
       >
-        <Button href={links.clubAccountabilityTracker} variant="primary" external>Club Accountability Tracker</Button>
+        <Button href="#accountability-tracker" variant="primary">Club Accountability Tracker</Button>
         <Button href={links.clubHandbook} variant="primary" external>Club Handbook</Button>
         <Button href="#club-list" variant="secondary">Browse the club list</Button>
         <Button href="#start-a-club" variant="secondary">How to start a club</Button>
@@ -214,7 +215,35 @@ export default function Clubs() {
         </div>
       </section>
 
-      {/* ── How to start a club ────────────────────────────────────────────── */}
+      {/* ── Club Accountability Tracker (live preview of the sheet) ─────────── */}
+      <section id="accountability-tracker" className="container-site section-space scroll-mt-20">
+        <div className="grid gap-8 lg:grid-cols-[1fr_18rem] lg:gap-12">
+          <div className="min-w-0">
+            <SectionHeader eyebrow="Live from the sheet" title="Club Accountability Tracker" className="!mb-4" />
+            <Embed
+              src={embeds.clubAccountabilityTracker}
+              title="Club Accountability Tracker"
+              minHeight="70vh"
+              fallback="The accountability tracker isn't shared yet — check with ASB."
+            />
+          </div>
+          <aside>
+            <p className="eyebrow mb-2">How to read it</p>
+            <div className="rule-accent-left mb-4" />
+            <p className="text-sm leading-relaxed text-body">
+              This is the live tracker — it updates as ASB records constitutions, Clubs Day, the monthly
+              check-ins, Grub Day, and strikes. Find your club’s row to see where you stand.
+            </p>
+            <div className="mt-6">
+              <Button href={links.clubAccountabilityTracker} variant="primary" external>
+                Open in Google Sheets
+              </Button>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      {/* ── How to start a club ──────────────────── */}
       {/*
         Copy below is limited to what the old site and the Club Accountability Tracker
         columns confirm: teacher advisor, constitution, submit to ASB, Clubs Day (both

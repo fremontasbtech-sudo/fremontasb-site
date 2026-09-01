@@ -38,7 +38,7 @@ export const sheets = {
 
 export const links = {
   clubAccountabilityTracker:
-    'https://docs.google.com/spreadsheets/d/1R4lCQLhORgiMtezlPA63ERTk_266YjHO4lmydUQQgeA/edit',
+    'https://docs.google.com/spreadsheets/d/1ZpDVioKRc0TDzUSYpGspEOOEEM9TXBVjk8Tl6wzirJE/edit',
   clubHandbook:
     'https://docs.google.com/document/d/1fiowHLXAjMT61OVWanui4NadO_apk0Ufc40KnZYiXng/edit',
   // TODO(26-27): interim 25-26 list — swap to the 26-27 sheet when ready (keep in sync with sheets.clubs above).
@@ -75,6 +75,12 @@ export const embeds = {
   // Contact to update: Ms. Adriana Magallon-Loredo (FUHSD College & Career Center).
   opportunitiesSlides:
     'https://docs.google.com/document/d/1Eejgl40HokOrwIrHIZB21hpTecIMvW_AmEOnn9ex7kw/preview',
+
+  // Clubs page: LIVE PREVIEW of the Club Accountability / Strike Tracker.
+  //   /preview renders a read-only, embeddable view of a "anyone with the link" sheet
+  //   (no "Publish to web" needed). To swap sheets, change the id; keep links.clubAccountabilityTracker in sync.
+  clubAccountabilityTracker:
+    'https://docs.google.com/spreadsheets/d/1ZpDVioKRc0TDzUSYpGspEOOEEM9TXBVjk8Tl6wzirJE/preview',
 
   // Home hero video. Put a file in /public and reference it as "/hero.mp4", or keep the current Wix-hosted URL.
   heroVideo: '/hero.mp4',
