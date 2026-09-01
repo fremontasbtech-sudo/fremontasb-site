@@ -5,6 +5,8 @@
 // (past-only + 8:30 AM cutoff); this just extracts everything with real dates.
 
 const DAY_RE = /\b(mon|tue|tues|wed|weds|thu|thur|thurs|fri)[a-z]*\.?\s+(\d{1,2})\/(\d{1,2})\b/i
+const WEEK_RE = /week of\s+(\d{1,2})\/(\d{1,2})/i
+const DAY_OFFSET = { mon: 0, tue: 1, tues: 1, wed: 2, weds: 2, thu: 3, thur: 3, thurs: 3, fri: 4 }
 
 function toCsvUrl(url) {
   if (!url.includes('docs.google.com/spreadsheets') || url.includes('output=csv')) return url
@@ -61,17 +63,33 @@ export function titleOf(text) {
   return (words.length > 52 ? words.slice(0, 50).trim() + '\u2026' : words) || 'Announcement'
 }
 
+function makeDate(mon, day, now) { return new Date(schoolYearFor(mon, now), mon - 1, day) }
+function mondayOf(d) { const x = new Date(d); const wd = x.getDay(); x.setDate(x.getDate() + (wd === 0 ? -6 : 1 - wd)); return x }
+function isoOf(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}` }
+
+// Each week block starts with "Week of M/D - M/D". We anchor on that week's Monday and place
+// each announcement by its column's WEEKDAY LABEL (Wed = Mon+2, Fri = Mon+4) — NOT the date typed
+// in the header cell, which in this sheet is often off by a day. So a "Wednesday" announcement
+// always goes out on the real Wednesday even when the sheet's date is wrong.
 export function parseAnnouncements(rows, now = new Date()) {
   const out = []
   let colDates = {}
+  let weekMonday = null
   for (const row of rows) {
+    for (const c of row) { const wm = (c || '').match(WEEK_RE); if (wm) weekMonday = mondayOf(makeDate(+wm[1], +wm[2], now)) }
     const dayCells = row.map((c, i) => ({ i, c })).filter((x) => DAY_RE.test(x.c || ''))
     if (dayCells.length >= 2) {
       colDates = {}
       for (const { i, c } of dayCells) {
-        const m = c.match(DAY_RE); const mon = +m[2], day = +m[3]
-        const y = schoolYearFor(mon, now)
-        colDates[i] = `${y}-${String(mon).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+        const m = c.match(DAY_RE)
+        const off = DAY_OFFSET[m[1].toLowerCase()]
+        const headerDate = makeDate(+m[2], +m[3], now)
+        let date = headerDate
+        if (weekMonday && off != null) {
+          const snap = new Date(weekMonday); snap.setDate(snap.getDate() + off)
+          if (Math.abs((snap - headerDate) / 86400000) <= 6) date = snap // correct off-by-days within the week
+        }
+        colDates[i] = isoOf(date)
       }
       continue
     }

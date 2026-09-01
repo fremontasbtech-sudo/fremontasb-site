@@ -381,6 +381,7 @@ function MorningAnnouncements() {
       if (!m.has(a.date)) m.set(a.date, [])
       m.get(a.date).push(a)
     }
+    for (const arr of m.values()) arr.sort((x, y) => x.title.localeCompare(y.title)) // alphabetical by topic
     return m
   }, [items])
   const dates = useMemo(() => [...byDate.keys()].sort((a, b) => (a < b ? 1 : -1)), [byDate])
