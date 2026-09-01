@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Button from '../components/Button'
 import SectionHeader from '../components/SectionHeader'
@@ -373,56 +373,134 @@ function Arrow({ className = 'text-brand' }) {
  */
 function MorningAnnouncements() {
   const { items, loading } = useAnnouncements()
+
+  // Group past announcements by date; the calendar marks each date that has any.
+  const byDate = useMemo(() => {
+    const m = new Map()
+    for (const a of items) {
+      if (!m.has(a.date)) m.set(a.date, [])
+      m.get(a.date).push(a)
+    }
+    return m
+  }, [items])
+  const dates = useMemo(() => [...byDate.keys()].sort((a, b) => (a < b ? 1 : -1)), [byDate])
+
+  const [selected, setSelected] = useState(null)
+  const [view, setView] = useState(null)
+  useEffect(() => {
+    if (dates.length && !selected) {
+      setSelected(dates[0])
+      const [y, mm] = dates[0].split('-').map(Number)
+      setView({ y, m: mm - 1 })
+    }
+  }, [dates, selected])
+
   if (!loading && items.length === 0) return null
+  const dayItems = selected ? byDate.get(selected) || [] : []
 
   return (
     <section id="announcements" className="border-t border-rule bg-paper section-space scroll-mt-16">
       <div className="container-site">
         <SectionHeader eyebrow="Read on the PA" title="Morning Announcements" />
-        <p className="-mt-3 mb-6 max-w-2xl leading-relaxed text-body sm:mb-8">
-          What went out over the announcements on Wednesday and Friday mornings. Tap one to read it.
+        <p className="-mt-3 mb-8 max-w-2xl leading-relaxed text-body">
+          Read over the PA on Wednesday and Friday mornings. Pick a marked day on the calendar to catch that morning&rsquo;s announcements, then tap any headline to open it.
         </p>
         {loading && <Loading label="Loading announcements…" />}
-        {items.length > 0 && (
-          <ul className="mx-auto max-w-3xl border-t border-rule">
-            {items.map((a) => (
-              <li key={a.key} className="border-b border-rule">
-                <AnnouncementRow item={a} />
-              </li>
-            ))}
-          </ul>
+        {view && (
+          <>
+            <div className="mx-auto max-w-md">
+              <Calendar view={view} setView={setView} datesWith={byDate} selected={selected} onSelect={setSelected} />
+            </div>
+
+            <div className="mt-10">
+              {dayItems.length > 0 ? (
+                <>
+                  <h3 className="font-display text-xl font-extrabold tracking-tight text-ink sm:text-2xl">
+                    {formatAnnDate(selected)}
+                  </h3>
+                  <div className="rule-accent-left" />
+                  <ul className="mt-5 divide-y divide-rule border-y border-rule">
+                    {dayItems.map((a) => (
+                      <li key={a.key}><AnnouncementRow item={a} /></li>
+                    ))}
+                  </ul>
+                </>
+              ) : (
+                <p className="text-body">Pick a highlighted day on the calendar to read that morning&rsquo;s announcements.</p>
+              )}
+            </div>
+          </>
         )}
       </div>
     </section>
   )
 }
 
+const DOW = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+
+/** Month calendar. Days with announcements get a rust dot and are clickable; the rest are dim. */
+function Calendar({ view, setView, datesWith, selected, onSelect }) {
+  const { y, m } = view
+  const first = new Date(y, m, 1)
+  const startDow = first.getDay()
+  const days = new Date(y, m + 1, 0).getDate()
+  const label = first.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+  const iso = (d) => `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+  const shift = (delta) => { const nd = new Date(y, m + delta, 1); setView({ y: nd.getFullYear(), m: nd.getMonth() }) }
+  const cells = []
+  for (let i = 0; i < startDow; i++) cells.push(null)
+  for (let d = 1; d <= days; d++) cells.push(d)
+  return (
+    <div className="rounded-lg border border-rule p-4 sm:p-5">
+      <div className="mb-3 flex items-center justify-between">
+        <button type="button" onClick={() => shift(-1)} aria-label="Previous month"
+          className="flex h-9 w-9 items-center justify-center rounded-btn text-lg text-ink [@media(hover:hover)]:hover:bg-brand-tint">&lsaquo;</button>
+        <span className="font-display text-base font-extrabold text-ink">{label}</span>
+        <button type="button" onClick={() => shift(1)} aria-label="Next month"
+          className="flex h-9 w-9 items-center justify-center rounded-btn text-lg text-ink [@media(hover:hover)]:hover:bg-brand-tint">&rsaquo;</button>
+      </div>
+      <div className="grid grid-cols-7 gap-1">
+        {DOW.map((d, i) => (
+          <span key={i} className="pb-1 text-center font-display text-[0.65rem] font-bold uppercase tracking-wider text-body/60">{d}</span>
+        ))}
+        {cells.map((d, i) => {
+          if (d === null) return <span key={i} />
+          const key = iso(d)
+          const has = datesWith.has(key)
+          const isSel = key === selected
+          return (
+            <button key={i} type="button" disabled={!has} onClick={() => onSelect(key)}
+              aria-label={has ? `${label} ${d}, view announcements` : undefined}
+              className={`relative flex h-10 items-center justify-center rounded-btn font-display text-sm transition-colors ${isSel ? 'bg-brand font-bold text-white' : has ? 'font-bold text-ink [@media(hover:hover)]:hover:bg-brand-tint' : 'text-body/35'}`}>
+              {d}
+              {has && !isSel && <span className="absolute bottom-1.5 h-1.5 w-1.5 rounded-full bg-brand" aria-hidden="true" />}
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 function AnnouncementRow({ item }) {
   const [open, setOpen] = useState(false)
   return (
-    <>
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-        className="group flex w-full min-h-[44px] items-center justify-between gap-4 py-4 text-left"
-      >
-        <span className="min-w-0">
-          <span className="block font-display text-lg font-bold leading-snug text-ink transition-colors group-hover:text-brand">
-            {item.title}
-          </span>
-          <span className="mt-0.5 block text-sm text-body">{formatAnnDate(item.date)}</span>
+    <div>
+      <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open}
+        className="group flex w-full min-h-[56px] items-center justify-between gap-4 py-5 text-left">
+        <span className="font-display text-lg font-bold leading-snug text-ink transition-colors group-hover:text-brand sm:text-xl">
+          {item.title}
         </span>
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-btn text-brand ring-1 ring-inset ring-rule [@media(hover:hover)]:group-hover:bg-brand-tint">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-btn text-brand ring-1 ring-inset ring-rule [@media(hover:hover)]:group-hover:bg-brand-tint">
           <Chevron open={open} />
         </span>
       </button>
       {open && (
-        <div className="pb-5 pr-12">
-          <p className="leading-relaxed text-body [overflow-wrap:anywhere]">{item.text}</p>
+        <div className="pb-6">
+          <p className="max-w-4xl text-base leading-relaxed text-body [overflow-wrap:anywhere]">{item.text}</p>
         </div>
       )}
-    </>
+    </div>
   )
 }
 
