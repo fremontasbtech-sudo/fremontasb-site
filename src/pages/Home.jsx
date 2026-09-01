@@ -386,8 +386,11 @@ function MorningAnnouncements() {
   }, [items])
   const dates = useMemo(() => [...byDate.keys()].sort((a, b) => (a < b ? 1 : -1)), [byDate])
   const years = useMemo(() => {
-    const ys = new Set(dates.map((d) => +d.slice(0, 4)))
-    ys.add(new Date().getFullYear())
+    // Cover the current school year (Aug–Jun spans two calendar years) plus any years present.
+    const now = new Date()
+    const startYear = now.getMonth() + 1 >= 7 ? now.getFullYear() : now.getFullYear() - 1
+    const ys = new Set([startYear, startYear + 1, now.getFullYear()])
+    for (const d of dates) ys.add(+d.slice(0, 4))
     return [...ys]
   }, [dates])
   const latest = dates[0] || null
