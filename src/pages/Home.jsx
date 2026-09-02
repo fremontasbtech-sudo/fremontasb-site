@@ -1,5 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
-import Calendar from '../components/Calendar'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Button from '../components/Button'
 import SectionHeader from '../components/SectionHeader'
@@ -30,7 +29,6 @@ export default function Home() {
       <Hero />
       <SpiritPoints />
       <LatestNews />
-      <MorningAnnouncements />
       <AppBanner />
     </>
   )
@@ -171,9 +169,10 @@ function LatestNews() {
   const { rows, loading: newsLoading, source } = useSheetData(sheets.news, newsJson)
   const { rows: videos, loading: vLoading } = useYouTube(mediaOverlay)
   const { albums, loading: aLoading } = useFlickr(photoAlbums)
+  const { items: announcements, loading: annLoading } = useAnnouncements()
 
-  const items = buildNews(rows, source, videos, albums)
-  const loading = (newsLoading || vLoading || aLoading) && items.length === 0
+  const items = buildNews(rows, source, videos, albums, announcements)
+  const loading = (newsLoading || vLoading || aLoading || annLoading) && items.length === 0
 
   return (
     <section id="news" className="border-t border-rule bg-paper section-space scroll-mt-16">
@@ -183,7 +182,7 @@ function LatestNews() {
         <div className="lg:col-span-8">
           <SectionHeader eyebrow="From ASB" title="Latest News" />
           {source !== 'sheet' && (
-            <DevNote>Auto-feed: newest FremontTV episodes + photo albums. Connect sheets.news in sources.js to add written announcements on top.</DevNote>
+            <DevNote>Auto-feed: newest morning announcements, FremontTV episodes + photo albums. Connect sheets.news in sources.js to add written announcements on top.</DevNote>
           )}
           {loading && <Loading label="Loading the latest…" />}
           {!loading && items.length > 0 && (
@@ -252,7 +251,7 @@ function TypeBadge({ type }) {
  *  - Auto items from the already-live feeds: newest FremontTV episodes + photo albums.
  * Result: the section is always real and current, even before anyone writes an announcement.
  */
-function buildNews(newsRows, source, videos, albums) {
+function buildNews(newsRows, source, videos, albums, announcements) {
   const manual = source === 'sheet'
     ? newsRows.filter((n) => n.title).map((n) => ({
         key: `a-${n.title}-${n.date || ''}`,
@@ -290,26 +289,52 @@ function buildNews(newsRows, source, videos, albums) {
     pinned: false,
   }))
 
-  return [...manual, ...vids, ...albs]
+  const anns = (announcements || []).map((a) => ({
+    key: `ann-${a.key || (a.date || '') + a.title}`,
+    type: 'Announcement',
+    title: a.title,
+    blurb: '',
+    text: a.text,          // full PA text — the row expands (dropdown) to show it
+    href: null,
+    when: parseDate(a.date),
+    pinned: false,
+  }))
+
+  return [...manual, ...vids, ...albs, ...anns]
     .filter((it) => it.title)
     .sort((x, y) => (Number(y.pinned) - Number(x.pinned)) || ((y.when?.getTime() ?? 0) - (x.when?.getTime() ?? 0)))
-    .slice(0, 6)
+    .slice(0, 5)
 }
 
 function NewsItem({ item, featured }) {
-  const rowCls = `grid grid-cols-[4.25rem_1fr] gap-x-5 py-6 sm:grid-cols-[6rem_1fr] sm:gap-x-8 sm:py-7${item.href ? ' group' : ''}`
+  const [open, setOpen] = useState(false)
+  const expandable = Boolean(item.text)
+  const interactive = item.href || expandable
+  const rowCls = `grid grid-cols-[4.25rem_1fr] gap-x-5 py-6 sm:grid-cols-[6rem_1fr] sm:gap-x-8 sm:py-7${interactive ? ' group' : ''}`
   const inner = (
     <>
       <DateRail date={item.when} raw="New" featured={featured} />
       <div className="min-w-0">
-        <TypeBadge type={item.type} />
-        <h3 className={`mt-2 font-display font-bold leading-snug text-ink ${featured ? 'text-2xl sm:text-3xl' : 'text-lg sm:text-xl'}${item.href ? ' transition-colors group-hover:text-brand' : ''}`}>
-          {item.title}
-        </h3>
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <TypeBadge type={item.type} />
+            <h3 className={`mt-2 font-display font-bold leading-snug text-ink ${featured ? 'text-2xl sm:text-3xl' : 'text-lg sm:text-xl'}${interactive ? ' transition-colors group-hover:text-brand' : ''}`}>
+              {item.title}
+            </h3>
+          </div>
+          {expandable && (
+            <span className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-btn text-brand ring-1 ring-inset ring-rule [@media(hover:hover)]:group-hover:bg-brand-tint">
+              <Chevron open={open} />
+            </span>
+          )}
+        </div>
         {item.blurb && (
           <p className={`mt-2 leading-relaxed text-body ${featured ? 'text-base sm:text-lg' : 'text-sm sm:text-base'}`}>
             {item.blurb}
           </p>
+        )}
+        {expandable && open && (
+          <p className="mt-3 max-w-4xl text-base leading-relaxed text-body [overflow-wrap:anywhere]">{item.text}</p>
         )}
         {item.href && (
           <span className="mt-3 inline-flex min-h-[24px] items-center gap-1.5 font-display text-sm font-bold text-brand">
@@ -319,6 +344,13 @@ function NewsItem({ item, featured }) {
       </div>
     </>
   )
+  if (expandable) {
+    return (
+      <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className={`${rowCls} w-full text-left`}>
+        {inner}
+      </button>
+    )
+  }
   return item.href ? (
     <a href={item.href} target="_blank" rel="noopener noreferrer" className={rowCls}>{inner}</a>
   ) : (
@@ -363,125 +395,6 @@ function Arrow({ className = 'text-brand' }) {
       <path d="M4 10h12M11 5l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
-}
-
-/* ─────────────────── 3.5 Morning Announcements ─────────────────── */
-
-/**
- * Morning Announcements — the recap of what went out over the PA on Wednesday and
- * Friday mornings, pulled live from the ASB sheet via /api/announcements (never embedded).
- * Only past mornings show (8:30 AM cutoff, in useAnnouncements). Collapsed by default:
- * each row shows a topic title + date, and expands on click — read only the ones you want.
- */
-function MorningAnnouncements() {
-  const { items, loading } = useAnnouncements()
-
-  // Group past announcements by date; the calendar marks each date that has any.
-  const byDate = useMemo(() => {
-    const m = new Map()
-    for (const a of items) {
-      if (!m.has(a.date)) m.set(a.date, [])
-      m.get(a.date).push(a)
-    }
-    for (const arr of m.values()) arr.sort((x, y) => x.title.localeCompare(y.title)) // alphabetical by topic
-    return m
-  }, [items])
-  const dates = useMemo(() => [...byDate.keys()].sort((a, b) => (a < b ? 1 : -1)), [byDate])
-  const years = useMemo(() => {
-    // Cover the current school year (Aug–Jun spans two calendar years) plus any years present.
-    const now = new Date()
-    const startYear = now.getMonth() + 1 >= 7 ? now.getFullYear() : now.getFullYear() - 1
-    const ys = new Set([startYear, startYear + 1, now.getFullYear()])
-    for (const d of dates) ys.add(+d.slice(0, 4))
-    return [...ys]
-  }, [dates])
-  const latest = dates[0] || null
-
-  const [selected, setSelected] = useState(null)
-  const [view, setView] = useState(null)
-  useEffect(() => {
-    if (dates.length && !selected) {
-      setSelected(dates[0])
-      const [y, mm] = dates[0].split('-').map(Number)
-      setView({ y, m: mm - 1 })
-    }
-  }, [dates, selected])
-
-  const jumpLatest = () => {
-    if (!latest) return
-    setSelected(latest)
-    const [y, mm] = latest.split('-').map(Number)
-    setView({ y, m: mm - 1 })
-  }
-
-  if (!loading && items.length === 0) return null
-  const dayItems = selected ? byDate.get(selected) || [] : []
-
-  return (
-    <section id="announcements" className="border-t border-rule bg-paper section-space scroll-mt-16">
-      <div className="container-site">
-        <SectionHeader eyebrow="Read on the PA" title="Morning Announcements" />
-        <p className="-mt-3 mb-8 max-w-2xl leading-relaxed text-body">
-          Read over the PA on Wednesday and Friday mornings. Pick a marked day on the calendar to catch that morning&rsquo;s announcements, then tap any headline to open it.
-        </p>
-        {loading && <Loading label="Loading announcements…" />}
-        {view && (
-          <>
-            <div className="mx-auto max-w-md">
-              <Calendar view={view} setView={setView} datesWith={byDate} selected={selected} onSelect={setSelected} years={years} latest={latest} onJumpLatest={jumpLatest} />
-            </div>
-
-            <div className="mt-10">
-              {dayItems.length > 0 ? (
-                <>
-                  <h3 className="font-display text-xl font-extrabold tracking-tight text-ink sm:text-2xl">
-                    {formatAnnDate(selected)}
-                  </h3>
-                  <div className="rule-accent-left" />
-                  <ul className="mt-5 divide-y divide-rule border-y border-rule">
-                    {dayItems.map((a) => (
-                      <li key={a.key}><AnnouncementRow item={a} /></li>
-                    ))}
-                  </ul>
-                </>
-              ) : (
-                <p className="text-body">Pick a highlighted day on the calendar to read that morning&rsquo;s announcements.</p>
-              )}
-            </div>
-          </>
-        )}
-      </div>
-    </section>
-  )
-}
-
-function AnnouncementRow({ item }) {
-  const [open, setOpen] = useState(false)
-  return (
-    <div>
-      <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open}
-        className="group flex w-full min-h-[56px] items-center justify-between gap-4 py-5 text-left">
-        <span className="font-display text-lg font-bold leading-snug text-ink transition-colors group-hover:text-brand sm:text-xl">
-          {item.title}
-        </span>
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-btn text-brand ring-1 ring-inset ring-rule [@media(hover:hover)]:group-hover:bg-brand-tint">
-          <Chevron open={open} />
-        </span>
-      </button>
-      {open && (
-        <div className="pb-6">
-          <p className="max-w-4xl text-base leading-relaxed text-body [overflow-wrap:anywhere]">{item.text}</p>
-        </div>
-      )}
-    </div>
-  )
-}
-
-function formatAnnDate(iso) {
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso)
-  if (!m) return iso
-  const d = new Date(+m[1], +m[2] - 1, +m[3])
-  return Number.isNaN(d.getTime()) ? iso : d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
 }
 
 /* ───────────────────────── 4. Download the App ───────────────────────── */
