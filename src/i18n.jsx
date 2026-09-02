@@ -1,6 +1,17 @@
 import { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react'
 import { ES } from './data/es'
 
+// Match text regardless of straight vs. curly apostrophes/quotes and whitespace runs,
+// so a dictionary key and the page text resolve even when their punctuation differs.
+const norm = (t) => t
+  .replace(/[\u2018\u2019\u201A\u201B\u2032]/g, String.fromCharCode(39))
+  .replace(/[\u201C\u201D\u201E\u2033]/g, String.fromCharCode(34))
+  .replace(/\s+/g, ' ')
+  .trim()
+const NORM = Object.create(null)
+for (const k in ES) NORM[norm(k)] = ES[k]
+const lookup = (key) => ES[key] || NORM[norm(key)]
+
 /**
  * Lightweight site-wide translation. One curated dictionary (src/data/es.js) maps the
  * site's static English UI to Spanish. When Spanish is on, we translate the visible text
@@ -31,14 +42,14 @@ function translateTree(root, dict) {
     if (!raw) continue
     const key = raw.trim()
     if (!key) continue
-    const val = dict[key]
+    const val = lookup(key)
     if (val && val !== key) node.nodeValue = raw.replace(key, val)
   }
   root.querySelectorAll('[aria-label],[placeholder],[title],img[alt]').forEach((el) => {
     for (const a of ATTRS) {
       const v = el.getAttribute(a)
       if (!v) continue
-      const val = dict[v.trim()]
+      const val = lookup(v.trim())
       if (val && val !== v.trim()) el.setAttribute(a, val)
     }
   })

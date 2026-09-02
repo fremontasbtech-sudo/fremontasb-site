@@ -123,9 +123,9 @@ export default function Media() {
 
 function Meta({ label, children }) {
   return (
-    <div className="flex gap-4">
-      <dt className="w-14 shrink-0 font-display font-bold text-ink">{label}</dt>
-      <dd className="text-body">{children}</dd>
+    <div className="flex flex-wrap gap-x-4 gap-y-0.5">
+      <dt className="shrink-0 whitespace-nowrap font-display font-bold text-ink">{label}</dt>
+      <dd className="min-w-0 text-body">{children}</dd>
     </div>
   )
 }
