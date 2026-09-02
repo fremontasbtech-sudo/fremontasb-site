@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { NavLink, Link, useLocation } from 'react-router-dom'
 import logo from '../assets/fremont-tower.png'
+import { LangToggle } from '../i18n'
 
 // Primary links show in the bar; "More" holds seasonal + secondary pages.
 // Homecoming Court and Elections are separate pages on separate schedules — never merge them.
@@ -91,6 +92,8 @@ export default function Navbar() {
             )}
           </li>
         </ul>
+
+        <LangToggle className="ml-2 mr-1 lg:ml-3" />
 
         {/* Mobile toggle */}
         <button type="button" onClick={() => setOpen((v) => !v)}
