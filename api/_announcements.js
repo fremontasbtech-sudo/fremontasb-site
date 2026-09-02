@@ -104,9 +104,55 @@ export function parseAnnouncements(rows, now = new Date()) {
   return uniq.map((a) => ({ ...a, title: titleOf(a.text) }))
 }
 
-export async function fetchAnnouncements(sheetUrl) {
+const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
+// The sheet has one TAB per month ("September 2026", "October 2026", …). Build the list of
+// tab names for this school year, from August of the start year through the current month
+// (we only ever surface PAST announcements, so future months add nothing).
+function monthTabs(now) {
+  const startYear = (now.getMonth() + 1) >= 7 ? now.getFullYear() : now.getFullYear() - 1
+  const curY = now.getFullYear(), curM = now.getMonth() + 1
+  const tabs = []
+  let y = startYear, m = 8 // August
+  for (let guard = 0; guard < 13; guard++) {
+    tabs.push(`${MONTH_NAMES[m - 1]} ${y}`)
+    if (y === curY && m === curM) break
+    m++; if (m > 12) { m = 1; y++ }
+    if (y > startYear + 1) break
+  }
+  return tabs
+}
+
+function sheetIdOf(url) { return url.match(/\/d\/([a-zA-Z0-9-_]+)/)?.[1] }
+
+async function fetchTab(id, name, now) {
+  const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(name)}`
+  const res = await fetch(url)
+  if (!res.ok) return []
+  const text = await res.text()
+  // A bad/missing tab can still return 200 with a non-CSV error body — parseAnnouncements
+  // simply finds no week/day rows in that case, so this stays safe.
+  if (/<!DOCTYPE html|google\.visualization\.Query/i.test(text)) return []
+  return parseAnnouncements(parseCsvRows(text), now)
+}
+
+// Pull EVERY month tab by name and merge. Falls back to the default sheet (old single-tab
+// layout) if the tabbed fetch turns up nothing, so it keeps working either way.
+export async function fetchAnnouncements(sheetUrl, now = new Date()) {
   if (!sheetUrl) throw new Error('no announcements sheet url')
-  const res = await fetch(toCsvUrl(sheetUrl))
-  if (!res.ok) throw new Error(`sheet ${res.status}`)
-  return parseAnnouncements(parseCsvRows(await res.text()))
+  const id = sheetIdOf(sheetUrl)
+  let items = []
+  if (id) {
+    const perTab = await Promise.all(monthTabs(now).map((name) => fetchTab(id, name, now).catch(() => [])))
+    items = perTab.flat()
+  }
+  if (!items.length) {
+    const res = await fetch(toCsvUrl(sheetUrl))
+    if (!res.ok) throw new Error(`sheet ${res.status}`)
+    items = parseAnnouncements(parseCsvRows(await res.text()), now)
+  }
+  const seen = new Set()
+  const uniq = items.filter((a) => { const k = a.date + '|' + a.text; if (seen.has(k)) return false; seen.add(k); return true })
+  uniq.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0))
+  return uniq
 }
