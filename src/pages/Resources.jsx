@@ -1,6 +1,6 @@
 import PageHero from '../components/PageHero'
 import Button from '../components/Button'
-import { links, school } from '../data/sources'
+import { links, school, resourceLinks } from '../data/sources'
 
 // Six resources, two groups. Links live in src/data/sources.js — a '#' means
 // ASB Tech hasn't confirmed the real URL yet, and the block says so instead of pretending.
@@ -9,7 +9,7 @@ const GROUPS = [
   {
     eyebrow: 'For students',
     title: 'Help, support, and spirit wear',
-    blurb: 'The three links students ask the ASB office for most. Anyone can use them — no club or cabinet needed.',
+    blurb: 'The store students ask the ASB office for most. Community and wellness resources are just below.',
     items: [
       {
         title: 'School Store',
@@ -17,18 +17,6 @@ const GROUPS = [
         body: 'The online store for Fremont spirit wear and ASB purchases, run through MySchoolCentral.',
         href: links.schoolStore,
         cta: 'Open the School Store',
-      },
-      {
-        title: 'ASB Community Resources',
-        body: 'A list of local community resources for Firebirds and their families.',
-        href: links.communityResources,
-        cta: 'View community resources',
-      },
-      {
-        title: 'Student Wellness',
-        body: 'Where students can find support and wellness resources at Fremont.',
-        href: links.studentWellness,
-        cta: 'View wellness resources',
       },
     ],
   },
@@ -89,6 +77,20 @@ export default function Resources() {
         </section>
       ))}
 
+      <LinkListSection
+        eyebrow="Support"
+        title="Community Resources"
+        blurb="Local and national support for Firebirds and their families. If you or someone you know is in crisis, reach out — these lines are free and confidential."
+        groups={resourceLinks.community}
+      />
+
+      <LinkListSection
+        eyebrow="At Fremont"
+        title="Student Wellness"
+        blurb="Wellness support at Fremont: talk to a therapist, get a referral, or reach the wellness staff."
+        groups={resourceLinks.wellness}
+      />
+
       <section className="border-t border-rule">
         <div className="container-site py-10 sm:py-12">
           <p className="text-sm text-body">
@@ -98,6 +100,39 @@ export default function Resources() {
         </div>
       </section>
     </>
+  )
+}
+
+function LinkListSection({ eyebrow, title, blurb, groups }) {
+  return (
+    <section className="container-site section-space border-t border-rule">
+      <div className="grid gap-8 lg:grid-cols-12 lg:gap-14">
+        <div className="lg:col-span-4">
+          <p className="eyebrow mb-2">{eyebrow}</p>
+          <h2 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-ink">{title}</h2>
+          <div className="rule-accent-left" />
+          <p className="mt-5 text-body leading-relaxed">{blurb}</p>
+        </div>
+        <div className="grid gap-x-10 gap-y-6 lg:col-span-8 sm:grid-cols-2">
+          {groups.map((g) => (
+            <div key={g.name}>
+              <h3 className="font-display text-lg font-extrabold tracking-tight text-ink">{g.name}</h3>
+              {g.note && <p className="mt-1 text-sm leading-relaxed text-body">{g.note}</p>}
+              <ul className="mt-2 space-y-1">
+                {g.links.map((l) => (
+                  <li key={l.href}>
+                    <a href={l.href} target="_blank" rel="noopener noreferrer"
+                      className="link-brand inline-flex min-h-[32px] items-center font-display text-sm font-bold">
+                      {l.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   )
 }
 

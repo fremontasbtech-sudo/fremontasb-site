@@ -60,8 +60,8 @@ export const links = {
   // Resources page (placeholders until ASB Tech confirms the real links)
   communityResources: '#',
   studentWellness: 'https://fhs.fuhsd.org/guidance-student-support/student-wellness-resources',
-  fundraiserApproval: '#',
-  reimbursements: '#',
+  fundraiserApproval: 'https://app.informedk12.com/link_campaigns/fundraiser-form-59de5f92-6589-4b27-a103-a684782f1c47?token=1D7o2fJ7jgbtjjbREaZxw2sq',
+  reimbursements: 'https://app.informedk12.com/link_campaigns/check-request-electronic-form-638b46dd-9d91-411d-9056-ca54f5cb63f1?token=nLaHtqkbjGdUbqL1AvB7f3Mp',
   incomeEligibility: 'https://app.informedk12.com/link_campaigns/fuhsd-income-eligibility-form?token=8N8nQUcZx2jhd2HM2dwH4QZr',
 
   // App store links — leave null to show "Coming soon"
@@ -160,5 +160,56 @@ export const clubDates = {
     { iso: '2027-01-27', display: 'Jan 27',    label: 'Club Trivia Night',          type: 'event' },
     { iso: '2027-04-21', display: 'Apr 21',    label: 'Club Grub Day',              type: 'event' },
     { iso: '2027-05-15', display: 'May',       label: 'Club renewals for next year', type: 'process' },
+  ],
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RESOURCE LINK LISTS (Resources page) — ported from the old fremontasb.org
+//   "Community Resources" and "Student Wellness" tabs. Each entry: a name, an
+//   optional note, and one or more { label, href } links. Edit here to update.
+// ─────────────────────────────────────────────────────────────────────────────
+export const resourceLinks = {
+  community: [
+    { name: 'Suicide Prevention', links: [
+      { label: 'American Foundation for Suicide Prevention', href: 'https://afsp.org/' },
+      { label: 'Crisis Text Line', href: 'https://www.crisistextline.org/' },
+      { label: '988 Suicide & Crisis Lifeline', href: 'https://988lifeline.org/' },
+    ] },
+    { name: 'Community Counseling (sliding fee scale)', links: [
+      { label: 'Community Health Awareness Council', href: 'http://www.chacmv.org/clinic/' },
+    ] },
+    { name: 'LGBTQ Resources', links: [
+      { label: 'LGBTQ Youth Space (Billy DeFrank Center)', href: 'http://youthspace.org/locations/the-billy-defrank-center/' },
+      { label: 'PFLAG San Jose', href: 'http://www.pflagsanjose.org/' },
+    ] },
+    { name: 'Grief Support', note: 'Center for Living with Dying · (408) 243-0222', links: [
+      { label: 'Kara Grief Support', href: 'http://www.kara-grief.org/' },
+    ] },
+    { name: 'Emergency Youth Housing', links: [
+      { label: 'Bill Wilson Center', href: 'http://www.billwilsoncenter.org/services/all/drop.html' },
+    ] },
+    { name: 'Child Protective Services', links: [
+      { label: 'Suspected Child Abuse — form & instructions (PDF)', href: 'https://oag.ca.gov/sites/all/files/agweb/pdfs/childabuse/ss_8572.pdf' },
+    ] },
+    { name: 'More resources', links: [
+      { label: 'Books on Mental Health & Wellness (Gale)', href: 'https://infotrac.gale.com/itweb/sunn62370?db=GVRL-0' },
+      { label: 'FUHSD Mental Health Resources', href: 'https://fhs.fuhsd.org/fs/pages/2482' },
+    ] },
+  ],
+  wellness: [
+    { name: 'Wellness Check-In Form', note: 'Request to speak with a school-based therapist or psychologist.', links: [
+      { label: 'Open the check-in form', href: 'https://forms.gle/LREikhxnf1nQRogP6' },
+    ] },
+    { name: 'FUHSD School Linked Services Referral', note: 'Staff referral to the district specialist for community resources.', links: [
+      { label: 'Referral form', href: 'https://docs.google.com/forms/d/e/1FAIpQLSe0dXD7SLYPcq0aa3I4XOr9r1DxKw-5U97nBxvA9CafF12QOA/viewform' },
+    ] },
+    { name: 'Family Community Support Referral', links: [
+      { label: 'Referral form', href: 'https://docs.google.com/forms/d/e/1FAIpQLSe9J4wMxyCWdanv292_306Y6ZW5TvcSkqCWeK0cB43Ggv1Gcw/viewform' },
+    ] },
+    { name: 'Wellness Staff', note: 'Deirdre Louie, LMFT — School-Based Therapist · (408) 522-2487 · A-Building (downstairs).', links: [
+      { label: 'SV Community Services', href: 'https://svcommunityservices.org/' },
+      { label: 'Mayview Community Health', href: 'https://www.mayview.org/' },
+      { label: 'YWCA', href: 'https://www.ywca.org/' },
+    ] },
   ],
 }
