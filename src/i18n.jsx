@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback } from 'react'
+import { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react'
 import { ES } from './data/es'
 
 /**
@@ -71,24 +71,52 @@ export function LanguageProvider({ children }) {
   return <LangCtx.Provider value={{ lang, setLang }}>{children}</LangCtx.Provider>
 }
 
-/** Subtle EN/ES switch used in the navbar. */
+/** Subtle language dropdown used in the navbar: shows the current language, lists both. */
 export function LangToggle({ className = '' }) {
   const { lang, setLang } = useLang()
-  const next = lang === 'es' ? 'en' : 'es'
-  const label = lang === 'es' ? 'English' : 'Español'
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+  useEffect(() => {
+    const onDown = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    const onKey = (e) => { if (e.key === 'Escape') setOpen(false) }
+    document.addEventListener('pointerdown', onDown)
+    window.addEventListener('keydown', onKey)
+    return () => { document.removeEventListener('pointerdown', onDown); window.removeEventListener('keydown', onKey) }
+  }, [])
+  const current = lang === 'es' ? 'Español' : 'English'
+  const options = [{ code: 'en', label: 'English' }, { code: 'es', label: 'Español' }]
+  const choose = (code) => { setOpen(false); if (code !== lang) setLang(code) }
   return (
-    <button
-      type="button"
-      onClick={() => setLang(next)}
-      lang={next}
-      aria-label={lang === 'es' ? 'Switch to English' : 'Cambiar a español'}
-      className={`inline-flex min-h-[44px] items-center gap-1 text-xs font-semibold uppercase tracking-wide text-body/70 transition-colors hover:text-brand ${className}`}
-    >
-      <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
-        <circle cx="10" cy="10" r="7.5" />
-        <path d="M2.5 10h15M10 2.5c2.5 2.4 2.5 12.6 0 15M10 2.5c-2.5 2.4-2.5 12.6 0 15" strokeLinecap="round" />
-      </svg>
-      {label}
-    </button>
+    <div className={`relative ${className}`} ref={ref}>
+      <button type="button" aria-haspopup="true" aria-expanded={open} onClick={() => setOpen((v) => !v)}
+        aria-label="Language / Idioma"
+        className="inline-flex min-h-[44px] items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-body/70 transition-colors hover:text-brand">
+        <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+          <circle cx="10" cy="10" r="7.5" />
+          <path d="M2.5 10h15M10 2.5c2.5 2.4 2.5 12.6 0 15M10 2.5c-2.5 2.4-2.5 12.6 0 15" strokeLinecap="round" />
+        </svg>
+        {current}
+        <svg className={`h-3.5 w-3.5 transition-transform ${open ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+          <path d="M6 8l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+      {open && (
+        <ul className="absolute right-0 top-full z-50 mt-1 w-40 card-surface py-1.5 shadow-lg">
+          {options.map((o) => (
+            <li key={o.code}>
+              <button type="button" onClick={() => choose(o.code)}
+                className={`flex w-full items-center justify-between px-4 py-2.5 text-left font-display text-[15px] font-bold ${o.code === lang ? 'text-brand' : 'text-ink hover:bg-brand-tint hover:text-brand'}`}>
+                {o.label}
+                {o.code === lang && (
+                  <svg className="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+                    <path d="M4 10l4 4 8-8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   )
 }
