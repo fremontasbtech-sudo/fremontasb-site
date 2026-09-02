@@ -293,7 +293,7 @@ function buildNews(newsRows, source, videos, albums) {
   return [...manual, ...vids, ...albs]
     .filter((it) => it.title)
     .sort((x, y) => (Number(y.pinned) - Number(x.pinned)) || ((y.when?.getTime() ?? 0) - (x.when?.getTime() ?? 0)))
-    .slice(0, 6)
+    .slice(0, 5)
 }
 
 function NewsItem({ item, featured }) {
