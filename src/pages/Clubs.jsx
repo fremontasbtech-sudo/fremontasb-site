@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import PageHero from '../components/PageHero'
 import Button from '../components/Button'
 import Embed from '../components/Embed'
+import Calendar from '../components/Calendar'
 import SectionHeader from '../components/SectionHeader'
 import { Loading, DevNote } from '../components/DataState'
 import { useSheetData } from '../data/useSheetData'
@@ -103,8 +104,6 @@ export default function Clubs() {
         <Button href="#club-dates" variant="secondary">Key dates</Button>
         <Button href="#start-a-club" variant="secondary">How to start a club</Button>
       </PageHero>
-
-      <ClubDates />
 
       {/* ── Club list ──────────────────────────────────────────────────────── */}
       <section id="club-list" className="container-site section-space scroll-mt-20">
@@ -217,6 +216,8 @@ export default function Clubs() {
           </div>
         </div>
       </section>
+
+      <ClubDates />
 
       {/* ── Club Accountability Tracker (live preview of the sheet) ─────────── */}
       <section id="accountability-tracker" className="container-site section-space scroll-mt-20">
@@ -439,45 +440,78 @@ function SearchIcon({ className }) {
 
 /* ── Key dates (from the Club Info Meeting deck; data in sources.js clubDates) ── */
 function ClubDates() {
-  const today = new Date().toISOString().slice(0, 10)
-  const items = [...clubDates.items].sort((a, b) => a.iso.localeCompare(b.iso))
-  const nextIso = items.find((it) => it.iso >= today)?.iso
+  const items = useMemo(() => [...clubDates.items].sort((a, b) => a.iso.localeCompare(b.iso)), [])
+  const byDate = useMemo(() => {
+    const m = new Map()
+    for (const it of items) { if (!m.has(it.iso)) m.set(it.iso, []); m.get(it.iso).push(it) }
+    return m
+  }, [items])
+  const datesWith = useMemo(() => new Set(byDate.keys()), [byDate])
+  const years = useMemo(() => [...new Set(items.map((it) => +it.iso.slice(0, 4)))], [items])
+  const todayIso = new Date().toISOString().slice(0, 10)
+  const nextIso = items.find((it) => it.iso >= todayIso)?.iso ?? items[items.length - 1]?.iso
+  const [open, setOpen] = useState(true)
+  const [selected, setSelected] = useState(nextIso)
+  const [view, setView] = useState(() => { const d = new Date((nextIso || todayIso) + 'T00:00:00'); return { y: d.getFullYear(), m: d.getMonth() } })
+  const pick = (iso) => { setSelected(iso); const d = new Date(iso + 'T00:00:00'); setView({ y: d.getFullYear(), m: d.getMonth() }) }
   const dot = { event: 'bg-brand', deadline: 'bg-ink', process: 'bg-body/40' }
+  const nextItem = byDate.get(nextIso)?.[0]
+  const fmt = (iso) => new Date(iso + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+
   return (
-    <section id="club-dates" className="container-site section-space scroll-mt-20">
-      <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
-        <div className="lg:col-span-5">
-          <SectionHeader eyebrow="26–27 calendar" title="Key dates" className="!mb-4" />
-          <p className="text-base leading-relaxed text-body">
-            Clubs Day, the big club nights, and the deadlines that keep your club official — all in one place. ASB emails the details ahead of each one.
-          </p>
-          {clubDates.note && (
-            <p className="mt-4 text-sm leading-relaxed text-body">{clubDates.note}</p>
+    <section id="club-dates" className="scroll-mt-20 border-t border-rule bg-paper">
+      <div className="container-site section-space">
+        <div className="mx-auto max-w-4xl">
+          <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open}
+            className="flex w-full items-center justify-between gap-4 text-left">
+            <span>
+              <span className="eyebrow">26–27 calendar</span>
+              <span className="mt-1 block font-display text-2xl font-extrabold text-ink sm:text-3xl">Club dates</span>
+            </span>
+            <span className="flex items-center gap-3">
+              {nextItem && !open && (
+                <span className="hidden text-sm text-body sm:inline">Next: {nextItem.label} · {fmt(nextIso)}</span>
+              )}
+              <svg viewBox="0 0 20 20" className={`h-5 w-5 shrink-0 text-ink transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M5 8l5 5 5-5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+          </button>
+
+          {open && (
+            <div className="mt-6 grid gap-8 md:grid-cols-2 md:items-start">
+              <Calendar view={view} setView={setView} datesWith={datesWith} selected={selected} onSelect={setSelected}
+                years={years} latest={nextIso} onJumpLatest={() => pick(nextIso)} jumpLabel="next up" />
+              <div className="md:pt-1">
+                <p className="eyebrow mb-3">All dates</p>
+                <ul className="max-h-[19rem] space-y-1 overflow-y-auto pr-1">
+                  {items.map((it, i) => {
+                    const past = it.iso < todayIso
+                    const sel = it.iso === selected
+                    return (
+                      <li key={i}>
+                        <button type="button" onClick={() => pick(it.iso)}
+                          className={`flex w-full items-baseline gap-3 rounded-btn px-2 py-2 text-left transition-colors ${sel ? 'bg-brand-tint' : '[@media(hover:hover)]:hover:bg-brand-tint'} ${past ? 'opacity-45' : ''}`}>
+                          <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${dot[it.type] || 'bg-body/40'}`} />
+                          <span className={`w-16 shrink-0 font-display text-sm font-bold tabular-nums ${sel ? 'text-brand' : 'text-ink'}`}>{it.display}</span>
+                          <span className="min-w-0">
+                            <span className="font-display text-sm font-bold text-ink">{it.label}</span>
+                            {it.detail && <span className="block text-xs text-body">{it.detail}</span>}
+                          </span>
+                        </button>
+                      </li>
+                    )
+                  })}
+                </ul>
+                {clubDates.note && <p className="mt-4 text-xs leading-relaxed text-body">{clubDates.note}</p>}
+                <p className="mt-4 text-[0.7rem] uppercase tracking-wider text-body/70">
+                  <span className="mr-1 inline-block h-2 w-2 rounded-full bg-brand align-middle" />Event
+                  <span className="ml-3 mr-1 inline-block h-2 w-2 rounded-full bg-ink align-middle" />Deadline
+                  <span className="ml-3 mr-1 inline-block h-2 w-2 rounded-full bg-body/40 align-middle" />Milestone
+                </p>
+              </div>
+            </div>
           )}
-          <p className="mt-6 text-xs uppercase tracking-wider text-body">
-            <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-brand align-middle" />Event
-            <span className="ml-4 mr-1.5 inline-block h-2 w-2 rounded-full bg-ink align-middle" />Deadline
-            <span className="ml-4 mr-1.5 inline-block h-2 w-2 rounded-full bg-body/40 align-middle" />Process
-          </p>
-        </div>
-        <div className="lg:col-span-7">
-          <ol className="divide-y divide-rule border-y border-rule">
-            {items.map((it) => {
-              const past = it.iso < today
-              const next = it.iso === nextIso
-              return (
-                <li key={it.iso + it.label} className={`flex items-baseline gap-4 py-4 ${past ? 'opacity-45' : ''}`}>
-                  <span className={`mt-2 h-2.5 w-2.5 shrink-0 rounded-full ${dot[it.type] || 'bg-body/40'}`} />
-                  <span className="w-24 shrink-0 font-display font-bold tabular-nums text-ink">{it.display}</span>
-                  <span className="min-w-0">
-                    <span className="font-display font-bold text-ink">{it.label}</span>
-                    {next && <span className="eyebrow ml-2 text-brand">Next up</span>}
-                    {it.detail && <span className="block text-sm text-body">{it.detail}</span>}
-                  </span>
-                </li>
-              )
-            })}
-          </ol>
         </div>
       </div>
     </section>
