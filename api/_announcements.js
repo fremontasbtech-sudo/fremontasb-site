@@ -136,6 +136,67 @@ async function fetchTab(id, name, now) {
   return parseAnnouncements(parseCsvRows(text), now)
 }
 
+// ── Clean topic titles via an LLM (optional) ──────────────────────────────────
+// The raw announcement is a full paragraph; titleOf() above is a keyword heuristic
+// (guesses, and falls back to the first few words). If an LLM key is set as a Vercel
+// env var — ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY (whichever exists) —
+// we generate a clean 2–5 word topic title per blurb in ONE batched call, cached by
+// blurb text. No key ⇒ we keep the heuristic. Failures never break the feed.
+const titleCache = new Map()
+const TITLE_INSTRUCTION =
+  'You turn a high school\'s morning-announcement blurbs into short topic titles for a website. ' +
+  'For EACH blurb, output a concise title: 2 to 5 words, Title Case, naming the subject ' +
+  '(a club, event, program, deadline, or notice). No ending punctuation, no quotes. ' +
+  'Return ONLY a JSON array of strings, one per blurb, in the same order.'
+
+async function llmTitles(texts) {
+  const AK = process.env.ANTHROPIC_API_KEY, OK = process.env.OPENAI_API_KEY, GK = process.env.GEMINI_API_KEY
+  if (!texts.length || (!AK && !OK && !GK)) return null
+  const payload = JSON.stringify(texts)
+  try {
+    let content
+    if (AK) {
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-api-key': AK, 'anthropic-version': '2023-06-01' },
+        body: JSON.stringify({ model: 'claude-3-5-haiku-latest', max_tokens: 1024,
+          messages: [{ role: 'user', content: TITLE_INSTRUCTION + '\n\nBlurbs:\n' + payload }] }),
+      })
+      if (!r.ok) throw new Error('anthropic ' + r.status)
+      content = (await r.json()).content?.[0]?.text
+    } else if (OK) {
+      const r = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', authorization: `Bearer ${OK}` },
+        body: JSON.stringify({ model: 'gpt-4o-mini', temperature: 0.2,
+          messages: [{ role: 'system', content: TITLE_INSTRUCTION }, { role: 'user', content: payload }] }),
+      })
+      if (!r.ok) throw new Error('openai ' + r.status)
+      content = (await r.json()).choices?.[0]?.message?.content
+    } else {
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GK}`, {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: TITLE_INSTRUCTION + '\n\nBlurbs:\n' + payload }] }] }),
+      })
+      if (!r.ok) throw new Error('gemini ' + r.status)
+      content = (await r.json()).candidates?.[0]?.content?.parts?.[0]?.text
+    }
+    if (!content) return null
+    const arr = JSON.parse((content.match(/\[[\s\S]*\]/) || [content])[0])
+    if (!Array.isArray(arr) || arr.length !== texts.length) return null
+    return arr.map((t) => String(t == null ? '' : t).replace(/^["'\s]+|["'\s.]+$/g, '').trim())
+  } catch (e) { return null }
+}
+
+async function applyTitles(items) {
+  const need = [...new Set(items.map((it) => it.text).filter((t) => !titleCache.has(t)))].slice(0, 80)
+  if (need.length) {
+    const titles = await llmTitles(need)
+    if (titles) need.forEach((t, i) => { if (titles[i]) titleCache.set(t, titles[i]) })
+  }
+  return items.map((it) => ({ ...it, title: titleCache.get(it.text) || it.title }))
+}
+
 // Pull EVERY month tab by name and merge. Falls back to the default sheet (old single-tab
 // layout) if the tabbed fetch turns up nothing, so it keeps working either way.
 export async function fetchAnnouncements(sheetUrl, now = new Date()) {
@@ -154,5 +215,5 @@ export async function fetchAnnouncements(sheetUrl, now = new Date()) {
   const seen = new Set()
   const uniq = items.filter((a) => { const k = a.date + '|' + a.text; if (seen.has(k)) return false; seen.add(k); return true })
   uniq.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0))
-  return uniq
+  return applyTitles(uniq)
 }
