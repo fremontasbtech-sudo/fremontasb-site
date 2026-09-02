@@ -1,6 +1,6 @@
 import PageHero from '../components/PageHero'
 import Button from '../components/Button'
-import { links, school, resourceLinks } from '../data/sources'
+import { links, resourceLinks } from '../data/sources'
 
 // Six resources, two groups. Links live in src/data/sources.js — a '#' means
 // ASB Tech hasn't confirmed the real URL yet, and the block says so instead of pretending.
@@ -53,10 +53,7 @@ const isPlaceholder = (href) => !href || href === '#'
 export default function Resources() {
   return (
     <>
-      <PageHero
-        title="Resources"
-        subtext="The links ASB gets asked for. If a block says “link coming soon,” ASB Tech is still confirming the URL — email us and we’ll send it directly."
-      />
+      <PageHero title="Resources" />
 
       {GROUPS.map((group, i) => (
         <section key={group.eyebrow} className={`container-site section-space ${i > 0 ? 'border-t border-rule' : ''}`}>
@@ -90,15 +87,6 @@ export default function Resources() {
         blurb="Wellness support at Fremont: talk to a therapist, get a referral, or reach the wellness staff."
         groups={resourceLinks.wellness}
       />
-
-      <section className="border-t border-rule">
-        <div className="container-site py-10 sm:py-12">
-          <p className="text-sm text-body">
-            The old Forms link was removed because it no longer worked.
-            Questions about any of the above: <a href={`mailto:${school.email}`} className="link-brand">{school.email}</a>.
-          </p>
-        </div>
-      </section>
     </>
   )
 }
