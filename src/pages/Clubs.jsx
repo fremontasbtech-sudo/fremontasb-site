@@ -5,7 +5,7 @@ import Embed from '../components/Embed'
 import SectionHeader from '../components/SectionHeader'
 import { Loading, DevNote } from '../components/DataState'
 import { useSheetData } from '../data/useSheetData'
-import { sheets, links, school, embeds } from '../data/sources'
+import { sheets, links, school, embeds, clubDates } from '../data/sources'
 import clubsJson from '../data/clubs.json'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -100,8 +100,11 @@ export default function Clubs() {
         <Button href="#accountability-tracker" variant="primary">Club Accountability Tracker</Button>
         <Button href={links.clubHandbook} variant="primary" external>Club Handbook</Button>
         <Button href="#club-list" variant="secondary">Browse the club list</Button>
+        <Button href="#club-dates" variant="secondary">Key dates</Button>
         <Button href="#start-a-club" variant="secondary">How to start a club</Button>
       </PageHero>
+
+      <ClubDates />
 
       {/* ── Club list ──────────────────────────────────────────────────────── */}
       <section id="club-list" className="container-site section-space scroll-mt-20">
@@ -431,6 +434,53 @@ function SearchIcon({ className }) {
       <circle cx="9" cy="9" r="5.5" />
       <path d="M13.5 13.5L17 17" strokeLinecap="round" />
     </svg>
+  )
+}
+
+/* ── Key dates (from the Club Info Meeting deck; data in sources.js clubDates) ── */
+function ClubDates() {
+  const today = new Date().toISOString().slice(0, 10)
+  const items = [...clubDates.items].sort((a, b) => a.iso.localeCompare(b.iso))
+  const nextIso = items.find((it) => it.iso >= today)?.iso
+  const dot = { event: 'bg-brand', deadline: 'bg-ink', process: 'bg-body/40' }
+  return (
+    <section id="club-dates" className="container-site section-space scroll-mt-20">
+      <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
+        <div className="lg:col-span-5">
+          <SectionHeader eyebrow="26–27 calendar" title="Key dates" className="!mb-4" />
+          <p className="text-base leading-relaxed text-body">
+            Clubs Day, the big club nights, and the deadlines that keep your club official — all in one place. ASB emails the details ahead of each one.
+          </p>
+          {clubDates.note && (
+            <p className="mt-4 text-sm leading-relaxed text-body">{clubDates.note}</p>
+          )}
+          <p className="mt-6 text-xs uppercase tracking-wider text-body">
+            <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-brand align-middle" />Event
+            <span className="ml-4 mr-1.5 inline-block h-2 w-2 rounded-full bg-ink align-middle" />Deadline
+            <span className="ml-4 mr-1.5 inline-block h-2 w-2 rounded-full bg-body/40 align-middle" />Process
+          </p>
+        </div>
+        <div className="lg:col-span-7">
+          <ol className="divide-y divide-rule border-y border-rule">
+            {items.map((it) => {
+              const past = it.iso < today
+              const next = it.iso === nextIso
+              return (
+                <li key={it.iso + it.label} className={`flex items-baseline gap-4 py-4 ${past ? 'opacity-45' : ''}`}>
+                  <span className={`mt-2 h-2.5 w-2.5 shrink-0 rounded-full ${dot[it.type] || 'bg-body/40'}`} />
+                  <span className="w-24 shrink-0 font-display font-bold tabular-nums text-ink">{it.display}</span>
+                  <span className="min-w-0">
+                    <span className="font-display font-bold text-ink">{it.label}</span>
+                    {next && <span className="eyebrow ml-2 text-brand">Next up</span>}
+                    {it.detail && <span className="block text-sm text-body">{it.detail}</span>}
+                  </span>
+                </li>
+              )
+            })}
+          </ol>
+        </div>
+      </div>
+    </section>
   )
 }
 

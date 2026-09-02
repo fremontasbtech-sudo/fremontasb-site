@@ -136,3 +136,26 @@ export const school = {
   tagline: 'Fremont! You Know!',
   credit: 'Created and maintained by Fremont ASB Tech',
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CLUB KEY DATES (Clubs page) — the Clubs Commission's 26–27 calendar.
+//   Source: the Club Info Meeting deck. Edit here to change what the site shows.
+//   iso = YYYY-MM-DD (used to sort and to dim dates that have passed / highlight
+//   the next one up). display = how the date reads. type = event | deadline | process.
+// ─────────────────────────────────────────────────────────────────────────────
+export const clubDates = {
+  note: 'New-club applications and renewals for 2026–27 closed August 31. A second application round opens in January.',
+  items: [
+    { iso: '2026-08-31', display: 'Aug 31',    label: 'Applications & renewals due', detail: 'No late submissions', type: 'deadline' },
+    { iso: '2026-09-09', display: 'Sep 2–9',   label: 'New club interviews',        type: 'process' },
+    { iso: '2026-09-10', display: 'Sep 9–10',  label: 'Clubs list finalized',       type: 'process' },
+    { iso: '2026-09-13', display: 'Sep 9–13',  label: 'Clubs Day sign-ups',         type: 'process' },
+    { iso: '2026-09-16', display: 'Sep 16',    label: 'Clubs Day',                  type: 'event' },
+    { iso: '2026-09-30', display: 'Sep 30',    label: 'First monthly check-in due', detail: 'Due 11:59 PM, then the last of every month', type: 'deadline' },
+    { iso: '2026-10-28', display: 'Oct 28',    label: 'Multicultural Night',        type: 'event' },
+    { iso: '2027-01-15', display: 'January',   label: '2nd-semester applications open', type: 'process' },
+    { iso: '2027-01-27', display: 'Jan 27',    label: 'Club Trivia Night',          type: 'event' },
+    { iso: '2027-04-21', display: 'Apr 21',    label: 'Club Grub Day',              type: 'event' },
+    { iso: '2027-05-15', display: 'May',       label: 'Club renewals for next year', type: 'process' },
+  ],
+}
