@@ -98,7 +98,6 @@ export default function Clubs() {
         eyebrow={school.year}
         subtext="Every club that is official this year, who runs it, and where it meets. Officers: the tracker and handbook are your two links."
       >
-        <Button href="#accountability-tracker" variant="primary">Club Accountability Tracker</Button>
         <Button href={links.clubHandbook} variant="primary" external>Club Handbook</Button>
         <Button href="#club-list" variant="secondary">Browse the club list</Button>
         <Button href="#club-dates" variant="secondary">Key dates</Button>
@@ -219,30 +218,31 @@ export default function Clubs() {
 
       <ClubDates />
 
-      {/* ── Club Accountability Tracker (live preview of the sheet) ─────────── */}
-      <section id="accountability-tracker" className="container-site section-space scroll-mt-20">
-        <div className="grid gap-8 lg:grid-cols-[1fr_18rem] lg:gap-12">
+      {/* ── Club Info Meeting slides (smaller preview) ─────────────────────── */}
+      <section id="club-info" className="container-site section-space scroll-mt-20">
+        <div className="grid gap-8 lg:grid-cols-[1fr_18rem] lg:items-start lg:gap-12">
           <div className="min-w-0">
-            <SectionHeader eyebrow="Live from the sheet" title="Club Accountability Tracker" className="!mb-4" />
-            <Embed
-              src={embeds.clubAccountabilityTracker}
-              title="Club Accountability Tracker"
-              minHeight="70vh"
-              fallback="The accountability tracker isn't shared yet — check with ASB."
-            />
+            <SectionHeader eyebrow="New to clubs?" title="Club Info Meeting" className="!mb-4" />
+            <div className="mx-auto max-w-2xl">
+              <Embed
+                src={embeds.clubInfoSlides}
+                title="Club Info Meeting slides"
+                ratio="16 / 9"
+                fallback="The club info slides aren't posted yet — check back soon."
+              />
+            </div>
           </div>
           <aside>
-            <p className="eyebrow mb-2">How to read it</p>
+            <p className="eyebrow mb-2">What's inside</p>
             <div className="rule-accent-left mb-4" />
             <p className="text-sm leading-relaxed text-body">
-              This is the live tracker — it updates as ASB records constitutions, Clubs Day, the monthly
-              check-ins, Grub Day, and strikes. Find your club’s row to see where you stand.
+              The Clubs Commission's info deck: how to start a club, how to stay official, the strike system, and the events for the year. Tap through it here, or open it full screen.
             </p>
-            <div className="mt-6">
-              <Button href={links.clubAccountabilityTracker} variant="primary" external>
-                Open in Google Sheets
-              </Button>
-            </div>
+            {links.clubInfoSlides && (
+              <div className="mt-6">
+                <Button href={links.clubInfoSlides} variant="primary" external>Open the slides</Button>
+              </div>
+            )}
           </aside>
         </div>
       </section>
@@ -287,11 +287,7 @@ export default function Clubs() {
                 <h3 className="font-display text-xl font-extrabold tracking-tight text-ink sm:text-2xl">Staying active</h3>
                 <div className="rule-accent-left" />
                 <p className="mt-4 text-body leading-relaxed">
-                  Once you’re on the list, ASB tracks these on the{' '}
-                  <a href={links.clubAccountabilityTracker} className="link-brand" target="_blank" rel="noopener noreferrer">
-                    Club Accountability Tracker
-                  </a>
-                  . Missed items show up as strikes on the tracker, so check your club’s row.
+                  Once you’re on the list, ASB tracks these on the Club Accountability Tracker. Missed items show up as strikes on the tracker, so check your club’s row.
                 </p>
                 <dl className="mt-6 border-t border-rule">
                   {ACTIVE_REQUIREMENTS.map((r) => (

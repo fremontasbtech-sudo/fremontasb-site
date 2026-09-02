@@ -41,6 +41,9 @@ export const links = {
     'https://docs.google.com/spreadsheets/d/1ZpDVioKRc0TDzUSYpGspEOOEEM9TXBVjk8Tl6wzirJE/edit',
   clubHandbook:
     'https://docs.google.com/document/d/1fiowHLXAjMT61OVWanui4NadO_apk0Ufc40KnZYiXng/edit',
+  // Club Info Meeting deck — normal view link for the "Open the slides" button (embed lives in embeds.clubInfoSlides).
+  clubInfoSlides:
+    'https://docs.google.com/presentation/d/1GV6dM2eOitIWyesUN5ciMVs3Cq9pqc8a-hBYtz1OmIs/edit?usp=sharing',
   // TODO(26-27): interim 25-26 list — swap to the 26-27 sheet when ready (keep in sync with sheets.clubs above).
   clubsListSheet:
     'https://docs.google.com/spreadsheets/d/1M-PZR_C9X4JCqk_uDWEE6MsLFpinhewrbd6oiPRMgqw/edit?gid=0#gid=0',
@@ -76,11 +79,11 @@ export const embeds = {
   opportunitiesSlides:
     'https://docs.google.com/document/d/1Eejgl40HokOrwIrHIZB21hpTecIMvW_AmEOnn9ex7kw/preview',
 
-  // Clubs page: LIVE PREVIEW of the Club Accountability / Strike Tracker.
-  //   /preview renders a read-only, embeddable view of a "anyone with the link" sheet
-  //   (no "Publish to web" needed). To swap sheets, change the id; keep links.clubAccountabilityTracker in sync.
-  clubAccountabilityTracker:
-    'https://docs.google.com/spreadsheets/d/1ZpDVioKRc0TDzUSYpGspEOOEEM9TXBVjk8Tl6wzirJE/preview',
+  // Clubs page: the Clubs Commission's Club Info Meeting deck (Google Slides), previewed on the page.
+  //   /embed is the iframe-friendly Slides URL (works for "anyone with the link"). Swap the id to change decks.
+  //   (The Club Accountability Tracker sheet embed is intentionally not shown for now.)
+  clubInfoSlides:
+    'https://docs.google.com/presentation/d/1GV6dM2eOitIWyesUN5ciMVs3Cq9pqc8a-hBYtz1OmIs/embed?start=false&loop=false&delayms=5000',
 
   // Home hero video. Put a file in /public and reference it as "/hero.mp4", or keep the current Wix-hosted URL.
   heroVideo: '/hero.mp4',
