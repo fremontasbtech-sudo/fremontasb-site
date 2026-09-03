@@ -26,11 +26,13 @@ import { cleanAlbumTitle } from '../data/albumTitle'
  * not image tiles, so a card grid would flatten the hierarchy this page depends on.
  */
 export default function Home() {
+  const { upcoming, recent, loading: eventsLoading } = useEvents()
   return (
     <>
       <Hero />
       <SpiritPoints />
-      <LatestNews />
+      <LatestNews eventsRecent={recent} />
+      <UpcomingEvents items={upcoming} loading={eventsLoading} />
       <MorningAnnouncements />
       <AppBanner />
     </>
@@ -168,14 +170,13 @@ const quickLinks = [
   { to: '/resources', label: 'School Store', note: 'ASB cards, dance tickets, gear' },
 ]
 
-function LatestNews() {
+function LatestNews({ eventsRecent = [] }) {
   const { rows, loading: newsLoading, source } = useSheetData(sheets.news, newsJson)
   const { rows: videos, loading: vLoading } = useYouTube(mediaOverlay)
   const { albums, loading: aLoading } = useFlickr(photoAlbums)
-  const { upcoming: evUpcoming, recent: evRecent, loading: eLoading } = useEvents()
 
-  const items = buildNews(rows, source, videos, albums, evUpcoming, evRecent)
-  const loading = (newsLoading || vLoading || aLoading || eLoading) && items.length === 0
+  const items = buildNews(rows, source, videos, albums, eventsRecent)
+  const loading = (newsLoading || vLoading || aLoading) && items.length === 0
 
   return (
     <section id="news" className="border-t border-rule bg-paper section-space scroll-mt-16">
@@ -255,7 +256,7 @@ function TypeBadge({ type }) {
  *  - Auto items from the already-live feeds: newest FremontTV episodes + photo albums.
  * Result: the section is always real and current, even before anyone writes an announcement.
  */
-function buildNews(newsRows, source, videos, albums, eventsUpcoming = [], eventsRecent = []) {
+function buildNews(newsRows, source, videos, albums, eventsRecent = []) {
   const manual = source === 'sheet'
     ? newsRows.filter((n) => n.title).map((n) => ({
         key: `a-${n.title}-${n.date || ''}`,
@@ -300,11 +301,10 @@ function buildNews(newsRows, source, videos, albums, eventsUpcoming = [], events
   // Curated upcoming events + pinned games (from the shared sheet) lead the feed, soonest
   // first; the dated/recent items fill the rest, freshest first. Cap the lead so real news
   // still shows through.
-  const feed = [...manual, ...vids, ...albs, ...eventsRecent.map((it) => ({ ...it, pinned: false }))]
+  return [...manual, ...vids, ...albs, ...eventsRecent.map((it) => ({ ...it, pinned: false }))]
     .filter((it) => it.title && it.when && it.when >= cutoff)
     .sort((x, y) => (Number(y.pinned) - Number(x.pinned)) || ((y.when?.getTime() ?? 0) - (x.when?.getTime() ?? 0)))
-  const lead = eventsUpcoming.filter((it) => it.title && it.when).slice(0, 3)
-  return [...lead, ...feed].slice(0, 5)
+    .slice(0, 5)
 }
 
 function NewsItem({ item, featured }) {
@@ -373,6 +373,38 @@ function Arrow({ className = 'text-brand' }) {
     <svg className={`h-5 w-5 shrink-0 transition-transform group-hover:translate-x-0.5 ${className}`} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
       <path d="M4 10h12M11 5l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
+  )
+}
+
+/* ───────────────────── 3.25 Upcoming Events ───────────────────── */
+
+/**
+ * Upcoming Events — the curated featured events (+ pinned games) from the shared
+ * sheet, in FORWARD order (soonest first), so it reads like a calendar. Kept
+ * separate from Latest News (which is a newest-first recap) so the two orderings
+ * never mix. Sits right above the Morning Announcements calendar, which is also
+ * forward-ordered. Hidden entirely when nothing is coming up.
+ */
+function UpcomingEvents({ items = [], loading }) {
+  if (!loading && items.length === 0) return null
+  return (
+    <section id="events" className="border-t border-rule bg-paper section-space scroll-mt-16">
+      <div className="container-site">
+        <div className="mx-auto max-w-3xl">
+          <SectionHeader eyebrow="On the calendar" title="Upcoming Events" />
+          {loading && items.length === 0 && <Loading label="Loading upcoming events…" />}
+          {items.length > 0 && (
+            <ol className="divide-y divide-rule border-t border-rule">
+              {items.map((item) => (
+                <li key={item.key}>
+                  <NewsItem item={item} />
+                </li>
+              ))}
+            </ol>
+          )}
+        </div>
+      </div>
+    </section>
   )
 }
 
