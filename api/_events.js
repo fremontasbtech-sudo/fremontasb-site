@@ -1,7 +1,8 @@
 // Shared server-side helper: pull the Firebird Hub "Events (26-27)" Google Sheet
 // (the SAME sheet the app reads) and return the CURATED items only:
 //   • events — Events tab (gid=0) rows where featured = YES
-//   • games  — Sports tab rows where push = y (column A)
+//   • games  — Sports tab rows where push = y (column A) OR that are senior nights
+//             (seniorNight column = YES, or "SENIOR NIGHT" in the title)
 // Public gviz CSV, no key. The CLIENT windows these to the upcoming range
 // (see src/data/useEvents.js); this just extracts every flagged row with a real date.
 
@@ -101,13 +102,16 @@ function parseGames(rows) {
   for (let i = 1; i < rows.length; i++) {
     const r = rows[i]
     const date = normDate(r[2])
-    if (!date) continue        // skip divider/season/info rows (no real date)
-    if (!isYes(r[0])) continue // push flag
+    if (!date) continue                          // skip divider/season/info rows (no real date)
+    const push = isYes(r[0])                      // pinned to the site by a human
+    const title = clean(r[14])
+    const senior = isYes(r[13]) || /senior\s*night/i.test(title) // seniorNight col OR title text
+    if (!push && !senior) continue               // only curated (pinned) OR senior-night games
     out.push({
       sport: clean(r[1]), date, time: clean(r[4]), level: clean(r[5]),
       homeAway: clean(r[6]), opponent: clean(r[7]), location: clean(r[8]),
       section: clean(r[11]).toLowerCase(), score: clean(r[12]),
-      seniorNight: isYes(r[13]), title: clean(r[14]),
+      seniorNight: senior, push, title,
     })
   }
   return out

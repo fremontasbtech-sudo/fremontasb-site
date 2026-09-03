@@ -330,7 +330,12 @@ function NewsItem({ item, featured }) {
     <>
       <DateRail date={item.when} raw="New" featured={featured} />
       <div className="min-w-0">
-        <TypeBadge type={item.type} />
+        <span className="flex flex-wrap items-center gap-2">
+          <TypeBadge type={item.type} />
+          {item.seniorNight && (
+            <span className="inline-flex items-center gap-1 rounded-btn bg-brand px-2 py-0.5 font-display text-[0.65rem] font-bold uppercase tracking-[0.12em] text-white">★ Senior Night</span>
+          )}
+        </span>
         <h3 className={`mt-2 font-display font-bold leading-snug text-ink ${featured ? 'text-2xl sm:text-3xl' : 'text-lg sm:text-xl'}${item.href ? ' transition-colors group-hover:text-brand' : ''}`}>
           {item.title}
         </h3>
