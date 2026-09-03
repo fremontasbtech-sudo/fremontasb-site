@@ -57,10 +57,20 @@ export function titleOf(text) {
     [/audition/i, 'Auditions'],
   ]
   for (const [re, label] of map) if (re.test(text)) return label
+  const tc = (x) => x.replace(/\s+/g, ' ').trim().replace(/\b([a-z])/g, (c) => c.toUpperCase())
+  // "Come join Friday Night Live! …" / "Join the Chess Club at lunch" → the club/thing name
+  let mm = t.match(/\b(?:come\s+)?join\s+(?:the\s+|our\s+)?([^.!?\n]{2,48}?)(?=[.!?]|\s+this\b|\s+at\b|\s+every\b|\s+during\b|\s+on\b|$)/i)
+  if (mm && mm[1]) return tc(mm[1])
+  // "For open tutorials there will be …" → "Open Tutorials"
+  mm = t.match(/^for\s+([^,.!?]{2,40}?)\s+there\s+(?:will\s+be|is|are)\b/i)
+  if (mm && mm[1]) return tc(mm[1])
+  // "The Sunnyvale Library will be outside …" → "Sunnyvale Library"
+  mm = t.match(/^(?:[Tt]he\s+)?([A-Z][^.!?,\n]{2,40}?)\s+(?:will\s+be|will\s+have|is\b|are\b|meets\b|returns\b|opens\b)/)
+  if (mm && mm[1]) return tc(mm[1])
   const m = text.match(/join (?:the |our )?([A-Z][A-Za-z&'\u2019 ]+?(?:Club|Team|Society|Program|Council|Committee|Choir|Band))/)
   if (m) return m[1].replace(/\s+/g, ' ').trim()
-  const words = t.split(' ').slice(0, 7).join(' ').replace(/[.,;:!?]+$/, '')
-  return (words.length > 52 ? words.slice(0, 50).trim() + '\u2026' : words) || 'Announcement'
+  const words = t.split(' ').slice(0, 6).join(' ').replace(/[.,;:!?]+$/, '')
+  return (words.length > 48 ? words.slice(0, 46).trim() + '\u2026' : words) || 'Announcement'
 }
 
 function makeDate(mon, day, now) { return new Date(schoolYearFor(mon, now), mon - 1, day) }

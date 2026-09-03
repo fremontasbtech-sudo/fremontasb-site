@@ -290,8 +290,12 @@ function buildNews(newsRows, source, videos, albums) {
     pinned: false,
   }))
 
+  // Only THIS school year (starts Aug 1 of the school-year start): drop last year's episodes/albums.
+  const nowD = new Date()
+  const syStart = (nowD.getMonth() + 1) >= 7 ? nowD.getFullYear() : nowD.getFullYear() - 1
+  const cutoff = new Date(syStart, 7, 1) // Aug 1
   return [...manual, ...vids, ...albs]
-    .filter((it) => it.title)
+    .filter((it) => it.title && it.when && it.when >= cutoff)
     .sort((x, y) => (Number(y.pinned) - Number(x.pinned)) || ((y.when?.getTime() ?? 0) - (x.when?.getTime() ?? 0)))
     .slice(0, 5)
 }
