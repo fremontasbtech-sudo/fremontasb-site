@@ -179,81 +179,74 @@ function LatestNews({ eventsRecent = [], eventsUpcoming = [], eventsLoading = fa
 
   return (
     <section id="news" className="border-t border-rule bg-paper section-space scroll-mt-16">
-      <div className="container-site grid gap-12 lg:grid-cols-12 lg:gap-16">
-        {/* 8/12 — the feed: written announcements (when a news sheet is connected) blended
-            with the newest FremontTV episodes + photo albums, freshest first. */}
-        <div className="lg:col-span-8">
-          <SectionHeader eyebrow="From ASB" title="Latest News" />
-          {source !== 'sheet' && (
-            <DevNote>Auto-feed: newest FremontTV episodes + photo albums. Connect sheets.news in sources.js to add written announcements on top.</DevNote>
-          )}
-          {loading && <Loading label="Loading the latest…" />}
-          {!loading && items.length > 0 && (
-            <ol className="divide-y divide-rule border-t border-rule">
-              {items.map((item, i) => (
-                <li key={item.key}>
-                  <NewsItem item={item} featured={i === 0} />
-                </li>
-              ))}
-            </ol>
-          )}
-          {!loading && items.length === 0 && <Notice>Nothing posted yet — check back once school events get going.</Notice>}
+      <div className="container-site">
+        {/* Two co-equal columns: the recap (newest first) and the calendar-ahead
+            (soonest first) — same NewsItem rows so they read at the same weight. */}
+        <div className="grid gap-12 lg:grid-cols-2 lg:gap-14">
+          <div>
+            <SectionHeader eyebrow="From ASB" title="Latest News" />
+            {source !== 'sheet' && (
+              <DevNote>Auto-feed: newest FremontTV episodes + photo albums. Connect sheets.news in sources.js to add written announcements on top.</DevNote>
+            )}
+            {loading && <Loading label="Loading the latest…" />}
+            {!loading && items.length > 0 && (
+              <ol className="divide-y divide-rule border-t border-rule">
+                {items.map((item) => (
+                  <li key={item.key}>
+                    <NewsItem item={item} />
+                  </li>
+                ))}
+              </ol>
+            )}
+            {!loading && items.length === 0 && <Notice>Nothing posted yet — check back once school events get going.</Notice>}
+          </div>
+
+          <div>
+            <SectionHeader eyebrow="On the calendar" title="Upcoming Events" />
+            {eventsLoading && eventsUpcoming.length === 0 && <Loading label="Loading upcoming events…" />}
+            {eventsUpcoming.length > 0 && (
+              <ol className="divide-y divide-rule border-t border-rule">
+                {eventsUpcoming.map((item) => (
+                  <li key={item.key}>
+                    <NewsItem item={item} />
+                  </li>
+                ))}
+              </ol>
+            )}
+            {!eventsLoading && eventsUpcoming.length === 0 && <Notice>Nothing coming up in the next three weeks — check back soon.</Notice>}
+          </div>
         </div>
 
-        <aside className="lg:col-span-4 space-y-10">
-          {(eventsLoading || eventsUpcoming.length > 0) && (
-            <div>
-              <p className="eyebrow">On the calendar</p>
-              <h3 className="mt-1 font-display text-xl font-bold text-ink">Upcoming Events</h3>
-              {eventsUpcoming.length > 0 ? (
-                <ul className="mt-4 border-t border-rule">
-                  {eventsUpcoming.map((ev) => (
-                    <li key={ev.key} className="border-b border-rule">
-                      <div className="flex gap-3.5 py-3.5">
-                        <span className="w-14 shrink-0 pt-0.5 font-display text-sm font-bold uppercase leading-tight tracking-wide text-brand tabular-nums">
-                          {ev.when.toLocaleDateString('en-US', { month: 'short' })} {ev.when.getDate()}
-                        </span>
-                        <span className="min-w-0">
-                          <span className="block font-display font-bold leading-snug text-ink">{ev.title}</span>
-                          {ev.meta && <span className="mt-0.5 block text-sm text-body">{ev.meta}</span>}
-                        </span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="mt-4 text-sm text-body">Loading upcoming events…</p>
-              )}
-            </div>
-          )}
-          <div>
+        {/* Around the site — full width beneath both columns, so the nav sits with the
+            page chrome instead of hanging off the bottom of a tall column. */}
+        <div className="mt-14 border-t border-rule pt-10">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+            <p className="eyebrow">Around the site</p>
             {/* The one on-white instance of the brand tagline style (bold italic rust). */}
-            <p className="tagline text-xl sm:text-2xl">{school.tagline}</p>
-            <p className="eyebrow mt-6">Around the site</p>
-            <ul className="mt-4 border-t border-rule sm:grid sm:grid-cols-2 sm:gap-x-8 lg:block">
-              {quickLinks.map((q) => (
-                <li key={q.to} className="border-b border-rule">
-                  <Link to={q.to} className="group flex min-h-[44px] items-center justify-between gap-4 py-4">
-                    <span>
-                      <span className="block font-display text-lg font-bold text-ink transition-colors group-hover:text-brand">{q.label}</span>
-                      <span className="block text-sm text-body">{q.note}</span>
-                    </span>
-                    <Arrow />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-5 text-sm text-body">
-              Questions for ASB?{' '}
-              <a href={`mailto:${school.email}`} className="link-brand">{school.email}</a>
-            </p>
+            <p className="tagline text-lg sm:text-xl">{school.tagline}</p>
           </div>
-        </aside>
+          <ul className="mt-5 grid border-t border-rule sm:grid-cols-2 sm:gap-x-10 lg:grid-cols-4 lg:gap-x-8">
+            {quickLinks.map((q) => (
+              <li key={q.to} className="border-b border-rule">
+                <Link to={q.to} className="group flex min-h-[44px] items-center justify-between gap-4 py-4">
+                  <span>
+                    <span className="block font-display text-lg font-bold text-ink transition-colors group-hover:text-brand">{q.label}</span>
+                    <span className="block text-sm text-body">{q.note}</span>
+                  </span>
+                  <Arrow />
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-6 text-sm text-body">
+            Questions for ASB?{' '}
+            <a href={`mailto:${school.email}`} className="link-brand">{school.email}</a>
+          </p>
+        </div>
       </div>
     </section>
   )
 }
-
 const TYPE_STYLES = {
   Announcement: 'bg-brand-tint text-brand',
   Event: 'bg-brand-tint text-brand',

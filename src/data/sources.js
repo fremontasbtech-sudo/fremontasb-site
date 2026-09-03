@@ -138,8 +138,15 @@ export const announcementsSheet =
 //     description,tags,featured.
 //   * Sports tab: games flagged push = y in column A (type "y" in a game's first
 //     cell to pin it). The 3-hour SportsSync rewrite preserves that y.
-// Pulled server-side (/api/events, keyless); the client shows only the upcoming
-// window. Edit the sheet -- both surfaces update. Keep "anyone with link - Viewer".
+// Pulled server-side (/api/events, keyless); the client (src/data/useEvents.js)
+// windows it for Home -> Upcoming Events with these rules:
+//   * Only the NEXT 3 WEEKS show.
+//   * Featured events: all of them in that window.
+//   * push=y games: only the SOONEST upcoming game PER SPORT shows (one football,
+//     one volleyball...), so flagging a whole season still shows one row at a time;
+//     when that game's day passes it drops out and that sport's next y-game appears
+//     automatically -- no editing needed.
+// Edit the sheet -- both surfaces update. Keep "anyone with link - Viewer".
 // -----------------------------------------------------------------------------
 export const eventsSheet =
   'https://docs.google.com/spreadsheets/d/11Pm2zUc_O40E0oTZekYvsD_D8FenH9s7PiJ43m7JCH0/edit'

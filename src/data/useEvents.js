@@ -5,16 +5,19 @@ import { useEffect, useState } from 'react'
  * (/api/events), the SAME sheet the app reads, so Latest News never drifts from it:
  *   • featured = YES events (Events tab)
  *   • push = y games (Sports tab)
- * The server returns every flagged row; here we window to what belongs in "Latest
- * News" right now — upcoming events/games (next ~6 weeks) and just-finished flagged
- * results (last 2 weeks) — re-evaluated against the CURRENT time each load.
+ * The server returns every flagged row; here we window to what belongs on the home
+ * page right now: featured events + pinned games in the NEXT 3 WEEKS, plus just-
+ * finished flagged results (last 2 weeks). Re-evaluated against the CURRENT time each
+ * load. For games we show only the SOONEST upcoming game per sport (one football, one
+ * volleyball…), so a flagged full season shows one row at a time; when that game's day
+ * passes it drops out and that sport's next y-game takes its place automatically.
  *
  * Instant load: the last response is cached in localStorage and rendered on the spot
  * (no spinner for repeat visitors), then revalidated in the background.
  * Returns { upcoming: [items asc], recent: [items desc], loading }.
  */
 const CACHE_KEY = 'fasb.events.v1'
-const HORIZON_DAYS = 56   // upcoming window (~8 weeks) for Latest News
+const HORIZON_DAYS = 21   // upcoming window: the next 3 weeks only
 const PAST_DAYS = 14      // how long a finished flagged game lingers
 
 function readCache() {
@@ -40,14 +43,14 @@ function shape(data) {
   const start = new Date(); start.setHours(0, 0, 0, 0)
   const horizon = new Date(start); horizon.setDate(horizon.getDate() + HORIZON_DAYS)
   const floor = new Date(start); floor.setDate(floor.getDate() - PAST_DAYS)
-  const upcoming = [], recent = []
+  const evItems = [], recent = []
 
   for (const e of data.events || []) {
     const d = parseIso(e.date); if (!d) continue
     const end = parseIso(e.endDate) || d
     // upcoming or currently running, within the horizon
     if (end >= start && d <= horizon) {
-      upcoming.push({
+      evItems.push({
         key: `ev-${e.date}-${e.name}`, type: 'Event', title: e.name, href: null, when: d,
         blurb: e.description || dashJoin([e.time, e.location]),
         meta: dashJoin([e.time, e.location]),
@@ -55,6 +58,10 @@ function shape(data) {
     }
   }
 
+  // push=y games: keep only the SOONEST upcoming game per sport within the window
+  // (one football, one volleyball…). As each game's day passes it drops out and that
+  // sport's next y-game becomes the soonest, so the calendar rotates on its own.
+  const nextBySport = new Map()
   for (const g of data.games || []) {
     const d = parseIso(g.date); if (!d) continue
     const matchup = `${g.sport}${g.opponent ? ` vs ${g.opponent}` : ''}`.trim()
@@ -63,13 +70,17 @@ function shape(data) {
       if (d >= floor && d < start) {
         recent.push({ key: `gm-${g.date}-${g.sport}`, type: 'Sports', title, href: null, when: d, blurb: dashJoin([`Final ${g.score}`, g.level]) })
       }
-    } else if (d >= start && d <= horizon) {
-      upcoming.push({ key: `gm-${g.date}-${g.sport}`, type: 'Sports', title, href: null, when: d, blurb: dashJoin([g.level, g.time, g.location]), meta: dashJoin([g.level, g.time, g.location]) })
+      continue
+    }
+    if (d < start || d > horizon) continue
+    const prev = nextBySport.get(g.sport)
+    if (!prev || d < prev.when) {
+      nextBySport.set(g.sport, { key: `gm-${g.date}-${g.sport}`, type: 'Sports', title, href: null, when: d, blurb: dashJoin([g.level, g.time, g.location]), meta: dashJoin([g.level, g.time, g.location]) })
     }
   }
 
-  upcoming.sort((a, b) => a.when - b.when)             // soonest first
-  recent.sort((a, b) => b.when - a.when)               // most recent first
+  const upcoming = [...evItems, ...nextBySport.values()].sort((a, b) => a.when - b.when) // soonest first
+  recent.sort((a, b) => b.when - a.when)                                                 // most recent first
   return { upcoming, recent }
 }
 
