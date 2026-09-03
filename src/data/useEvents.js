@@ -50,6 +50,7 @@ function shape(data) {
       upcoming.push({
         key: `ev-${e.date}-${e.name}`, type: 'Event', title: e.name, href: null, when: d,
         blurb: e.description || dashJoin([e.time, e.location]),
+        meta: dashJoin([e.time, e.location]),
       })
     }
   }
@@ -63,7 +64,7 @@ function shape(data) {
         recent.push({ key: `gm-${g.date}-${g.sport}`, type: 'Sports', title, href: null, when: d, blurb: dashJoin([`Final ${g.score}`, g.level]) })
       }
     } else if (d >= start && d <= horizon) {
-      upcoming.push({ key: `gm-${g.date}-${g.sport}`, type: 'Sports', title, href: null, when: d, blurb: dashJoin([g.level, g.time, g.location]) })
+      upcoming.push({ key: `gm-${g.date}-${g.sport}`, type: 'Sports', title, href: null, when: d, blurb: dashJoin([g.level, g.time, g.location]), meta: dashJoin([g.level, g.time, g.location]) })
     }
   }
 

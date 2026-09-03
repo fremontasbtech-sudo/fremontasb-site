@@ -31,8 +31,7 @@ export default function Home() {
     <>
       <Hero />
       <SpiritPoints />
-      <LatestNews eventsRecent={recent} />
-      <UpcomingEvents items={upcoming} loading={eventsLoading} />
+      <LatestNews eventsRecent={recent} eventsUpcoming={upcoming} eventsLoading={eventsLoading} />
       <MorningAnnouncements />
       <AppBanner />
     </>
@@ -170,7 +169,7 @@ const quickLinks = [
   { to: '/resources', label: 'School Store', note: 'ASB cards, dance tickets, gear' },
 ]
 
-function LatestNews({ eventsRecent = [] }) {
+function LatestNews({ eventsRecent = [], eventsUpcoming = [], eventsLoading = false }) {
   const { rows, loading: newsLoading, source } = useSheetData(sheets.news, newsJson)
   const { rows: videos, loading: vLoading } = useYouTube(mediaOverlay)
   const { albums, loading: aLoading } = useFlickr(photoAlbums)
@@ -201,7 +200,32 @@ function LatestNews({ eventsRecent = [] }) {
           {!loading && items.length === 0 && <Notice>Nothing posted yet — check back once school events get going.</Notice>}
         </div>
 
-        <aside className="lg:col-span-4">
+        <aside className="lg:col-span-4 space-y-10">
+          {(eventsLoading || eventsUpcoming.length > 0) && (
+            <div>
+              <p className="eyebrow">On the calendar</p>
+              <h3 className="mt-1 font-display text-xl font-bold text-ink">Upcoming Events</h3>
+              {eventsUpcoming.length > 0 ? (
+                <ul className="mt-4 border-t border-rule">
+                  {eventsUpcoming.map((ev) => (
+                    <li key={ev.key} className="border-b border-rule">
+                      <div className="flex gap-3.5 py-3.5">
+                        <span className="w-14 shrink-0 pt-0.5 font-display text-sm font-bold uppercase leading-tight tracking-wide text-brand tabular-nums">
+                          {ev.when.toLocaleDateString('en-US', { month: 'short' })} {ev.when.getDate()}
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block font-display font-bold leading-snug text-ink">{ev.title}</span>
+                          {ev.meta && <span className="mt-0.5 block text-sm text-body">{ev.meta}</span>}
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-4 text-sm text-body">Loading upcoming events…</p>
+              )}
+            </div>
+          )}
           <div>
             {/* The one on-white instance of the brand tagline style (bold italic rust). */}
             <p className="tagline text-xl sm:text-2xl">{school.tagline}</p>
@@ -373,38 +397,6 @@ function Arrow({ className = 'text-brand' }) {
     <svg className={`h-5 w-5 shrink-0 transition-transform group-hover:translate-x-0.5 ${className}`} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
       <path d="M4 10h12M11 5l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
-  )
-}
-
-/* ───────────────────── 3.25 Upcoming Events ───────────────────── */
-
-/**
- * Upcoming Events — the curated featured events (+ pinned games) from the shared
- * sheet, in FORWARD order (soonest first), so it reads like a calendar. Kept
- * separate from Latest News (which is a newest-first recap) so the two orderings
- * never mix. Sits right above the Morning Announcements calendar, which is also
- * forward-ordered. Hidden entirely when nothing is coming up.
- */
-function UpcomingEvents({ items = [], loading }) {
-  if (!loading && items.length === 0) return null
-  return (
-    <section id="events" className="border-t border-rule bg-paper section-space scroll-mt-16">
-      <div className="container-site">
-        <div className="mx-auto max-w-3xl">
-          <SectionHeader eyebrow="On the calendar" title="Upcoming Events" />
-          {loading && items.length === 0 && <Loading label="Loading upcoming events…" />}
-          {items.length > 0 && (
-            <ol className="divide-y divide-rule border-t border-rule">
-              {items.map((item) => (
-                <li key={item.key}>
-                  <NewsItem item={item} />
-                </li>
-              ))}
-            </ol>
-          )}
-        </div>
-      </div>
-    </section>
   )
 }
 
