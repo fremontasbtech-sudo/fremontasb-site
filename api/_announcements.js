@@ -191,12 +191,20 @@ async function llmTitles(texts) {
       if (!r.ok) throw new Error('openai ' + r.status)
       content = (await r.json()).choices?.[0]?.message?.content
     } else {
-      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GK}`, {
-        method: 'POST', headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: [{ text: TITLE_INSTRUCTION + '\n\nBlurbs:\n' + payload }] }] }),
-      })
-      if (!r.ok) throw new Error('gemini ' + r.status)
-      content = (await r.json()).candidates?.[0]?.content?.parts?.[0]?.text
+      // gemini-flash-latest is a stable alias that always points at the current Flash model,
+      // so this keeps working as Google retires old versions. Falls through a couple of names.
+      const models = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.0-flash']
+      let ok = null
+      for (const model of models) {
+        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', 'x-goog-api-key': GK },
+          body: JSON.stringify({ contents: [{ parts: [{ text: TITLE_INSTRUCTION + '\n\nBlurbs:\n' + payload }] }] }),
+        })
+        if (r.ok) { ok = r; break }
+      }
+      if (!ok) throw new Error('gemini all models failed')
+      content = (await ok.json()).candidates?.[0]?.content?.parts?.[0]?.text
     }
     if (!content) return null
     const arr = JSON.parse((content.match(/\[[\s\S]*\]/) || [content])[0])
