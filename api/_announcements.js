@@ -153,6 +153,7 @@ async function fetchTab(id, name, now) {
 // we generate a clean 2–5 word topic title per blurb in ONE batched call, cached by
 // blurb text. No key ⇒ we keep the heuristic. Failures never break the feed.
 const titleCache = new Map()
+let lastLLMError = ''
 const TITLE_INSTRUCTION = [
   'You write short topic titles for a high school\'s morning announcements, shown on the school website.',
   'For EACH blurb, return a clean title of 2 to 5 words in Title Case that names the specific club, event,',
@@ -194,23 +195,25 @@ async function llmTitles(texts) {
       // gemini-flash-latest is a stable alias that always points at the current Flash model,
       // so this keeps working as Google retires old versions. Falls through a couple of names.
       const models = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.0-flash']
-      let ok = null
+      let ok = null, diag = []
       for (const model of models) {
-        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(GK)}`, {
           method: 'POST',
           headers: { 'content-type': 'application/json', 'x-goog-api-key': GK },
           body: JSON.stringify({ contents: [{ parts: [{ text: TITLE_INSTRUCTION + '\n\nBlurbs:\n' + payload }] }] }),
         })
         if (r.ok) { ok = r; break }
+        diag.push(model + ':' + r.status + ' ' + (await r.text()).slice(0, 120))
       }
-      if (!ok) throw new Error('gemini all models failed')
+      if (!ok) throw new Error('gemini ' + diag.join(' | '))
       content = (await ok.json()).candidates?.[0]?.content?.parts?.[0]?.text
     }
     if (!content) return null
     const arr = JSON.parse((content.match(/\[[\s\S]*\]/) || [content])[0])
     if (!Array.isArray(arr) || arr.length !== texts.length) return null
+    lastLLMError = ''
     return arr.map((t) => String(t == null ? '' : t).replace(/^["'\s]+|["'\s.]+$/g, '').trim())
-  } catch (e) { return null }
+  } catch (e) { lastLLMError = String(e && e.message || e).slice(0, 300); return null }
 }
 
 async function applyTitles(items) {
@@ -222,6 +225,7 @@ async function applyTitles(items) {
   }
   const out = items.map((it) => ({ ...it, title: titleCache.get(it.text) || it.title }))
   out.titleSource = usedLLM ? 'llm' : 'heuristic'
+  out.titleError = usedLLM ? '' : lastLLMError
   return out
 }
 
