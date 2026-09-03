@@ -194,7 +194,7 @@ async function llmTitles(texts) {
     } else {
       // gemini-flash-latest is a stable alias that always points at the current Flash model,
       // so this keeps working as Google retires old versions. Falls through a couple of names.
-      const models = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.0-flash']
+      const models = ['gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-2.0-flash']
       let ok = null, diag = []
       for (const model of models) {
         const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(GK)}`, {
