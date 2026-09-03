@@ -75,7 +75,7 @@ function shape(data) {
         const k = `${g.sport}|${g.date}`
         const prev = recentBy.get(k)
         if (!prev || prioOf(g) > prev.prio) {
-          recentBy.set(k, { prio: prioOf(g), item: { key: `gm-${g.date}-${g.sport}`, type: 'Sports', title, href: null, when: d, seniorNight: isSenior, blurb: dashJoin([`Final ${g.score}`, g.level]) } })
+          recentBy.set(k, { prio: prioOf(g), item: { key: `gm-${g.date}-${g.sport}`, type: 'Sports', title, href: null, when: d, seniorNight: isSenior, blurb: dashJoin([isSenior ? 'Senior Night' : '', `Final ${g.score}`, g.level]) } })
         }
       }
       continue
@@ -83,7 +83,7 @@ function shape(data) {
     if (d < start || d > horizon) continue
     const prev = nextBySport.get(g.sport)
     if (!prev || d < prev.when || (d.getTime() === prev.when.getTime() && prioOf(g) > prev.prio)) {
-      nextBySport.set(g.sport, { when: d, prio: prioOf(g), item: { key: `gm-${g.date}-${g.sport}`, type: 'Sports', title, href: null, when: d, seniorNight: isSenior, blurb: dashJoin([g.level, g.time, g.location]), meta: dashJoin([g.level, g.time, g.location]) } })
+      nextBySport.set(g.sport, { when: d, prio: prioOf(g), item: { key: `gm-${g.date}-${g.sport}`, type: 'Sports', title, href: null, when: d, seniorNight: isSenior, blurb: dashJoin([isSenior ? 'Senior Night' : '', g.level, g.time, g.location]), meta: dashJoin([isSenior ? 'Senior Night' : '', g.level, g.time, g.location]) } })
     }
   }
   for (const v of recentBy.values()) recent.push(v.item)
