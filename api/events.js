@@ -8,7 +8,10 @@ import { eventsSheet } from '../src/data/sources.js'
 export default async function handler(req, res) {
   try {
     const { events, games } = await fetchEvents(eventsSheet)
-    res.setHeader('Cache-Control', 's-maxage=900, stale-while-revalidate=3600')
+    // Short CDN cache so sheet edits (adding/removing a featured=YES or push=y flag)
+    // show up within ~a minute instead of up to 15. Keyless + tiny payload, so re-running
+    // the function this often is cheap; stale-while-revalidate keeps it instant meanwhile.
+    res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=300')
     res.status(200).json({ events, games })
   } catch (err) {
     res.status(200).json({ events: [], games: [], error: String(err && err.message || err) })
