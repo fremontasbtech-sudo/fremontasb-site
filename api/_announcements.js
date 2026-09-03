@@ -153,11 +153,18 @@ async function fetchTab(id, name, now) {
 // we generate a clean 2–5 word topic title per blurb in ONE batched call, cached by
 // blurb text. No key ⇒ we keep the heuristic. Failures never break the feed.
 const titleCache = new Map()
-const TITLE_INSTRUCTION =
-  'You turn a high school\'s morning-announcement blurbs into short topic titles for a website. ' +
-  'For EACH blurb, output a concise title: 2 to 5 words, Title Case, naming the subject ' +
-  '(a club, event, program, deadline, or notice). No ending punctuation, no quotes. ' +
-  'Return ONLY a JSON array of strings, one per blurb, in the same order.'
+const TITLE_INSTRUCTION = [
+  'You write short topic titles for a high school\'s morning announcements, shown on the school website.',
+  'For EACH blurb, return a clean title of 2 to 5 words in Title Case that names the specific club, event,',
+  'program, deadline, or notice. Drop greetings ("Hey Fremont"), filler, dates, room numbers and calls to action.',
+  'Examples:',
+  '"Come join Friday Night Live! This club meets every Thursday..." -> "Friday Night Live"',
+  '"For open tutorials there will be Yoga in the Nest on Wednesdays..." -> "Open Tutorials"',
+  '"The Sunnyvale Library will be outside the FHS Library today during lunch..." -> "Sunnyvale Library Visit"',
+  '"Hey Fremont! Are you interested in space? Join Astrophysics Club..." -> "Astrophysics Club"',
+  '"If you like folklore and acting, audition for the Haunted House..." -> "Haunted House Auditions"',
+  'No ending punctuation, no quotes around the title. Return ONLY a JSON array of strings, one per blurb, in the same order.',
+].join(' ')
 
 async function llmTitles(texts) {
   const AK = process.env.ANTHROPIC_API_KEY, OK = process.env.OPENAI_API_KEY, GK = process.env.GEMINI_API_KEY
