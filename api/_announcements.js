@@ -207,11 +207,14 @@ async function llmTitles(texts) {
 
 async function applyTitles(items) {
   const need = [...new Set(items.map((it) => it.text).filter((t) => !titleCache.has(t)))].slice(0, 80)
+  let usedLLM = false
   if (need.length) {
     const titles = await llmTitles(need)
-    if (titles) need.forEach((t, i) => { if (titles[i]) titleCache.set(t, titles[i]) })
+    if (titles) { usedLLM = true; need.forEach((t, i) => { if (titles[i]) titleCache.set(t, titles[i]) }) }
   }
-  return items.map((it) => ({ ...it, title: titleCache.get(it.text) || it.title }))
+  const out = items.map((it) => ({ ...it, title: titleCache.get(it.text) || it.title }))
+  out.titleSource = usedLLM ? 'llm' : 'heuristic'
+  return out
 }
 
 // Pull EVERY month tab by name and merge. Falls back to the default sheet (old single-tab
