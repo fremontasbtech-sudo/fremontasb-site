@@ -130,6 +130,20 @@ export const flickrFeed = {
 export const announcementsSheet =
   'https://docs.google.com/spreadsheets/d/1S4-AYwuZXewRqtRoMeHWgITXbuQH7R8r74RmTMegCqQ/edit'
 
+// -----------------------------------------------------------------------------
+// EVENTS + SPORTS -- the SAME sheet the Firebird Hub app reads, so website + app
+// never drift. Home -> Latest News surfaces the curated items:
+//   * Events tab (gid=0): rows flagged featured = YES (ASB highlights the row red;
+//     an Apps Script turns red -> YES). Cols: name,date,endDate,time,location,
+//     description,tags,featured.
+//   * Sports tab: games flagged push = y in column A (type "y" in a game's first
+//     cell to pin it). The 3-hour SportsSync rewrite preserves that y.
+// Pulled server-side (/api/events, keyless); the client shows only the upcoming
+// window. Edit the sheet -- both surfaces update. Keep "anyone with link - Viewer".
+// -----------------------------------------------------------------------------
+export const eventsSheet =
+  'https://docs.google.com/spreadsheets/d/11Pm2zUc_O40E0oTZekYvsD_D8FenH9s7PiJ43m7JCH0/edit'
+
 export const school = {
   name: 'Fremont High School ASB',
   year: '2026–27',            // shown on Clubs etc. Update every August.

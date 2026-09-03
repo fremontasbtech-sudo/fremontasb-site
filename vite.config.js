@@ -3,7 +3,8 @@ import react from '@vitejs/plugin-react'
 import { fetchChannelVideos } from './api/_feed.js'
 import { fetchAlbums } from './api/_flickr.js'
 import { fetchAnnouncements } from './api/_announcements.js'
-import { youtubeFeed, flickrFeed, announcementsSheet } from './src/data/sources.js'
+import { fetchEvents } from './api/_events.js'
+import { youtubeFeed, flickrFeed, announcementsSheet, eventsSheet } from './src/data/sources.js'
 
 // Dev-only: serve the same /api/* endpoints the Vercel functions serve in
 // production, so the Media and Photos pages auto-pull live data on localhost too.
@@ -33,6 +34,14 @@ function devApi(flickrKey) {
           res.end(JSON.stringify({ announcements: await fetchAnnouncements(announcementsSheet) }))
         } catch (err) {
           res.end(JSON.stringify({ announcements: [], error: String(err && err.message || err) }))
+        }
+      })
+      server.middlewares.use('/api/events', async (_req, res) => {
+        res.setHeader('Content-Type', 'application/json')
+        try {
+          res.end(JSON.stringify(await fetchEvents(eventsSheet)))
+        } catch (err) {
+          res.end(JSON.stringify({ events: [], games: [], error: String(err && err.message || err) }))
         }
       })
     },

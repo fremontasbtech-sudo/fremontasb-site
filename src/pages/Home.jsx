@@ -14,6 +14,7 @@ import newsJson from '../data/news.json'
 import mediaOverlay from '../data/media.json'
 import photoAlbums from '../data/photos.json'
 import { useAnnouncements } from '../data/useAnnouncements'
+import { useEvents } from '../data/useEvents'
 import { cleanAlbumTitle } from '../data/albumTitle'
 
 /**
@@ -171,9 +172,10 @@ function LatestNews() {
   const { rows, loading: newsLoading, source } = useSheetData(sheets.news, newsJson)
   const { rows: videos, loading: vLoading } = useYouTube(mediaOverlay)
   const { albums, loading: aLoading } = useFlickr(photoAlbums)
+  const { upcoming: evUpcoming, recent: evRecent, loading: eLoading } = useEvents()
 
-  const items = buildNews(rows, source, videos, albums)
-  const loading = (newsLoading || vLoading || aLoading) && items.length === 0
+  const items = buildNews(rows, source, videos, albums, evUpcoming, evRecent)
+  const loading = (newsLoading || vLoading || aLoading || eLoading) && items.length === 0
 
   return (
     <section id="news" className="border-t border-rule bg-paper section-space scroll-mt-16">
@@ -231,6 +233,7 @@ const TYPE_STYLES = {
   Announcement: 'bg-brand-tint text-brand',
   Event: 'bg-brand-tint text-brand',
   Rally: 'bg-brand-tint text-brand',
+  Sports: 'bg-brand-tint text-brand',
   FremontTV: 'bg-ink/5 text-ink',
   Photos: 'bg-ink/5 text-ink',
 }
@@ -252,7 +255,7 @@ function TypeBadge({ type }) {
  *  - Auto items from the already-live feeds: newest FremontTV episodes + photo albums.
  * Result: the section is always real and current, even before anyone writes an announcement.
  */
-function buildNews(newsRows, source, videos, albums) {
+function buildNews(newsRows, source, videos, albums, eventsUpcoming = [], eventsRecent = []) {
   const manual = source === 'sheet'
     ? newsRows.filter((n) => n.title).map((n) => ({
         key: `a-${n.title}-${n.date || ''}`,
@@ -294,10 +297,14 @@ function buildNews(newsRows, source, videos, albums) {
   const nowD = new Date()
   const syStart = (nowD.getMonth() + 1) >= 7 ? nowD.getFullYear() : nowD.getFullYear() - 1
   const cutoff = new Date(syStart, 7, 1) // Aug 1
-  return [...manual, ...vids, ...albs]
+  // Curated upcoming events + pinned games (from the shared sheet) lead the feed, soonest
+  // first; the dated/recent items fill the rest, freshest first. Cap the lead so real news
+  // still shows through.
+  const feed = [...manual, ...vids, ...albs, ...eventsRecent.map((it) => ({ ...it, pinned: false }))]
     .filter((it) => it.title && it.when && it.when >= cutoff)
     .sort((x, y) => (Number(y.pinned) - Number(x.pinned)) || ((y.when?.getTime() ?? 0) - (x.when?.getTime() ?? 0)))
-    .slice(0, 5)
+  const lead = eventsUpcoming.filter((it) => it.title && it.when).slice(0, 3)
+  return [...lead, ...feed].slice(0, 5)
 }
 
 function NewsItem({ item, featured }) {
