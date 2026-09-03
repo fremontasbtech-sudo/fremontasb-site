@@ -41,51 +41,73 @@ async function fetchRows(url) {
 }
 
 const clean = (t) => String(t || '').replace(/\s+/g, ' ').trim()
+const pad = (n) => String(n).padStart(2, '0')
 
-// Events tab has a clean header row (name,date,endDate,time,location,description,tags,featured).
+// Tolerant "is this cell flagged?" — accepts y, yes, true, x, ✓, 1, done (any case,
+// stray spaces), so a human typing "Y", "Yes", "x", etc. still counts. Blank = no.
+const isYes = (v) => {
+  const t = clean(v).toLowerCase()
+  return t !== '' && (t === 'y' || t === 'yes' || t === 'true' || t === 'x' || t === '✓' || t === '1' || t === 'done' || t.startsWith('y'))
+}
+
+// Normalize a date cell to YYYY-MM-DD. Accepts ISO (2026-09-16) OR US M/D/YYYY,
+// M/D/YY (9/16/2026, 9/16/26). Anything else (blank, banner rows, "Use this red")
+// returns '' and is skipped — that's also how divider/legend rows drop out.
+function normDate(v) {
+  const s = clean(v)
+  let m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(s)
+  if (m) return `${m[1]}-${pad(m[2])}-${pad(m[3])}`
+  m = /^(\d{1,2})[/](\d{1,2})[/](\d{2,4})$/.exec(s)
+  if (m) { let y = +m[3]; if (y < 100) y += 2000; return `${y}-${pad(m[1])}-${pad(m[2])}` }
+  return ''
+}
+
+// Events tab header: name,date,endDate,time,location,description,tags,featured.
+// Column lookup is by header name (order-independent) with safe fallbacks so a
+// renamed/moved header can't silently blank the whole feed.
 function parseEvents(rows) {
   if (!rows.length) return []
   const head = rows[0].map((h) => clean(h).toLowerCase())
   const col = (n) => head.indexOf(n)
   const ci = {
-    name: col('name'), date: col('date'), endDate: col('enddate'), time: col('time'),
-    location: col('location'), description: col('description'), tags: col('tags'), featured: col('featured'),
+    name: col('name') >= 0 ? col('name') : 0,
+    date: col('date') >= 0 ? col('date') : 1,
+    endDate: col('enddate'), time: col('time'), location: col('location'),
+    description: col('description'), tags: col('tags'),
+    featured: col('featured') >= 0 ? col('featured') : head.length - 1, // last col by convention
   }
+  const get = (r, i) => (i >= 0 ? clean(r[i]) : '')
   const out = []
   for (let i = 1; i < rows.length; i++) {
     const r = rows[i]
-    const date = clean(r[ci.date])
-    if (!ISO_RE.test(date)) continue // skips the "Use this red -->" legend row and blanks
-    if (clean(r[ci.featured]).toUpperCase() !== 'YES') continue
+    const date = normDate(r[ci.date])
+    if (!date) continue                // skips the "Use this red -->" legend row and blanks
+    if (!isYes(r[ci.featured])) continue
     out.push({
-      name: clean(r[ci.name]),
-      date,
-      endDate: ISO_RE.test(clean(r[ci.endDate])) ? clean(r[ci.endDate]) : '',
-      time: clean(r[ci.time]),
-      location: clean(r[ci.location]),
-      description: clean(r[ci.description]),
-      tags: clean(r[ci.tags]),
+      name: get(r, ci.name), date, endDate: normDate(r[ci.endDate]),
+      time: get(r, ci.time), location: get(r, ci.location),
+      description: get(r, ci.description), tags: get(r, ci.tags),
     })
   }
   return out.filter((e) => e.name)
 }
 
-// Sports tab: merged banner mangles the col-A header, so read push (col 0) and the
-// rest by POSITION, not header name. Layout:
+// Sports tab: the merged season banner mangles the col-A header, so read push (col 0)
+// and the rest by POSITION, not header name. Layout:
 // 0 push, 1 sport, 2 date, 3 day, 4 time, 5 level, 6 homeAway, 7 opponent,
 // 8 location, 9 type, 10 kind, 11 section, 12 score, 13 seniorNight, 14 title
 function parseGames(rows) {
   const out = []
   for (let i = 1; i < rows.length; i++) {
     const r = rows[i]
-    const date = clean(r[2])
-    if (!ISO_RE.test(date)) continue // skip divider/season/info rows
-    if (clean(r[0]).toLowerCase() !== 'y') continue // push flag
+    const date = normDate(r[2])
+    if (!date) continue        // skip divider/season/info rows (no real date)
+    if (!isYes(r[0])) continue // push flag
     out.push({
       sport: clean(r[1]), date, time: clean(r[4]), level: clean(r[5]),
       homeAway: clean(r[6]), opponent: clean(r[7]), location: clean(r[8]),
       section: clean(r[11]).toLowerCase(), score: clean(r[12]),
-      seniorNight: clean(r[13]).toUpperCase() === 'YES', title: clean(r[14]),
+      seniorNight: isYes(r[13]), title: clean(r[14]),
     })
   }
   return out

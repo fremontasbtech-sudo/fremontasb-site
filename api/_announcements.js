@@ -12,7 +12,7 @@ function toCsvUrl(url) {
   if (!url.includes('docs.google.com/spreadsheets') || url.includes('output=csv')) return url
   const id = url.match(/\/d\/([a-zA-Z0-9-_]+)/)?.[1]
   const gid = url.match(/[#&?]gid=(\d+)/)?.[1] ?? '0'
-  return `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&gid=${gid}`
+  return `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&gid=${gid}&_cb=${Date.now()}`
 }
 
 // RFC-4180 CSV → array of rows (each row an array of cell strings).
@@ -136,7 +136,7 @@ function monthTabs(now) {
 function sheetIdOf(url) { return url.match(/\/d\/([a-zA-Z0-9-_]+)/)?.[1] }
 
 async function fetchTab(id, name, now) {
-  const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(name)}`
+  const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(name)}&_cb=${Date.now()}`
   const res = await fetch(url)
   if (!res.ok) return []
   const text = await res.text()

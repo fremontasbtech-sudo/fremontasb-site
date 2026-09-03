@@ -7,7 +7,8 @@ import { announcementsSheet } from '../src/data/sources.js'
 export default async function handler(req, res) {
   try {
     const announcements = await fetchAnnouncements(announcementsSheet)
-    res.setHeader('Cache-Control', 's-maxage=900, stale-while-revalidate=3600')
+    // Short CDN cache so sheet edits show within a few minutes, not up to 15.
+    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=1800')
     res.status(200).json({ announcements, titleSource: announcements.titleSource || 'heuristic', titleError: announcements.titleError || '' })
   } catch (err) {
     res.status(200).json({ announcements: [], error: String(err && err.message || err) })
