@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
  * useYouTube(overlayRows)
  *
  * Auto-pulls the channel's newest uploads from /api/youtube (a keyless proxy of
- * the channel's public RSS feed — see api/youtube.js and vite.config.js).
+ * the channel's public RSS feed, see api/youtube.js and vite.config.js).
  *
  *  - Live videos come from the feed; media.json (overlayRows) is the OVERLAY:
  *    it supplies "hosts" and "kind" (FremontTV/Rally/Event) the feed can't give,

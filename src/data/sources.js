@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// CONTENT SOURCES — the one file a non-technical ASB member edits.
+// CONTENT SOURCES - the one file a non-technical ASB member edits.
 //
 // Every URL that points at a Google Sheet / Form / Slides deck / Flickr /
 // YouTube lives here. Change the link, save, redeploy. No other code changes.
@@ -17,7 +17,7 @@ export const sheets = {
   // is the sum of its row, so adding an event = adding a column. Nothing else to do.
   spiritPoints: 'https://docs.google.com/spreadsheets/d/1gS0bbOGgpjMpCfeYOUBI4B39oPEtNU-1Y2n1nEWkZ7o/edit?gid=0#gid=0',
 
-  // Home → Latest News.  Columns: title | date | blurb   (newest rows first or last — we sort by date)
+  // Home → Latest News.  Columns: title | date | blurb   (newest rows first or last, we sort by date)
   news: null,
 
   // Clubs → Club List.  "Official Clubs List" sheet (first tab).
@@ -41,10 +41,10 @@ export const links = {
     'https://docs.google.com/spreadsheets/d/1ZpDVioKRc0TDzUSYpGspEOOEEM9TXBVjk8Tl6wzirJE/edit',
   clubHandbook:
     'https://docs.google.com/document/d/1fiowHLXAjMT61OVWanui4NadO_apk0Ufc40KnZYiXng/edit',
-  // Club Info Meeting deck — normal view link for the "Open the slides" button (embed lives in embeds.clubInfoSlides).
+  // Club Info Meeting deck, normal view link for the "Open the slides" button (embed lives in embeds.clubInfoSlides).
   clubInfoSlides:
     'https://docs.google.com/presentation/d/1GV6dM2eOitIWyesUN5ciMVs3Cq9pqc8a-hBYtz1OmIs/edit?usp=sharing',
-  // TODO(26-27): interim 25-26 list — swap to the 26-27 sheet when ready (keep in sync with sheets.clubs above).
+  // TODO(26-27): interim 25-26 list, swap to the 26-27 sheet when ready (keep in sync with sheets.clubs above).
   clubsListSheet:
     'https://docs.google.com/spreadsheets/d/1M-PZR_C9X4JCqk_uDWEE6MsLFpinhewrbd6oiPRMgqw/edit?gid=0#gid=0',
 
@@ -64,7 +64,7 @@ export const links = {
   reimbursements: 'https://app.informedk12.com/link_campaigns/check-request-electronic-form-638b46dd-9d91-411d-9056-ca54f5cb63f1?token=nLaHtqkbjGdUbqL1AvB7f3Mp',
   incomeEligibility: 'https://app.informedk12.com/link_campaigns/fuhsd-income-eligibility-form?token=8N8nQUcZx2jhd2HM2dwH4QZr',
 
-  // App store links — leave null to show "Coming soon"
+  // App store links, leave null to show "Coming soon"
   appStore: null,
   playStore: null,
 }
@@ -91,7 +91,7 @@ export const embeds = {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// YOUTUBE AUTO-PULL (Media page) — LIVE, via the channel's public RSS feed.
+// YOUTUBE AUTO-PULL (Media page) - LIVE, via the channel's public RSS feed.
 //   The Media page auto-pulls the newest uploads (no API key, no secrets). The
 //   feed is fetched server-side by /api/youtube (api/youtube.js on Vercel in
 //   production; the dev middleware in vite.config.js on localhost), both reading
@@ -105,11 +105,11 @@ export const youtubeFeed = {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// FLICKR AUTO-PULL (Photos page) — LIVE albums via the Flickr API.
+// FLICKR AUTO-PULL (Photos page) - LIVE albums via the Flickr API.
 //   The Photos page auto-pulls every album (photoset) from the ASB Flickr.
 //   Needs two things (see .env.example / README):
-//     • nsid below — the ASB Flickr account's user id (already filled in).
-//     • a free Flickr API key, kept SERVER-SIDE as the FLICKR_API_KEY env var —
+//     • nsid below, the ASB Flickr account's user id (already filled in).
+//     • a free Flickr API key, kept SERVER-SIDE as the FLICKR_API_KEY env var,
 //       never in this file or the client bundle. Locally: put it in .env
 //       (FLICKR_API_KEY=...). On Vercel: Project → Settings → Environment Variables.
 //   Served by /api/flickr (api/flickr.js on Vercel; dev middleware in vite.config.js).
@@ -120,12 +120,12 @@ export const flickrFeed = {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MORNING ANNOUNCEMENTS (Home page) — pulled live from the ASB announcements sheet.
+// MORNING ANNOUNCEMENTS (Home page) - pulled live from the ASB announcements sheet.
 //   The sheet is a weekly Wed/Fri grid holding the whole year. The site pulls it
 //   server-side (/api/announcements, no embed, no key) and shows ONLY announcements
-//   whose morning has passed (8:30 AM cutoff) — so each appears on its Wed/Fri
+//   whose morning has passed (8:30 AM cutoff), so each appears on its Wed/Fri
 //   automatically, no scheduler. To point at a different sheet, change the URL
-//   (must be shared "anyone with the link — Viewer").
+//   (must be shared "anyone with the link - Viewer").
 // ─────────────────────────────────────────────────────────────────────────────
 export const announcementsSheet =
   'https://docs.google.com/spreadsheets/d/1S4-AYwuZXewRqtRoMeHWgITXbuQH7R8r74RmTMegCqQ/edit'
@@ -162,7 +162,7 @@ export const school = {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CLUB KEY DATES (Clubs page) — the Clubs Commission's 26–27 calendar.
+// CLUB KEY DATES (Clubs page) - the Clubs Commission's 26–27 calendar.
 //   Source: the Club Info Meeting deck. Edit here to change what the site shows.
 //   iso = YYYY-MM-DD (used to sort and to dim dates that have passed / highlight
 //   the next one up). display = how the date reads. type = event | deadline | process.
@@ -185,7 +185,7 @@ export const clubDates = {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// RESOURCE LINK LISTS (Resources page) — ported from the old fremontasb.org
+// RESOURCE LINK LISTS (Resources page) - ported from the old fremontasb.org
 //   "Community Resources" and "Student Wellness" tabs. Each entry: a name, an
 //   optional note, and one or more { label, href } links. Edit here to update.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -210,7 +210,7 @@ export const resourceLinks = {
       { label: 'Bill Wilson Center', href: 'http://www.billwilsoncenter.org/services/all/drop.html' },
     ] },
     { name: 'Child Protective Services', links: [
-      { label: 'Suspected Child Abuse — form & instructions (PDF)', href: 'https://oag.ca.gov/sites/all/files/agweb/pdfs/childabuse/ss_8572.pdf' },
+      { label: 'Suspected Child Abuse: form & instructions (PDF)', href: 'https://oag.ca.gov/sites/all/files/agweb/pdfs/childabuse/ss_8572.pdf' },
     ] },
     { name: 'More resources', links: [
       { label: 'Books on Mental Health & Wellness (Gale)', href: 'https://infotrac.gale.com/itweb/sunn62370?db=GVRL-0' },
@@ -227,7 +227,7 @@ export const resourceLinks = {
     { name: 'Family Community Support Referral', links: [
       { label: 'Referral form', href: 'https://docs.google.com/forms/d/e/1FAIpQLSe9J4wMxyCWdanv292_306Y6ZW5TvcSkqCWeK0cB43Ggv1Gcw/viewform' },
     ] },
-    { name: 'Wellness Staff', note: 'Deirdre Louie, LMFT — School-Based Therapist · (408) 522-2487 · A-Building (downstairs).', links: [
+    { name: 'Wellness Staff', note: 'Deirdre Louie, LMFT, School-Based Therapist · (408) 522-2487 · A-Building (downstairs).', links: [
       { label: 'SV Community Services', href: 'https://svcommunityservices.org/' },
       { label: 'Mayview Community Health', href: 'https://www.mayview.org/' },
       { label: 'YWCA', href: 'https://www.ywca.org/' },

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 
 /**
- * Button — the one button style on the site.
+ * Button - the one button style on the site.
  * props: text | children, href (external) or to (internal route) or onClick,
  *        variant: 'primary' (default) | 'secondary' | 'inverse' (white on rust) | 'disabled', external (adds icon + new tab)
  */

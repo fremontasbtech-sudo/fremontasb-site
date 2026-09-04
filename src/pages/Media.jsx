@@ -7,7 +7,7 @@ import overlay from '../data/media.json'
 import { useYouTube } from '../data/useYouTube'
 
 /**
- * Media — FremontTV + rally/event videos in one place.
+ * Media - FremontTV + rally/event videos in one place.
  * Data: src/data/media.json  [{ title, date, youtubeId, hosts, kind }]
  * Swap rows in that file and this page updates; nothing here is hardcoded to an episode.
  * Newest row = featured player. Everything else = archive.
@@ -56,7 +56,7 @@ export default function Media() {
         <Button variant="secondary" href={links.youtube} external>YouTube channel</Button>
       </PageHero>
 
-      {/* Latest episode — the one focal point on the page */}
+      {/* Latest episode, the one focal point on the page */}
       {latest && (
         <section className="section-space">
           <div className="container-site">
@@ -153,7 +153,7 @@ function FilterChip({ active, onClick, children }) {
 }
 
 /**
- * Player — poster + play button; loads the YouTube iframe only when clicked.
+ * Player - poster + play button; loads the YouTube iframe only when clicked.
  * Keeps the page fast and gives a neutral 16:9 box when YouTube can't be reached.
  * The title lives in the h2 beside/below the player, so the poster carries no caption.
  */

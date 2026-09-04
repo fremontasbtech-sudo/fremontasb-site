@@ -1,7 +1,7 @@
 import { ExternalIcon } from './Button'
 
 /**
- * Card — image + title + optional caption. Wraps itself in a link if href/to is given.
+ * Card - image + title + optional caption. Wraps itself in a link if href/to is given.
  * props: image (url), alt, title, caption, href (external), children (extra body), ratio ('16/9' default), imageFit
  */
 export default function Card({ image, alt = '', title, caption, href, children, ratio = '16 / 9', className = '', placeholder }) {

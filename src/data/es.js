@@ -1,6 +1,6 @@
 // Spanish translations for the static UI. Keys are the EXACT English text as it
 // appears on the site (trimmed). Anything not listed stays in its source language
-// — that's intentional for dynamic feed content (video titles, album names, club
+// - that's intentional for dynamic feed content (video titles, album names, club
 // names, announcements, people, dates). Edit/extend here; the switch is in the navbar.
 export const ES = {
   // ── Navbar / chrome ──
@@ -22,7 +22,7 @@ export const ES = {
   'Main': 'Principal',
 
   // ── Footer ──
-  'The Associated Student Body of Fremont High School — rallies, clubs, FremontTV, dances, and everything in between.':
+  'The Associated Student Body of Fremont High School: rallies, clubs, FremontTV, dances, and everything in between.':
     'El cuerpo estudiantil (ASB) de Fremont High School: rallies, clubes, FremontTV, bailes y todo lo demás.',
   'Find us': 'Encuéntranos',
   'Follow': 'Síguenos',
@@ -31,16 +31,16 @@ export const ES = {
   'Open in Google Maps': 'Abrir en Google Maps',
   'Website designed and maintained by ASB Tech.': 'Sitio web diseñado y mantenido por ASB Tech.',
   'Created and maintained by Fremont ASB Tech': 'Creado y mantenido por Fremont ASB Tech',
-  'Flickr — event photos': 'Flickr — fotos de eventos',
+  'Flickr: event photos': 'Flickr: fotos de eventos',
 
   // ── Home: hero + spirit ──
-  "We're the students behind the rallies, the clubs, and FremontTV — plus the spirit points race that keeps all four grades going. Glad you're here.":
+  "We're the students behind the rallies, the clubs, and FremontTV, plus the spirit points race that keeps all four grades going. Glad you're here, Firebird.":
     'Somos los estudiantes detrás de los rallies, los clubes y FremontTV, además de la competencia de puntos de espíritu que mantiene activos a los cuatro grados. Nos alegra que estés aquí.',
   'Watch FremontTV': 'Ver FremontTV',
   'Spirit points': 'Puntos de espíritu',
   'Class competition': 'Competencia entre clases',
   'Spirit Points Tracker': 'Marcador de puntos de espíritu',
-  'Every rally, dress-up day, and class competition adds points to your class total. ASB updates the numbers after each event. Seniors, juniors, sophomores, freshmen — one class wins the year.':
+  'Every rally, dress-up day, and class competition adds points to your class total. ASB updates the numbers after each event. Seniors, juniors, sophomores, freshmen. One class wins the year.':
     'Cada rally, día temático y competencia entre clases suma puntos al total de tu grado. ASB actualiza los números después de cada evento. Seniors, juniors, sophomores, freshmen: un solo grado gana el año.',
   'Leading': 'Va ganando',
   'lead by': 'lidera por',
@@ -64,7 +64,7 @@ export const ES = {
   'View': 'Ver',
   'Announcement': 'Anuncio',
   'Event': 'Evento',
-  'Nothing posted yet — check back once school events get going.': 'Aún no hay nada publicado: vuelve cuando comiencen los eventos escolares.',
+  'Nothing posted yet. Check back once school events get going.': 'Aún no hay nada publicado: vuelve cuando comiencen los eventos escolares.',
   'New FremontTV episode': 'Nuevo episodio de FremontTV',
   'New album on Flickr': 'Nuevo álbum en Flickr',
   'FremontTV episodes and rally videos': 'Episodios de FremontTV y videos de rallies',
@@ -76,13 +76,13 @@ export const ES = {
   'The stuff the website can’t do lives in the app.': 'Lo que el sitio no puede hacer está en la app.',
   "Submit club forms, check spirit points, pull up today's bell schedule, and log teacher bonuses. Sign in with your school Google account.":
     'Envía formularios de clubes, revisa puntos de espíritu, consulta el horario de campanas de hoy y registra bonos de maestros. Inicia sesión con tu cuenta de Google escolar.',
-  'In development — store links post here first.': 'En desarrollo: los enlaces de las tiendas se publicarán aquí primero.',
+  'In development. Store links post here first.': 'En desarrollo: los enlaces de las tiendas se publicarán aquí primero.',
   'In development': 'En desarrollo',
   'Coming soon': 'Próximamente',
   'Get the app': 'Obtén la app',
   'The website is for reading. The app is for doing.': 'El sitio es para leer. La app es para hacer.',
   'Website vs. app': 'Sitio web vs. app',
-  'The Fremont ASB app is being built by ASB Tech. It handles club forms, spirit points, bell schedules and teacher bonuses — the parts of ASB that need a sign-in.':
+  'The Fremont ASB app is being built by ASB Tech. It handles club forms, spirit points, bell schedules and teacher bonuses, the parts of ASB that need a sign-in.':
     'La app de Fremont ASB está siendo creada por ASB Tech. Maneja formularios de clubes, puntos de espíritu, horarios de campanas y bonos de maestros: las partes de ASB que requieren iniciar sesión.',
   'The app requires Google sign-in.': 'La app requiere iniciar sesión con Google.',
   'Submit club forms in the app.': 'Envía formularios de clubes en la app.',
@@ -119,8 +119,8 @@ export const ES = {
   // ── Photos page ──
   'Click a photo below to see all photos from individual events, or click the button below to be redirected to the Fremont ASB Flickr page.':
     'Haz clic en una foto para ver todas las fotos de cada evento, o usa el botón de abajo para ir a la página de Flickr de Fremont ASB.',
-  'Every album — rallies, dances, spirit weeks — is on the ASB Flickr. Took photos at an event? Email them to':
-    'Cada álbum — rallies, bailes, semanas de espíritu — está en el Flickr de ASB. ¿Tomaste fotos en un evento? Envíalas a',
+  'Every album (rallies, dances, spirit weeks) is on the ASB Flickr. Took photos at an event? Email them to':
+    'Cada álbum (rallies, bailes, semanas de espíritu) está en el Flickr de ASB. ¿Tomaste fotos en un evento? Envíalas a',
   'All albums on Flickr': 'Todos los álbumes en Flickr',
 
   // ── Clubs page ──
@@ -183,7 +183,7 @@ export const ES = {
   'Second check-in.': 'Segundo registro.',
   'Feb/March Check-In': 'Registro de feb./marzo',
   'Third check-in.': 'Tercer registro.',
-  'Take part in Grub Day. Food sales need Fundraiser Approval first — see the Resources page.':
+  'Take part in Grub Day. Food sales need Fundraiser Approval first. See the Resources page.':
     'Participa en el Grub Day. Las ventas de comida necesitan primero la Aprobación de Recaudación: consulta la página de Recursos.',
   'Strikes': 'Strikes',
   'Missed items are recorded as strikes on the Club Accountability Tracker.':
@@ -218,7 +218,7 @@ export const ES = {
   'Go to FUHSD': 'Ir a FUHSD',
   'Support': 'Apoyo',
   'Community Resources': 'Recursos Comunitarios',
-  'Local and national support for Firebirds and their families. If you or someone you know is in crisis, reach out — these lines are free and confidential.':
+  'Local and national support for Firebirds and their families. If you or someone you know is in crisis, reach out. These lines are free and confidential.':
     'Apoyo local y nacional para los Firebirds y sus familias. Si tú o alguien que conoces está en crisis, comunícate: estas líneas son gratuitas y confidenciales.',
   'At Fremont': 'En Fremont',
   'Student Wellness': 'Bienestar Estudiantil',
@@ -261,7 +261,7 @@ export const ES = {
   'Check back during homecoming season. This is where the court’s names, photos, and bios will be once nominations are in.':
     'Vuelve durante la temporada de homecoming. Aquí aparecerán los nombres, fotos y biografías de la corte una vez que se reciban las nominaciones.',
   'No election is running right now.': 'No hay ninguna elección en curso en este momento.',
-  'Candidate statements show up here once the ballot is set — check back during election season.':
+  'Candidate statements show up here once the ballot is set. Check back during election season.':
     'Las declaraciones de los candidatos aparecerán aquí una vez definida la boleta: vuelve durante la temporada de elecciones.',
 
   // ── 404 ──

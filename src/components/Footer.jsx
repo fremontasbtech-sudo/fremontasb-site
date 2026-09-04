@@ -14,7 +14,7 @@ export default function Footer() {
             <p className="tagline text-2xl">“{school.tagline}”</p>
           </div>
           <p className="mt-4 text-sm text-body max-w-sm">
-            The Associated Student Body of Fremont High School — rallies, clubs, FremontTV, dances, and everything in between.
+            The Associated Student Body of Fremont High School: rallies, clubs, FremontTV, dances, and everything in between.
           </p>
           <p className="mt-3 text-sm text-body max-w-sm">
             Website designed and maintained by ASB Tech.
@@ -33,10 +33,10 @@ export default function Footer() {
         <div className="text-sm">
           <p className="eyebrow mb-2">Follow</p>
           <ul className="grid">
-            <li><a className={item} href={links.instagram} target="_blank" rel="noopener noreferrer">Instagram — @firebirdfelipe</a></li>
-            <li><a className={item} href={links.tiktok} target="_blank" rel="noopener noreferrer">TikTok — @felipethefirebird</a></li>
-            <li><a className={item} href={links.youtube} target="_blank" rel="noopener noreferrer">YouTube — Fremont High School ASB</a></li>
-            <li><a className={item} href={links.flickr} target="_blank" rel="noopener noreferrer">Flickr — event photos</a></li>
+            <li><a className={item} href={links.instagram} target="_blank" rel="noopener noreferrer">Instagram: @firebirdfelipe</a></li>
+            <li><a className={item} href={links.tiktok} target="_blank" rel="noopener noreferrer">TikTok: @felipethefirebird</a></li>
+            <li><a className={item} href={links.youtube} target="_blank" rel="noopener noreferrer">YouTube: Fremont High School ASB</a></li>
+            <li><a className={item} href={links.flickr} target="_blank" rel="noopener noreferrer">Flickr: event photos</a></li>
           </ul>
         </div>
       </div>

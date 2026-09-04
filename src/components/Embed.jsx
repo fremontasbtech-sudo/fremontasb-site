@@ -1,7 +1,7 @@
 /**
- * Embed — responsive iframe wrapper for Google Forms / Slides / YouTube.
+ * Embed - responsive iframe wrapper for Google Forms / Slides / YouTube.
  * props: src, title, ratio ('16 / 9' default) or minHeight for tall forms,
- *        fallback — what VISITORS see if the URL is still a PLACEHOLDER (node or string)
+ *        fallback - what VISITORS see if the URL is still a PLACEHOLDER (node or string)
  * In `npm run dev` a developer hint is shown instead so it's obvious what to fix.
  */
 export default function Embed({ src, title, ratio = '16 / 9', minHeight, fallback, className = '' }) {
@@ -17,7 +17,7 @@ export default function Embed({ src, title, ratio = '16 / 9', minHeight, fallbac
               <p className="text-sm text-body max-w-xs">Paste the real embed URL in <code className="rounded bg-paper px-1.5 py-0.5 text-xs">src/data/sources.js</code>. Visitors will see the fallback text instead of this box.</p>
             </>
           ) : (
-            <p className="text-sm text-body max-w-sm">{fallback ?? `${title} isn't posted yet — check back soon.`}</p>
+            <p className="text-sm text-body max-w-sm">{fallback ?? `${title} isn't posted yet. Check back soon.`}</p>
           )}
         </div>
       ) : (

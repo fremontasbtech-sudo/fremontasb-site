@@ -18,7 +18,7 @@ import { useEvents } from '../data/useEvents'
 import { cleanAlbumTitle } from '../data/albumTitle'
 
 /**
- * Home — hero video, Spirit Points ladder, Latest News, Download-the-App band.
+ * Home - hero video, Spirit Points ladder, Latest News, Download-the-App band.
  * Data: Spirit Points + News come from useSheetData (Google Sheet → local JSON fallback).
  * Swap the hero video/poster by editing embeds.heroVideo / embeds.heroPoster in src/data/sources.js.
  *
@@ -88,8 +88,8 @@ function Hero() {
           </h1>
           <div className="mt-5 h-1 w-14 bg-brand" aria-hidden="true" />
           <p className="mt-5 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">
-            We're the students behind the rallies, the clubs, and FremontTV — plus the spirit points race that keeps
-            all four grades going. Glad you're here.
+            We're the students behind the rallies, the clubs, and FremontTV, plus the spirit points race that keeps
+            all four grades going. Glad you're here, Firebird.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
             <Button to="/media" text="Watch FremontTV" />
@@ -122,12 +122,12 @@ function SpiritPoints() {
   return (
     <section id="spirit-points" className="section-space scroll-mt-16">
       <div className="container-site grid gap-10 lg:grid-cols-12 lg:gap-16">
-        {/* 5/12 — heading + how it works */}
+        {/* 5/12 - heading + how it works */}
         <div className="lg:col-span-5">
           <SectionHeader eyebrow="Class competition" title="Spirit Points Tracker" className="!mb-4 sm:!mb-4" />
           <p className="text-base leading-relaxed text-body">
             Every rally, dress-up day, and class competition adds points to your class total. ASB updates the numbers
-            after each event. Seniors, juniors, sophomores, freshmen — one class wins the year.
+            after each event. Seniors, juniors, sophomores, freshmen. One class wins the year.
           </p>
           {classes.length > 1 && !loading && (
             <p className="mt-6 font-display text-lg font-bold text-ink">
@@ -139,7 +139,7 @@ function SpiritPoints() {
           )}
         </div>
 
-        {/* 7/12 — ranked ladder */}
+        {/* 7/12 - ranked ladder */}
         <div className="lg:col-span-7">
           {loading && <Loading label="Loading spirit points…" />}
           {error && <Notice>Couldn't reach the Google Sheet ({error}). Showing the last saved numbers.</Notice>}
@@ -202,7 +202,7 @@ function LatestNews({ eventsRecent = [], eventsUpcoming = [], eventsLoading = fa
     <section id="news" className="border-t border-rule bg-paper section-space scroll-mt-16">
       <div className="container-site">
         {/* Two co-equal columns: the recap (newest first) and the calendar-ahead
-            (soonest first) — same NewsItem rows so they read at the same weight. */}
+            (soonest first), same NewsItem rows so they read at the same weight. */}
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-14">
           <div>
             <SectionHeader eyebrow="From ASB" title="Latest News" />
@@ -219,7 +219,7 @@ function LatestNews({ eventsRecent = [], eventsUpcoming = [], eventsLoading = fa
                 ))}
               </ol>
             )}
-            {!loading && items.length === 0 && <Notice>Nothing posted yet — check back once school events get going.</Notice>}
+            {!loading && items.length === 0 && <Notice>Nothing posted yet. Check back once school events get going.</Notice>}
           </div>
 
           <div>
@@ -234,11 +234,11 @@ function LatestNews({ eventsRecent = [], eventsUpcoming = [], eventsLoading = fa
                 ))}
               </ol>
             )}
-            {!eventsLoading && eventsUpcoming.length === 0 && <Notice>Nothing coming up in the next three weeks — check back soon.</Notice>}
+            {!eventsLoading && eventsUpcoming.length === 0 && <Notice>Nothing coming up in the next three weeks. Check back soon.</Notice>}
           </div>
         </div>
 
-        {/* Around the site — full width beneath both columns, so the nav sits with the
+        {/* Around the site, full width beneath both columns, so the nav sits with the
             page chrome instead of hanging off the bottom of a tall column. */}
         <div className="mt-14 border-t border-rule pt-10">
           <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
@@ -287,7 +287,7 @@ function TypeBadge({ type }) {
 }
 
 /**
- * Latest News feed — blends, freshest first:
+ * Latest News feed - blends, freshest first:
  *  - Written announcements from the news Google Sheet, but ONLY when one is connected
  *    (source === 'sheet'); we never render the local sample as if it were real news.
  *    Optional sheet columns: type, link, pinned (pinned rows stay on top).
@@ -422,10 +422,10 @@ function Arrow({ className = 'text-brand' }) {
 /* ─────────────────── 3.5 Morning Announcements ─────────────────── */
 
 /**
- * Morning Announcements — the recap of what went out over the PA on Wednesday and
+ * Morning Announcements - the recap of what went out over the PA on Wednesday and
  * Friday mornings, pulled live from the ASB sheet via /api/announcements (never embedded).
  * Only past mornings show (8:30 AM cutoff, in useAnnouncements). Collapsed by default:
- * each row shows a topic title + date, and expands on click — read only the ones you want.
+ * each row shows a topic title + date, and expands on click, read only the ones you want.
  */
 function MorningAnnouncements() {
   const { items, loading } = useAnnouncements()
@@ -556,7 +556,7 @@ function AppBanner() {
         </div>
         <div className="lg:col-span-4 lg:justify-self-end">
           <Button to="/download-app" text="Download the App" variant="inverse" />
-          <p className="mt-3 text-sm text-white/80">In development — store links post here first.</p>
+          <p className="mt-3 text-sm text-white/80">In development. Store links post here first.</p>
         </div>
       </div>
     </section>

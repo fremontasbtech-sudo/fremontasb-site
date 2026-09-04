@@ -2,7 +2,7 @@ import PageHero from '../components/PageHero'
 import Button from '../components/Button'
 import { links, resourceLinks } from '../data/sources'
 
-// Six resources, two groups. Links live in src/data/sources.js — a '#' means
+// Six resources, two groups. Links live in src/data/sources.js, a '#' means
 // ASB Tech hasn't confirmed the real URL yet, and the block says so instead of pretending.
 // Descriptions stay to one neutral sentence: what the resource is for, nothing we can't confirm.
 const GROUPS = [
@@ -77,7 +77,7 @@ export default function Resources() {
       <LinkListSection
         eyebrow="Support"
         title="Community Resources"
-        blurb="Local and national support for Firebirds and their families. If you or someone you know is in crisis, reach out — these lines are free and confidential."
+        blurb="Local and national support for Firebirds and their families. If you or someone you know is in crisis, reach out. These lines are free and confidential."
         groups={resourceLinks.community}
       />
 
@@ -137,7 +137,7 @@ function ResourceBlock({ title, body, href, cta, featured }) {
       </div>
       <div className={`mt-6 flex flex-wrap items-center gap-3 ${featured ? 'md:mt-0 md:flex-col md:items-start' : 'mt-auto pt-6'}`}>
         {placeholder ? (
-          // No gray button for a link we don't have yet — just say so.
+          // No gray button for a link we don't have yet, just say so.
           <span className="inline-flex min-h-[44px] items-center font-display text-xs font-bold uppercase tracking-[0.14em] text-body">
             Link coming soon
           </span>

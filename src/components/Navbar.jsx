@@ -4,7 +4,7 @@ import logo from '../assets/fremont-tower.png'
 import { LangToggle } from '../i18n'
 
 // Primary links show in the bar; "More" holds seasonal + secondary pages.
-// Homecoming Court and Elections are separate pages on separate schedules — never merge them.
+// Homecoming Court and Elections are separate pages on separate schedules, never merge them.
 const primary = [
   { to: '/', label: 'Home', end: true },
   { to: '/media', label: 'Media' },
@@ -105,7 +105,7 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile menu — fixed panel below the bar, scrolls on short screens */}
+      {/* Mobile menu, fixed panel below the bar, scrolls on short screens */}
       {open && (
         <div id="mobile-menu" className="lg:hidden fixed inset-x-0 top-16 bottom-0 overflow-y-auto border-t border-rule bg-paper">
           <ul className="container-site py-3 grid gap-0.5">

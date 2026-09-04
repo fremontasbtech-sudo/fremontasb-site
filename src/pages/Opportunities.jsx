@@ -6,12 +6,12 @@ import { DevNote } from '../components/DataState'
 import { embeds, links } from '../data/sources'
 
 /**
- * Opportunities — a Google Slides deck the college & career counselors keep updated.
+ * Opportunities - a Google Slides deck the college & career counselors keep updated.
  * Swapping the deck = change `embeds.opportunitiesSlides` in src/data/sources.js.
  * Set `links.opportunitiesDeck` (the normal share link) to show the "Open in Google Slides" button.
  */
 export default function Opportunities() {
-  // Slides is unusable at 16:9 on a phone — give it a squarer box below md.
+  // Slides is unusable at 16:9 on a phone, give it a squarer box below md.
   const wide = useMinWidth(768)
 
   return (
@@ -32,7 +32,7 @@ export default function Opportunities() {
                 src={embeds.opportunitiesSlides}
                 title="Opportunities document"
                 ratio="16 / 9"
-                fallback="The opportunities deck isn't posted yet — check with the College & Career Center."
+                fallback="The opportunities deck isn't posted yet. Check with the College & Career Center."
               />
             </div>
           )}

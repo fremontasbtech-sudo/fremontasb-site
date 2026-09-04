@@ -5,7 +5,7 @@ import { useSheetData, isHidden } from '../data/useSheetData'
 import localCourt from '../data/homecomingCourt.json'
 
 /**
- * Homecoming Court — seasonal, view-only.
+ * Homecoming Court - seasonal, view-only.
  *
  * Data: src/data/homecomingCourt.json  { active, cycle, candidates: [{ name, photoUrl, bio }] }
  * or the Google Sheet in sources.js (columns: name | photoUrl | bio | active | cycle).
@@ -17,7 +17,7 @@ import localCourt from '../data/homecomingCourt.json'
  *   Per row    → a single FALSE row is hidden while the rest of the court still shows.
  * Cycle label → first non-empty `cycle` cell (sheet), else `cycle` in the JSON.
  *
- * This page intentionally shares nothing with /elections — they run on different
+ * This page intentionally shares nothing with /elections, they run on different
  * schedules and are edited by different people.
  */
 export default function HomecomingCourt() {
@@ -61,7 +61,7 @@ export default function HomecomingCourt() {
       <PageHero
         title="Homecoming Court"
         eyebrow={cycle !== 'Homecoming Court' ? cycle : undefined}
-        subtext="View only — voting happens in class and on the official ballot. This page is for reading up on the court before you vote."
+        subtext="View only. Voting happens in class and on the official ballot. This page is for reading up on the court before you vote."
       />
 
       <section className="container-site section-space">
@@ -94,7 +94,7 @@ export default function HomecomingCourt() {
   )
 }
 
-/* Local to this page on purpose — Elections has its own card with its own layout. */
+/* Local to this page on purpose, Elections has its own card with its own layout. */
 function CandidateCard({ name, photoUrl, bio }) {
   return (
     <article className="card-surface flex h-full overflow-hidden sm:flex-col">

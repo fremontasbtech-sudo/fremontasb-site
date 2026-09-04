@@ -13,12 +13,12 @@ import { school } from './sources'
  *   Seniors     |    50      |    ...
  *
  * Each class's TOTAL is the sum of its row across every event column, so ASB
- * just adds a new column per event and fills in points — the totals grow on
+ * just adds a new column per event and fills in points, the totals grow on
  * their own. We ignore any row that isn't one of the four class names
  * (headers, "Senior Total", stray totals rows, blanks).
  *
  * Returns { rows, loading, error, source } shaped exactly like useSheetData,
- * where each row is { grade, classOf, points } — a drop-in for SpiritPoints.
+ * where each row is { grade, classOf, points }, a drop-in for SpiritPoints.
  */
 const GRADES = [
   { label: 'Seniors', offset: 0 },

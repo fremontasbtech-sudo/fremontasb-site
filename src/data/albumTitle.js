@@ -6,7 +6,7 @@
 export function cleanAlbumTitle(name) {
   let s = String(name || '').trim()
   // slashed dates anywhere (bounded): 9/19, 10/25, 5/11/24, 8/26
-  s = s.replace(/(^|[\s(–—-])\d{1,2}\/\d{1,2}(\/\d{2,4})?(?=$|[\s)(,–—-])/g, '$1')
+  s = s.replace(/(^|[\s(–\u2014-])\d{1,2}\/\d{1,2}(\/\d{2,4})?(?=$|[\s)(,–\u2014-])/g, '$1')
   // "Mon." / "Month" + year: "Aug. 2026", "August 2026"
   s = s.replace(/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?\s+(19|20)\d{2}\b/ig, ' ')
   // leading bare year: "2025 Winter Rally"
@@ -17,7 +17,7 @@ export function cleanAlbumTitle(name) {
   // tidy leftover spaces / empty parens / stray separators
   s = s.replace(/\(\s+/g, '(').replace(/\s+\)/g, ')').replace(/\(\)/g, '')
        .replace(/\s{2,}/g, ' ').replace(/\s+([),.])/g, '$1')
-       .replace(/[\s–—:-]+$/, '').replace(/^[\s–—:-]+/, '').trim()
+       .replace(/[\s–\u2014:-]+$/, '').replace(/^[\s–\u2014:-]+/, '').trim()
   return s || String(name || '').trim()
 }
 

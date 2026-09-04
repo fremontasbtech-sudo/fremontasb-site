@@ -3,7 +3,7 @@ import Embed from '../components/Embed'
 import { embeds, school, links } from '../data/sources'
 
 /**
- * Contact — Google Form embed + the same address/email the footer shows.
+ * Contact - Google Form embed + the same address/email the footer shows.
  * Swapping the form = change `embeds.contactForm` in src/data/sources.js.
  */
 export default function Contact() {
@@ -30,7 +30,7 @@ export default function Contact() {
               className="lg:!min-h-[760px]"
               fallback={
                 <>
-                  The contact form isn&rsquo;t up yet — email{' '}
+                  The contact form isn&rsquo;t up yet. Email{' '}
                   <a href={`mailto:${school.email}`} className="link-brand [overflow-wrap:anywhere]">{school.email}</a>.
                 </>
               }

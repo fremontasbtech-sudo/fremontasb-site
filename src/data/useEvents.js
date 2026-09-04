@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 /**
- * useEvents() — the curated items from the shared Firebird Hub Events sheet
+ * useEvents() - the curated items from the shared Firebird Hub Events sheet
  * (/api/events), the SAME sheet the app reads, so Latest News never drifts from it:
  *   • featured = YES events (Events tab)
  *   • push = y games (Sports tab)
@@ -62,7 +62,7 @@ function shape(data) {
   // sport within the window (one football, one volleyball…), preferring the pinned /
   // Varsity row on a tie; it rotates on its own as each game's day passes. Senior nights
   // are flagged so the UI can badge them. Finished games (a score is in) move to Latest
-  // News with the score — the moment the sheet fills the score, including same day.
+  // News with the score, the moment the sheet fills the score, including same day.
   const prioOf = (g) => (g.push ? 2 : 0) + (/varsity/i.test(g.level || '') ? 1 : 0)
   const nextBySport = new Map()
   const recentBy = new Map()

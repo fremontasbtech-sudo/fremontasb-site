@@ -1,5 +1,5 @@
 /**
- * SectionHeader — section title + short rust underline.
+ * SectionHeader - section title + short rust underline.
  * props: title, eyebrow (small caps label above), align: 'left' (default) | 'center', action (node rendered on the right)
  */
 export default function SectionHeader({ title, eyebrow, align = 'left', action, as: Tag = 'h2', className = '' }) {

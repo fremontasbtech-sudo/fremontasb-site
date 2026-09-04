@@ -17,7 +17,7 @@ export function Notice({ children, tone = 'brand' }) {
   )
 }
 
-/** Shown ONLY in `npm run dev` — hints for ASB Tech that visitors never see. */
+/** Shown ONLY in `npm run dev`, hints for ASB Tech that visitors never see. */
 export function DevNote({ children }) {
   if (!import.meta.env.DEV) return null
   return <p className="mt-2 text-xs text-body/70">{children}</p>

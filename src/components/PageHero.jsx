@@ -1,5 +1,5 @@
 /**
- * PageHero — top of every inner page: bold centered title, rust underline, optional italic subtext.
+ * PageHero - top of every inner page: bold centered title, rust underline, optional italic subtext.
  * props: title, subtext, children (e.g. buttons rendered under the subtext), eyebrow
  */
 export default function PageHero({ title, subtext, eyebrow, children, narrow = true }) {

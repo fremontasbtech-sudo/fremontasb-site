@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
  * useFlickr(fallbackAlbums)
  *
  * Auto-pulls the ASB Flickr albums from /api/flickr (a server-side proxy of the
- * Flickr API — see api/flickr.js and vite.config.js). The Flickr API key lives
+ * Flickr API, see api/flickr.js and vite.config.js). The Flickr API key lives
  * server-side (FLICKR_API_KEY env var), never in the client bundle.
  *
  *  - Returns live albums when the key is configured; otherwise (or on any error)

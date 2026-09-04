@@ -6,8 +6,8 @@ import fallbackAlbums from '../data/photos.json'
 import { useFlickr } from '../data/useFlickr'
 
 /**
- * Photos — event albums on Flickr.
- * Data: src/data/photos.json  [{ name, coverImageUrl, flickrUrl }]  — first row is the featured album.
+ * Photos - event albums on Flickr.
+ * Data: src/data/photos.json  [{ name, coverImageUrl, flickrUrl }]  - first row is the featured album.
  * Add an album: drop a cover image in /public, add a row to the JSON. Nothing else changes.
  *
  * Layout
@@ -48,7 +48,7 @@ export default function Photos() {
 
           <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-rule pt-8">
             <p className="text-sm text-body">
-              Every album — rallies, dances, spirit weeks — is on the ASB Flickr. Took photos at an event? Email them to{' '}
+              Every album (rallies, dances, spirit weeks) is on the ASB Flickr. Took photos at an event? Email them to{' '}
               <a href={`mailto:${school.email}`} className="link-brand">{school.email}</a>.
             </p>
             <Button variant="secondary" href={links.flickr} external>All albums on Flickr</Button>
@@ -65,7 +65,7 @@ function AlbumCard({ event, featured, ratio }) {
   return (
     <a href={event.flickrUrl} target="_blank" rel="noopener noreferrer"
        className="group card-surface flex h-full flex-col overflow-hidden">
-      {/* grow: if a neighbour's title wraps, the cover absorbs the extra height (object-cover) — no dead white */}
+      {/* grow: if a neighbour's title wraps, the cover absorbs the extra height (object-cover), no dead white */}
       <div className={`relative aspect-[4/3] w-full grow overflow-hidden bg-rule ${ratio}`}>
         <img
           src={event.coverImageUrl}

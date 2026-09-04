@@ -3,7 +3,7 @@ import Button from '../components/Button'
 import { links } from '../data/sources'
 
 /**
- * Download the App — companion ASB app, still in development.
+ * Download the App - companion ASB app, still in development.
  * Store links come from src/data/sources.js (links.appStore / links.playStore).
  * Leave them null → "Coming soon" buttons. Paste real URLs → live buttons. Nothing else changes.
  */
@@ -13,7 +13,7 @@ const STORES = [
   { key: 'playStore', label: 'Google Play', platform: 'Android' },
 ]
 
-// What lives where. Only what ASB Tech has said the app does — no extra promises.
+// What lives where. Only what ASB Tech has said the app does, no extra promises.
 const WEBSITE = [
   'Latest news and spirit points totals',
   'Club list, handbook and accountability tracker',
@@ -36,7 +36,7 @@ export default function DownloadApp() {
       <PageHero
         title="Download the App"
         eyebrow="In development"
-        subtext="The Fremont ASB app is being built by ASB Tech. It handles club forms, spirit points, bell schedules and teacher bonuses — the parts of ASB that need a sign-in."
+        subtext="The Fremont ASB app is being built by ASB Tech. It handles club forms, spirit points, bell schedules and teacher bonuses, the parts of ASB that need a sign-in."
       />
 
       <section className="section-space">
@@ -117,7 +117,7 @@ export default function DownloadApp() {
 /* ── local pieces ─────────────────────────────────────────────────────────── */
 
 /**
- * StoreButton — plain text labels, no store logos (badge art is added once links are live).
+ * StoreButton - plain text labels, no store logos (badge art is added once links are live).
  * Two short lines, never wrapping: "App Store" over "Coming soon" (or the platform name once live).
  */
 function StoreButton({ store, href }) {

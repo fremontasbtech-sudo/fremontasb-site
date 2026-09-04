@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Reusable brand classes. Tokens come from tailwind.config.js — see THEME.md. */
+/* Reusable brand classes. Tokens come from tailwind.config.js, see THEME.md. */
 @layer base {
   body { @apply bg-paper text-body font-sans antialiased; }
   h1, h2, h3, h4 { @apply font-display text-ink; }

@@ -5,14 +5,14 @@ import { useSheetData, isHidden } from '../data/useSheetData'
 import localRows from '../data/elections.json'
 
 /**
- * Elections — seasonal, view-only.
+ * Elections - seasonal, view-only.
  *
  * Data: src/data/elections.json, one row per candidate { section, active, name, photoUrl, bio },
  * or the Google Sheet in sources.js with the same columns.
  *
  * Showing / hiding:
  *   `active` blank or TRUE = shown. FALSE (or no / 0 / hidden / archived) = hidden.
- *   To archive a whole section after voting, set every one of its rows to FALSE —
+ *   To archive a whole section after voting, set every one of its rows to FALSE,
  *   the section disappears when none of its rows are shown. There is no separate
  *   settings tab. Old cycles stay in the file/sheet as FALSE rows; nothing needs deleting.
  *
@@ -54,7 +54,7 @@ export default function Elections() {
               No election is running right now.
             </p>
             <p className="mt-3 text-body">
-              Candidate statements show up here once the ballot is set — check back during election season.
+              Candidate statements show up here once the ballot is set. Check back during election season.
             </p>
           </div>
         </section>
@@ -69,7 +69,7 @@ export default function Elections() {
       <PageHero
         title="Elections"
         eyebrow="ASB and class cabinets"
-        subtext="View only — voting happens on the official ballot. Read the statements here first."
+        subtext="View only. Voting happens on the official ballot. Read the statements here first."
       />
 
       <div className="container-site section-space">
@@ -129,7 +129,7 @@ export default function Elections() {
   )
 }
 
-/* Local to this page on purpose — Homecoming Court has its own card. */
+/* Local to this page on purpose, Homecoming Court has its own card. */
 function CandidateCard({ name, photoUrl, bio }) {
   return (
     <article className="card-surface flex h-full gap-4 p-4 sm:gap-5 sm:p-5 lg:flex-col lg:gap-0 lg:p-0 lg:overflow-hidden">

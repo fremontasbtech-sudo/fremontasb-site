@@ -12,7 +12,7 @@ import clubsJson from '../data/clubs.json'
 // ─────────────────────────────────────────────────────────────────────────────
 // Data shape. The live "Official Clubs List" sheet has headers like
 //   f | Club Purpose | Student Advisors | Teacher Avisor | Meeting Location & Times | Email List | Other Information
-// (yes, "Avisor" — the typo is in the sheet). useSheetData camelCases those, so we
+// (yes, "Avisor", the typo is in the sheet). useSheetData camelCases those, so we
 // accept every spelling we've seen plus the local JSON keys and normalise to one shape.
 // ─────────────────────────────────────────────────────────────────────────────
 const EMAIL_RE = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g
@@ -63,7 +63,7 @@ function normalizeClub(row) {
 
 const uniq = (arr) => Array.from(new Set(arr.map((s) => s.toLowerCase())))
 
-// Hover colour only on devices that actually hover — otherwise the rust "sticks" after a tap on phones.
+// Hover colour only on devices that actually hover, otherwise the rust "sticks" after a tap on phones.
 const HOVER_BRAND = '[@media(hover:hover)]:hover:text-brand'
 
 export default function Clubs() {
@@ -118,7 +118,7 @@ export default function Clubs() {
             </label>
             <div className="relative mt-2">
               <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-body/60" />
-              {/* Focus ring comes from the global :focus-visible rule in index.css — no component ring, or it doubles up. */}
+              {/* Focus ring comes from the global :focus-visible rule in index.css, no component ring, or it doubles up. */}
               <input
                 id="club-search"
                 type="search"
@@ -228,7 +228,7 @@ export default function Clubs() {
                 src={embeds.clubInfoSlides}
                 title="Club Info Meeting slides"
                 ratio="16 / 9"
-                fallback="The club info slides aren't posted yet — check back soon."
+                fallback="The club info slides aren't posted yet. Check back soon."
               />
             </div>
           </div>
@@ -252,7 +252,7 @@ export default function Clubs() {
         Copy below is limited to what the old site and the Club Accountability Tracker
         columns confirm: teacher advisor, constitution, submit to ASB, Clubs Day (both
         semesters), the three check-ins, Grub Day, and strikes on the tracker. Do NOT add
-        a strike limit, months, or deadlines here — ASB Tech confirms those in the Handbook.
+        a strike limit, months, or deadlines here, ASB Tech confirms those in the Handbook.
       */}
       <section id="start-a-club" className="border-t border-rule bg-paper scroll-mt-20">
         <div className="container-site section-space">
@@ -531,13 +531,13 @@ const START_STEPS = [
   },
 ]
 
-// Row labels match the tracker columns. No dates here on purpose — the Handbook owns them.
+// Row labels match the tracker columns. No dates here on purpose, the Handbook owns them.
 const ACTIVE_REQUIREMENTS = [
   { label: 'Club Constitution', body: 'On file with ASB.' },
   { label: 'Clubs Day', body: 'Table at Clubs Day both semesters. This is where clubs pick up most of their members.' },
   { label: 'October Check-In', body: 'First check-in of the year with ASB.' },
   { label: 'Dec/Jan Check-In', body: 'Second check-in.' },
   { label: 'Feb/March Check-In', body: 'Third check-in.' },
-  { label: 'Grub Day', body: 'Take part in Grub Day. Food sales need Fundraiser Approval first — see the Resources page.' },
+  { label: 'Grub Day', body: 'Take part in Grub Day. Food sales need Fundraiser Approval first. See the Resources page.' },
   { label: 'Strikes', body: 'Missed items are recorded as strikes on the Club Accountability Tracker.' },
 ]

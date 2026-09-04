@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react'
  *  - If the fetch fails, or `sheetUrl` is null: returns `fallbackRows`
  *    (the local sample JSON) so the page never renders empty.
  *
- * options.map(row) — optional per-row transform (rename columns, coerce types).
+ * options.map(row) - optional per-row transform (rename columns, coerce types).
  */
 export function useSheetData(sheetUrl, fallbackRows = [], options = {}) {
   const [state, setState] = useState({
@@ -93,5 +93,5 @@ function toKey(h) {
 }
 
 export const isTrue = (v) => /^(true|yes|1|y)$/i.test(String(v ?? '').trim())
-/** Hidden only when someone explicitly wrote FALSE / no / 0 — a blank cell means "show it". */
+/** Hidden only when someone explicitly wrote FALSE / no / 0, a blank cell means "show it". */
 export const isHidden = (v) => /^(false|no|0|n|hidden|archived)$/i.test(String(v ?? '').trim())

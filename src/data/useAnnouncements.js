@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 
 /**
- * useAnnouncements() — morning announcements pulled from /api/announcements
+ * useAnnouncements() - morning announcements pulled from /api/announcements
  * (a server-parsed view of the ASB sheet; the sheet itself is never linked/embedded).
  *
  * The sheet holds the whole year up front, so the site reveals each announcement only
  * once its morning has arrived: we keep entries whose date is in the PAST, using an
- * 8:30 AM local cutoff (when announcements are read Wed/Fri). No cron — the date does it.
+ * 8:30 AM local cutoff (when announcements are read Wed/Fri). No cron, the date does it.
  *
  * Instant load: the last server response is cached in localStorage and rendered on the
  * spot (no "Loading…" flash for repeat visitors), then revalidated in the background so
