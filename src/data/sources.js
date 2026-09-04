@@ -87,7 +87,7 @@ export const embeds = {
 
   // Home hero video. Put a file in /public and reference it as "/hero.mp4", or keep the current Wix-hosted URL.
   heroVideo: '/hero.mp4',
-  heroPoster: '/photos-neon-nights-2024.jpg',
+  heroPoster: '/hero-poster.jpg',   // a frame from the drone video (no crowd photo flash before/without autoplay)
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
