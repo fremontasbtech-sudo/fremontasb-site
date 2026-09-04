@@ -325,7 +325,7 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = []) {
   const albs = (albums || []).slice(0, 3).map((a) => ({
     key: `f-${a.flickrUrl || a.name}`,
     type: 'Photos',
-    title: cleanAlbumTitle(a.name),
+    title: a.title || cleanAlbumTitle(a.name),
     blurb: a.count ? `${a.count} new photos on Flickr` : 'New album on Flickr',
     href: a.flickrUrl || null,
     when: parseDate(a.date),

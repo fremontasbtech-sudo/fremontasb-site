@@ -1,3 +1,4 @@
+import { llmTitles, llmError } from './_llm.js'
 // Shared server-side helper: pull the ASB morning-announcements Google Sheet and
 // parse its weekly Wed/Fri grid into flat { date, text } items.
 // Used by api/announcements.js (Vercel) and the dev middleware in vite.config.js.
@@ -153,7 +154,6 @@ async function fetchTab(id, name, now) {
 // we generate a clean 2–5 word topic title per blurb in ONE batched call, cached by
 // blurb text. No key ⇒ we keep the heuristic. Failures never break the feed.
 const titleCache = new Map()
-let lastLLMError = ''
 const TITLE_INSTRUCTION = [
   'You write short topic titles for a high school\'s morning announcements, shown on the school website.',
   'For EACH blurb, return a clean title of 2 to 5 words in Title Case that names the specific club, event,',
@@ -167,65 +167,16 @@ const TITLE_INSTRUCTION = [
   'No ending punctuation, no quotes around the title. Return ONLY a JSON array of strings, one per blurb, in the same order.',
 ].join(' ')
 
-async function llmTitles(texts) {
-  const AK = process.env.ANTHROPIC_API_KEY, OK = process.env.OPENAI_API_KEY, GK = process.env.GEMINI_API_KEY
-  if (!texts.length || (!AK && !OK && !GK)) return null
-  const payload = JSON.stringify(texts)
-  try {
-    let content
-    if (AK) {
-      const r = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', 'x-api-key': AK, 'anthropic-version': '2023-06-01' },
-        body: JSON.stringify({ model: 'claude-3-5-haiku-latest', max_tokens: 1024,
-          messages: [{ role: 'user', content: TITLE_INSTRUCTION + '\n\nBlurbs:\n' + payload }] }),
-      })
-      if (!r.ok) throw new Error('anthropic ' + r.status)
-      content = (await r.json()).content?.[0]?.text
-    } else if (OK) {
-      const r = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', authorization: `Bearer ${OK}` },
-        body: JSON.stringify({ model: 'gpt-4o-mini', temperature: 0.2,
-          messages: [{ role: 'system', content: TITLE_INSTRUCTION }, { role: 'user', content: payload }] }),
-      })
-      if (!r.ok) throw new Error('openai ' + r.status)
-      content = (await r.json()).choices?.[0]?.message?.content
-    } else {
-      // gemini-flash-latest is a stable alias that always points at the current Flash model,
-      // so this keeps working as Google retires old versions. Falls through a couple of names.
-      const models = ['gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-2.0-flash']
-      let ok = null, diag = []
-      for (const model of models) {
-        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(GK)}`, {
-          method: 'POST',
-          headers: { 'content-type': 'application/json', 'x-goog-api-key': GK },
-          body: JSON.stringify({ contents: [{ parts: [{ text: TITLE_INSTRUCTION + '\n\nBlurbs:\n' + payload }] }] }),
-        })
-        if (r.ok) { ok = r; break }
-        diag.push(model + ':' + r.status + ' ' + (await r.text()).slice(0, 120))
-      }
-      if (!ok) throw new Error('gemini ' + diag.join(' | '))
-      content = (await ok.json()).candidates?.[0]?.content?.parts?.[0]?.text
-    }
-    if (!content) return null
-    const arr = JSON.parse((content.match(/\[[\s\S]*\]/) || [content])[0])
-    if (!Array.isArray(arr) || arr.length !== texts.length) return null
-    lastLLMError = ''
-    return arr.map((t) => String(t == null ? '' : t).replace(/^["'\s]+|["'\s.]+$/g, '').trim())
-  } catch (e) { lastLLMError = String(e && e.message || e).slice(0, 300); return null }
-}
-
 async function applyTitles(items) {
   const need = [...new Set(items.map((it) => it.text).filter((t) => !titleCache.has(t)))].slice(0, 80)
   let usedLLM = false
   if (need.length) {
-    const titles = await llmTitles(need)
+    const titles = await llmTitles(need, TITLE_INSTRUCTION)
     if (titles) { usedLLM = true; need.forEach((t, i) => { if (titles[i]) titleCache.set(t, titles[i]) }) }
   }
   const out = items.map((it) => ({ ...it, title: titleCache.get(it.text) || it.title }))
   out.titleSource = usedLLM ? 'llm' : 'heuristic'
-  out.titleError = usedLLM ? '' : lastLLMError
+  out.titleError = usedLLM ? '' : llmError()
   return out
 }
 
