@@ -24,14 +24,18 @@ export default function Opportunities() {
 
       <section className="container-site section-space">
         <div className="grid gap-8 lg:grid-cols-[1fr_18rem] lg:gap-12">
-          <div className="min-w-0">
-            <Embed
-              src={embeds.opportunitiesSlides}
-              title="Opportunities document"
-              ratio={wide ? '16 / 9' : '4 / 3'}
-              fallback="The opportunities deck isn't posted yet — check with the College & Career Center."
-            />
-          </div>
+          {/* Preview only on desktop/tablet; on phones it's unreadable, so we show just
+              the "Open in Google Docs" button in the aside instead. */}
+          {wide && (
+            <div className="min-w-0">
+              <Embed
+                src={embeds.opportunitiesSlides}
+                title="Opportunities document"
+                ratio="16 / 9"
+                fallback="The opportunities deck isn't posted yet — check with the College & Career Center."
+              />
+            </div>
+          )}
 
           <aside>
             <p className="eyebrow mb-2">About these postings</p>

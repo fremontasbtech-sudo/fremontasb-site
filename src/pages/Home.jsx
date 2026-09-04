@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import Calendar from '../components/Calendar'
 import { Link } from 'react-router-dom'
 import Button from '../components/Button'
@@ -41,11 +41,32 @@ export default function Home() {
 /* ───────────────────────── 1. Hero video ───────────────────────── */
 
 function Hero() {
+  // Poster is the base layer; the video fades in ONLY once it's actually playing.
+  // If a phone blocks autoplay (e.g. iOS Low Power Mode), the video stays invisible
+  // (opacity-0 hides its play-button overlay too) and the poster simply shows.
+  const videoRef = useRef(null)
+  const [playing, setPlaying] = useState(false)
+  useEffect(() => {
+    const v = videoRef.current
+    if (!v) return
+    const onPlaying = () => setPlaying(true)
+    v.addEventListener('playing', onPlaying)
+    const p = v.play && v.play()
+    if (p && typeof p.catch === 'function') p.catch(() => {}) // autoplay blocked → poster stays
+    return () => v.removeEventListener('playing', onPlaying)
+  }, [])
   return (
     <section className="relative isolate overflow-hidden bg-ink text-white" aria-label="Fremont High School ASB">
-      {/* Video is decorative. Poster paints the frame until (or if) the file loads. */}
-      <video
+      {/* Poster paints the frame always; the video (below) fades in over it when it plays. */}
+      <img
+        src={embeds.heroPoster}
+        alt=""
+        aria-hidden="true"
         className="absolute inset-0 h-full w-full object-cover"
+      />
+      <video
+        ref={videoRef}
+        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${playing ? 'opacity-100' : 'opacity-0'}`}
         src={embeds.heroVideo}
         poster={embeds.heroPoster}
         autoPlay
