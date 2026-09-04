@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   try {
     const albums = await fetchAlbums(process.env.FLICKR_API_KEY, flickrFeed.nsid)
     res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400')
-    res.status(200).json({ albums })
+    res.status(200).json({ albums, titleSource: albums.titleSource || 'heuristic', titleError: albums.titleError || '' })
   } catch (err) {
     // Never hard-fail: the page falls back to photos.json when albums is empty.
     res.status(200).json({ albums: [], error: String(err && err.message || err) })

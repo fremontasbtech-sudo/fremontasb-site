@@ -10,7 +10,7 @@
 // Override it anytime (e.g. to rotate) by setting the FLICKR_API_KEY env var — no code change.
 const DEFAULT_API_KEY = '50ce36c804dbe7a0ee3942cb833f460c'
 
-import { llmTitles } from './_llm.js'
+import { llmTitles, llmError } from './_llm.js'
 
 // LLM-cleaned album titles. Rule (matches the announcements titling): return the event
 // name only, in Title Case, with any YEAR/DATE removed — the site shows the album's real
@@ -34,12 +34,19 @@ const ALBUM_INSTRUCTION = [
 ].join(' ')
 
 async function applyAlbumTitles(albums) {
-  const need = [...new Set(albums.map((a) => a.name).filter((n) => n && !albumTitleCache.has(n)))].slice(0, 80)
-  if (need.length) {
-    const titles = await llmTitles(need, ALBUM_INSTRUCTION)
-    if (titles) need.forEach((n, i) => { if (titles[i]) albumTitleCache.set(n, titles[i]) })
+  const need = [...new Set(albums.map((a) => a.name).filter((n) => n && !albumTitleCache.has(n)))].slice(0, 120)
+  let used = false
+  // Title in small chunks — one giant batch makes the model drop/merge items and the
+  // strict count check then rejects the whole thing. Chunks keep each call reliable.
+  for (let i = 0; i < need.length; i += 20) {
+    const chunk = need.slice(i, i + 20)
+    const titles = await llmTitles(chunk, ALBUM_INSTRUCTION)
+    if (titles) { used = true; chunk.forEach((n, j) => { if (titles[j]) albumTitleCache.set(n, titles[j]) }) }
   }
-  return albums.map((a) => ({ ...a, title: albumTitleCache.get(a.name) || '' }))
+  const out = albums.map((a) => ({ ...a, title: albumTitleCache.get(a.name) || '' }))
+  out.titleSource = used ? 'llm' : 'heuristic'
+  out.titleError = used ? '' : llmError()
+  return out
 }
 
 export async function fetchAlbums(apiKey, userId) {
