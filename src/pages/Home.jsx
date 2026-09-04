@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import Calendar from '../components/Calendar'
 import { Link } from 'react-router-dom'
 import Button from '../components/Button'
@@ -41,18 +41,44 @@ export default function Home() {
 /* ───────────────────────── 1. Hero video ───────────────────────── */
 
 function Hero() {
+  // Poster is the base layer; the video fades in ONLY once it's actually playing.
+  // If a phone blocks autoplay (e.g. iOS Low Power Mode), the video stays invisible
+  // (opacity-0 hides its play-button overlay too) and the poster simply shows.
+  const videoRef = useRef(null)
+  const [playing, setPlaying] = useState(false)
+  useEffect(() => {
+    const v = videoRef.current
+    if (!v) return
+    const onPlaying = () => setPlaying(true)
+    v.addEventListener('playing', onPlaying)
+    const p = v.play && v.play()
+    if (p && typeof p.catch === 'function') p.catch(() => {}) // autoplay blocked → poster stays
+    return () => v.removeEventListener('playing', onPlaying)
+  }, [])
   return (
     <section className="relative isolate overflow-hidden bg-ink text-white" aria-label="Fremont High School ASB">
-      {/* Fremont ASB logo, rendered white, as the hero mark: a faint centered watermark
-          on phones, a bold graphic on the right on wider screens. */}
+      {/* Poster paints the frame always; the video (below) fades in over it when it plays. */}
       <img
-        src="/logo.png"
+        src={embeds.heroPoster}
         alt=""
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 h-full w-full object-contain p-10 opacity-[0.14] [filter:brightness(0)_invert(1)] sm:left-auto sm:right-0 sm:w-[55%] sm:object-right sm:p-16 sm:opacity-90"
+        className="absolute inset-0 h-full w-full object-cover"
       />
-      {/* Gradient keeps the headline readable next to the mark. */}
-      <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/75 to-ink/30 sm:bg-gradient-to-r sm:from-ink sm:via-ink/80 sm:to-transparent" aria-hidden="true" />
+      <video
+        ref={videoRef}
+        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${playing ? 'opacity-100' : 'opacity-0'}`}
+        src={embeds.heroVideo}
+        poster={embeds.heroPoster}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        aria-hidden="true"
+        tabIndex={-1}
+      />
+      {/* Flat scrim so white text stays readable over any frame. */}
+      <div className="absolute inset-0 bg-ink/70" aria-hidden="true" />
 
       <div className="container-site relative flex min-h-[72vh] flex-col justify-end pb-12 pt-20 sm:min-h-[76vh] sm:pb-16 sm:pt-32 lg:min-h-[80vh]">
         <div className="max-w-3xl">
