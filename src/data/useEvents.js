@@ -70,17 +70,23 @@ function shape(data) {
     const d = parseIso(g.date); if (!d) continue
     const isSenior = !!g.seniorNight || /senior\s*night/i.test(g.title || '')
     const title = `${g.sport}${g.opponent ? ` vs ${g.opponent}` : ''}`.trim()
-    if (g.section === 'result' && g.score) {
-      if (d >= floor && d <= start) { // include TODAY so a score shows as soon as it's entered
+    // A game is finished once athletics marks it a result, a score is in, OR its day has
+    // passed. Finished games move to Latest News (with the score if we have it yet, else a
+    // "score soon" note so it never just vanishes) and out of Upcoming.
+    const hasScore = !!(g.score && String(g.score).trim())
+    const finished = g.section === 'result' || hasScore || d < start
+    if (finished) {
+      if (d >= floor && d <= start) { // within the last PAST_DAYS, through today
         const k = `${g.sport}|${g.date}`
         const prev = recentBy.get(k)
         if (!prev || prioOf(g) > prev.prio) {
-          recentBy.set(k, { prio: prioOf(g), item: { key: `gm-${g.date}-${g.sport}`, type: 'Sports', title, href: null, when: d, seniorNight: isSenior, blurb: dashJoin([isSenior ? 'Senior Night' : '', `Final ${g.score}`, g.level]) } })
+          const scoreBit = hasScore ? `Final ${g.score}` : 'Final score soon'
+          recentBy.set(k, { prio: prioOf(g), item: { key: `gm-${g.date}-${g.sport}`, type: 'Sports', title, href: null, when: d, seniorNight: isSenior, blurb: dashJoin([isSenior ? 'Senior Night' : '', scoreBit, g.level]) } })
         }
       }
       continue
     }
-    if (d < start || d > horizon) continue
+    if (d > horizon) continue
     const prev = nextBySport.get(g.sport)
     if (!prev || d < prev.when || (d.getTime() === prev.when.getTime() && prioOf(g) > prev.prio)) {
       nextBySport.set(g.sport, { when: d, prio: prioOf(g), item: { key: `gm-${g.date}-${g.sport}`, type: 'Sports', title, href: null, when: d, seniorNight: isSenior, blurb: dashJoin([isSenior ? 'Senior Night' : '', g.level, g.time, g.location]), meta: dashJoin([isSenior ? 'Senior Night' : '', g.level, g.time, g.location]) } })

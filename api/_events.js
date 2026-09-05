@@ -117,12 +117,46 @@ function parseGames(rows) {
   return out
 }
 
+// The FHS athletics results feed (same source the app's schedule widget uses). It carries
+// the real final scores, which the Sports tab's score column often lacks. We merge them in
+// by matching sport + date + level + opponent, so a game's score appears on the site as
+// soon as athletics posts it — no dependence on the sheet's score column being filled.
+const ATHLETICS_RESULTS = 'https://script.google.com/macros/s/AKfycby_2RTRuFEiIRdoNQtzbuUQzSGCGJ3G_p7CxNrqcqOcQiPk268kXu63uLf21GIT5RfQ/exec?view=results'
+const normOpp = (v) => clean(v).toLowerCase().replace(/^(vs\.?|at)\s+/, '').trim()
+const gkey = (sport, date, level, opp) => [clean(sport).toLowerCase(), clean(date), clean(level).toLowerCase(), normOpp(opp)].join('|')
+
+async function fetchScores() {
+  try {
+    const r = await fetch(ATHLETICS_RESULTS, { headers: { 'User-Agent': 'Mozilla/5.0 fremontasb' } })
+    if (!r.ok) return new Map()
+    const d = await r.json()
+    const m = new Map()
+    for (const p of d.programs || []) {
+      for (const g of p.results || []) {
+        if (!g || g.noScore) continue
+        const sc = clean(g.score)
+        if (!sc || /scrimmage|no score|tbd/i.test(sc)) continue
+        m.set(gkey(g.sport, g.date, g.level, g.opponent || g.matchup), sc)
+      }
+    }
+    return m
+  } catch { return new Map() }
+}
+
 export async function fetchEvents(sheetUrl) {
   const id = idOf(sheetUrl)
   if (!id) return { events: [], games: [] }
-  const [eventsRows, sportsRows] = await Promise.all([
+  const [eventsRows, sportsRows, scores] = await Promise.all([
     fetchRows(csvUrl(id, { gid: 0 })).catch(() => []),
     fetchRows(csvUrl(id, { sheet: 'Sports' })).catch(() => []),
+    fetchScores(),
   ])
-  return { events: parseEvents(eventsRows), games: parseGames(sportsRows) }
+  const games = parseGames(sportsRows)
+  // Fill missing scores from the athletics feed; a scored game is a finished game.
+  for (const g of games) {
+    if (clean(g.score)) continue
+    const sc = scores.get(gkey(g.sport, g.date, g.level, g.opponent))
+    if (sc) { g.score = sc; g.section = 'result' }
+  }
+  return { events: parseEvents(eventsRows), games }
 }
