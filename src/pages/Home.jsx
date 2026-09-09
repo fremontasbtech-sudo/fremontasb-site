@@ -322,13 +322,43 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = []) {
     }
   })
 
-  const albs = (albums || []).slice(0, 3).map((a) => ({
-    key: `f-${a.flickrUrl || a.name}`,
-    type: 'Photos',
+  // Photo albums, titles resolved. An album that matches a recent game (e.g. the
+  // "Football vs Westmont" album) is FOLDED INTO that game's result card as a photos
+  // link, instead of showing as its own row — so we track which albums get consumed.
+  const albumList = (albums || []).map((a) => ({
     title: a.title || cleanAlbumTitle(a.name),
-    blurb: a.count ? `${a.count} new photos on Flickr` : 'New album on Flickr',
     href: a.flickrUrl || null,
+    count: a.count || 0,
     when: parseDate(a.date),
+  }))
+  const norm = (s2) => String(s2 || '').toLowerCase().replace(/[^a-z0-9]/g, '')
+  const consumed = new Set()
+
+  // Recent finished games. If a photo album's title matches the game (same teams), show its
+  // photos link right on the score card and mark the album consumed so it isn't repeated.
+  const games = eventsRecent.map((it) => {
+    const gi = norm(it.title)
+    if (gi.length >= 6) {
+      const m = albumList.find((al) => {
+        if (!al.href || consumed.has(al)) return false
+        const ai = norm(al.title)
+        return ai && (ai === gi || ai.includes(gi) || gi.includes(ai))
+      })
+      if (m) {
+        consumed.add(m)
+        return { ...it, pinned: false, href: m.href, viewLabel: m.count ? `View ${m.count} photos` : 'View photos' }
+      }
+    }
+    return { ...it, pinned: false }
+  })
+
+  const albs = albumList.filter((al) => !consumed.has(al)).slice(0, 3).map((al) => ({
+    key: `f-${al.href || al.title}`,
+    type: 'Photos',
+    title: al.title,
+    blurb: al.count ? `${al.count} new photos on Flickr` : 'New album on Flickr',
+    href: al.href,
+    when: al.when,
     pinned: false,
   }))
 
@@ -336,10 +366,9 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = []) {
   const nowD = new Date()
   const syStart = (nowD.getMonth() + 1) >= 7 ? nowD.getFullYear() : nowD.getFullYear() - 1
   const cutoff = new Date(syStart, 7, 1) // Aug 1
-  // Curated upcoming events + pinned games (from the shared sheet) lead the feed, soonest
-  // first; the dated/recent items fill the rest, freshest first. Cap the lead so real news
-  // still shows through.
-  return [...manual, ...vids, ...albs, ...eventsRecent.map((it) => ({ ...it, pinned: false }))]
+  // Curated upcoming events + pinned games lead the feed, soonest first; the dated/recent
+  // items fill the rest, freshest first. Cap the lead so real news still shows through.
+  return [...manual, ...vids, ...albs, ...games]
     .filter((it) => it.title && it.when && it.when >= cutoff)
     .sort((x, y) => (Number(y.pinned) - Number(x.pinned)) || ((y.when?.getTime() ?? 0) - (x.when?.getTime() ?? 0)))
     .slice(0, 5)
@@ -367,7 +396,7 @@ function NewsItem({ item, featured }) {
         )}
         {item.href && (
           <span className="mt-3 inline-flex min-h-[24px] items-center gap-1.5 font-display text-sm font-bold text-brand">
-            View <Arrow />
+            {item.viewLabel || 'View'} <Arrow />
           </span>
         )}
       </div>

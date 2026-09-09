@@ -56,7 +56,7 @@ export async function fetchAlbums(apiKey, userId) {
     method: 'flickr.photosets.getList',
     api_key: key,
     user_id: userId,
-    primary_photo_extras: 'url_z,url_c,url_m',
+    primary_photo_extras: 'url_z,url_c,url_m,date_taken',
     format: 'json',
     nojsoncallback: '1',
   })
@@ -76,7 +76,11 @@ export async function fetchAlbums(apiKey, userId) {
       coverImageUrl: cover,
       flickrUrl: `https://www.flickr.com/photos/${userId}/albums/${s.id}`,
       count: Number(s.photos || 0),
-      date: s.date_create ? new Date(Number(s.date_create) * 1000).toISOString().slice(0, 10) : '',
+      // Prefer the primary photo's date TAKEN (the actual event day) over date_create
+      // (when it was uploaded to Flickr, often a day or two later).
+      date: (ex.datetaken && /^\d{4}-\d{2}-\d{2}/.test(ex.datetaken))
+        ? ex.datetaken.slice(0, 10)
+        : (s.date_create ? new Date(Number(s.date_create) * 1000).toISOString().slice(0, 10) : ''),
     }
   })
   return applyAlbumTitles(albums)
