@@ -23,7 +23,7 @@ export const sheets = {
   // Clubs → Club List.  "Official Clubs List" sheet (first tab).
   // Columns: name | purpose | studentAdvisors | teacherAdvisor | meetingInfo | email | other
   // TODO(26-27): this is the interim 25-26 list. Swap in the 26-27 sheet once it exists.
-  clubs: 'https://docs.google.com/spreadsheets/d/1M-PZR_C9X4JCqk_uDWEE6MsLFpinhewrbd6oiPRMgqw/edit?gid=0#gid=0',
+  clubs: 'https://docs.google.com/spreadsheets/d/1IQo9QG0ubONWAeaZfwPQ2GJH7zpBr_QexsH9o0XTOLg/edit?gid=0#gid=0',
 
   // Homecoming Court.  Columns: name | photoUrl | bio | active | cycle
   //   The page shows while ANY row has active = TRUE (blank counts as TRUE). Set every row to FALSE after voting.
@@ -46,7 +46,7 @@ export const links = {
     'https://docs.google.com/presentation/d/1GV6dM2eOitIWyesUN5ciMVs3Cq9pqc8a-hBYtz1OmIs/edit?usp=sharing',
   // TODO(26-27): interim 25-26 list, swap to the 26-27 sheet when ready (keep in sync with sheets.clubs above).
   clubsListSheet:
-    'https://docs.google.com/spreadsheets/d/1M-PZR_C9X4JCqk_uDWEE6MsLFpinhewrbd6oiPRMgqw/edit?gid=0#gid=0',
+    'https://docs.google.com/spreadsheets/d/1IQo9QG0ubONWAeaZfwPQ2GJH7zpBr_QexsH9o0XTOLg/edit?gid=0#gid=0',
 
   schoolStore: 'https://fremonths.myschoolcentral.com/',
   flickr: 'https://flickr.com/people/fremonthighschoolasb/',

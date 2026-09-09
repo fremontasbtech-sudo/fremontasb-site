@@ -5,8 +5,8 @@ import Embed from '../components/Embed'
 import Calendar from '../components/Calendar'
 import SectionHeader from '../components/SectionHeader'
 import { Loading, DevNote } from '../components/DataState'
-import { useSheetData } from '../data/useSheetData'
-import { sheets, links, school, embeds, clubDates } from '../data/sources'
+import { useClubs } from '../data/useClubs'
+import { links, school, embeds, clubDates } from '../data/sources'
 import clubsJson from '../data/clubs.json'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -67,7 +67,7 @@ const uniq = (arr) => Array.from(new Set(arr.map((s) => s.toLowerCase())))
 const HOVER_BRAND = '[@media(hover:hover)]:hover:text-brand'
 
 export default function Clubs() {
-  const { rows, loading, error, source } = useSheetData(sheets.clubs, clubsJson, { map: normalizeClub })
+  const { rows, loading, error, source } = useClubs(clubsJson)
   const [query, setQuery] = useState('')
   const [showDisbanded, setShowDisbanded] = useState(false)
   const [showAll, setShowAll] = useState(false)

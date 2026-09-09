@@ -8,6 +8,9 @@ import { llmTitles, llmError } from './_llm.js'
 const DAY_RE = /\b(mon|tue|tues|wed|weds|thu|thur|thurs|fri)[a-z]*\.?\s+(\d{1,2})\/(\d{1,2})\b/i
 const WEEK_RE = /week of\s+(\d{1,2})\/(\d{1,2})/i
 const DAY_OFFSET = { mon: 0, tue: 1, tues: 1, wed: 2, weds: 2, thu: 3, thur: 3, thurs: 3, fri: 4 }
+// A header cell that's JUST a date, e.g. "9/9" or "9/9/2026" (someone typed the date
+// instead of "Wednesday 9/9"). Short + pure-date so it can't match a real announcement.
+const BARE_DATE_RE = /^\s*(\d{1,2})\/(\d{1,2})(?:\/\d{2,4})?\s*$/
 
 function toCsvUrl(url) {
   if (!url.includes('docs.google.com/spreadsheets') || url.includes('output=csv')) return url
@@ -88,19 +91,36 @@ export function parseAnnouncements(rows, now = new Date()) {
   let weekMonday = null
   for (const row of rows) {
     for (const c of row) { const wm = (c || '').match(WEEK_RE); if (wm) weekMonday = mondayOf(makeDate(+wm[1], +wm[2], now)) }
-    const dayCells = row.map((c, i) => ({ i, c })).filter((x) => DAY_RE.test(x.c || ''))
+    // A day-header row: cells like "Wednesday 9/9" OR a bare date "9/9" / "9/9/2026"
+    // (advisors sometimes type just the date, which used to drop that whole column).
+    const dayCells = row.map((c, i) => ({ i, c: c || '' })).filter((x) => DAY_RE.test(x.c) || BARE_DATE_RE.test(x.c))
     if (dayCells.length >= 2) {
       colDates = {}
       for (const { i, c } of dayCells) {
         const m = c.match(DAY_RE)
-        const off = DAY_OFFSET[m[1].toLowerCase()]
-        const headerDate = makeDate(+m[2], +m[3], now)
-        let date = headerDate
-        if (weekMonday && off != null) {
-          const snap = new Date(weekMonday); snap.setDate(snap.getDate() + off)
-          if (Math.abs((snap - headerDate) / 86400000) <= 6) date = snap // correct off-by-days within the week
+        if (m) {
+          const off = DAY_OFFSET[m[1].toLowerCase()]
+          const headerDate = makeDate(+m[2], +m[3], now)
+          let date = headerDate
+          if (weekMonday && off != null) {
+            const snap = new Date(weekMonday); snap.setDate(snap.getDate() + off)
+            if (Math.abs((snap - headerDate) / 86400000) <= 6) date = snap // correct off-by-days within the week
+          }
+          colDates[i] = isoOf(date)
+        } else {
+          // Bare date header ("9/9/2026"): use the literal date, but keep it inside the
+          // week (snap to the same weekday there) if a stray year/typo pushed it out.
+          const b = c.match(BARE_DATE_RE)
+          let date = makeDate(+b[1], +b[2], now)
+          if (weekMonday) {
+            const diff = Math.round((date - weekMonday) / 86400000)
+            if (diff < 0 || diff > 6) {
+              const wd = date.getDay(); const off = wd === 0 ? 6 : wd - 1
+              const snap = new Date(weekMonday); snap.setDate(snap.getDate() + off); date = snap
+            }
+          }
+          colDates[i] = isoOf(date)
         }
-        colDates[i] = isoOf(date)
       }
       continue
     }
