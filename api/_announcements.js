@@ -5,12 +5,11 @@ import { llmTitles, llmError } from './_llm.js'
 // The sheet is a public gviz CSV — no key. The CLIENT decides what's visible
 // (past-only + 8:30 AM cutoff); this just extracts everything with real dates.
 
-const DAY_RE = /\b(mon|tue|tues|wed|weds|thu|thur|thurs|fri)[a-z]*\.?\s+(\d{1,2})\/(\d{1,2})\b/i
 const WEEK_RE = /week of\s+(\d{1,2})\/(\d{1,2})/i
-const DAY_OFFSET = { mon: 0, tue: 1, tues: 1, wed: 2, weds: 2, thu: 3, thur: 3, thurs: 3, fri: 4 }
-// A header cell that's JUST a date, e.g. "9/9" or "9/9/2026" (someone typed the date
-// instead of "Wednesday 9/9"). Short + pure-date so it can't match a real announcement.
-const BARE_DATE_RE = /^\s*(\d{1,2})\/(\d{1,2})(?:\/\d{2,4})?\s*$/
+// A "day header" cell: an optional weekday word then a date — "Wednesday 9/9", "Mon 9/8",
+// or just a bare date "9/9" / "9/9/2026". Anchored + date-only, so a real announcement
+// paragraph can never match it. Used ONLY to detect + skip header rows.
+const DAY_HEADER_RE = /^(?:\s*(?:mon|tue|tues|wed|weds|thu|thur|thurs|fri|sat|sun)[a-z]*\.?\s*)?\d{1,2}\/\d{1,2}(?:\/\d{2,4})?\s*$/i
 
 function toCsvUrl(url) {
   if (!url.includes('docs.google.com/spreadsheets') || url.includes('output=csv')) return url
@@ -86,47 +85,42 @@ function isoOf(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padSta
 // in the header cell, which in this sheet is often off by a day. So a "Wednesday" announcement
 // always goes out on the real Wednesday even when the sheet's date is wrong.
 export function parseAnnouncements(rows, now = new Date()) {
+  // This sheet is organized in WEEKLY blocks: a "Week of M/D - M/D" row, a day-header row
+  // (Mon/Tue/Wed/Thu/Fri labels), then the week's announcements stacked in cells below.
+  // The header labels and dates are typed inconsistently (bare dates, wrong days, blanks),
+  // and in practice every announcement is dumped into ONE column — so we do NOT trust the
+  // per-column date. Instead: anchor on the reliable "Week of" Monday, gather every content
+  // cell in that block, and surface the whole set on that week's two reading mornings —
+  // WEDNESDAY (Mon+2) and FRIDAY (Mon+4). Announcements are read over the PA on Wed and Fri,
+  // so the same weekly set appears on both days. The client's 8:30 AM cutoff then reveals
+  // each day on its own morning. This has no per-cell date guessing, so it can't silently
+  // drop a column again.
+  const READING_OFFSETS = [2, 4] // Wednesday, Friday relative to the week's Monday
   const out = []
-  let colDates = {}
   let weekMonday = null
   for (const row of rows) {
-    for (const c of row) { const wm = (c || '').match(WEEK_RE); if (wm) weekMonday = mondayOf(makeDate(+wm[1], +wm[2], now)) }
-    // A day-header row: cells like "Wednesday 9/9" OR a bare date "9/9" / "9/9/2026"
-    // (advisors sometimes type just the date, which used to drop that whole column).
-    const dayCells = row.map((c, i) => ({ i, c: c || '' })).filter((x) => DAY_RE.test(x.c) || BARE_DATE_RE.test(x.c))
-    if (dayCells.length >= 2) {
-      colDates = {}
-      for (const { i, c } of dayCells) {
-        const m = c.match(DAY_RE)
-        if (m) {
-          const off = DAY_OFFSET[m[1].toLowerCase()]
-          const headerDate = makeDate(+m[2], +m[3], now)
-          let date = headerDate
-          if (weekMonday && off != null) {
-            const snap = new Date(weekMonday); snap.setDate(snap.getDate() + off)
-            if (Math.abs((snap - headerDate) / 86400000) <= 6) date = snap // correct off-by-days within the week
-          }
-          colDates[i] = isoOf(date)
-        } else {
-          // Bare date header ("9/9/2026"): use the literal date, but keep it inside the
-          // week (snap to the same weekday there) if a stray year/typo pushed it out.
-          const b = c.match(BARE_DATE_RE)
-          let date = makeDate(+b[1], +b[2], now)
-          if (weekMonday) {
-            const diff = Math.round((date - weekMonday) / 86400000)
-            if (diff < 0 || diff > 6) {
-              const wd = date.getDay(); const off = wd === 0 ? 6 : wd - 1
-              const snap = new Date(weekMonday); snap.setDate(snap.getDate() + off); date = snap
-            }
-          }
-          colDates[i] = isoOf(date)
-        }
-      }
-      continue
+    // New week? Anchor on its Monday (the one thing in this sheet that's always correct).
+    let sawWeek = false
+    for (const c of row) {
+      const wm = (c || '').match(WEEK_RE)
+      if (wm) { weekMonday = mondayOf(makeDate(+wm[1], +wm[2], now)); sawWeek = true }
     }
-    for (let i = 0; i < row.length; i++) {
-      const cell = (row[i] || '').trim()
-      if (colDates[i] && cell && !/^week of/i.test(cell)) out.push({ date: colDates[i], text: cleanText(cell) })
+    // Skip a day-header row (2+ cells that are just a weekday/date label). A "Week of" row
+    // sometimes also carries header labels — that's fine, we already read its Monday above.
+    const headerCells = row.filter((c) => DAY_HEADER_RE.test((c || '').trim())).length
+    if (headerCells >= 2) continue
+    if (!weekMonday) continue // content before any "Week of" anchor — ignore, we can't date it
+    const dates = READING_OFFSETS.map((off) => {
+      const d = new Date(weekMonday); d.setDate(d.getDate() + off); return isoOf(d)
+    })
+    for (const raw of row) {
+      const cell = (raw || '').trim()
+      if (!cell) continue
+      if (WEEK_RE.test(cell)) continue          // stray "Week of" text
+      if (DAY_HEADER_RE.test(cell)) continue    // stray lone date/day label
+      if (sawWeek && cell.length < 3) continue  // tiny noise on the week row
+      const text = cleanText(cell)
+      for (const date of dates) out.push({ date, text })
     }
   }
   const seen = new Set()
