@@ -49,6 +49,41 @@ async function applyAlbumTitles(albums) {
   return out
 }
 
+// The album's real EVENT day. date_create is when it was UPLOADED (often a day or two after
+// the event), and the cover photo's EXIF date is unreliable (some cameras report a wrong year,
+// e.g. a 2019 timestamp on a 2026 photo). So for the most recent albums we pull their photos'
+// capture dates and take the MOST COMMON day that falls near the upload — that's the event day.
+// Bounded to the newest albums (the ones the site actually shows) and cached, so it's a handful
+// of extra calls, not one per album. Anything we can't resolve keeps the date_create fallback.
+const eventDateCache = new Map()
+async function applyEventDates(albums, key) {
+  const recent = albums.filter((a) => a.id).sort((a, b) => b.createEpoch - a.createEpoch).slice(0, 14)
+  await Promise.all(recent.map(async (a) => {
+    if (eventDateCache.has(a.id)) { a.date = eventDateCache.get(a.id); return }
+    try {
+      const u = `https://api.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=${encodeURIComponent(key)}&photoset_id=${a.id}&extras=date_taken&per_page=300&format=json&nojsoncallback=1`
+      const r = await fetch(u)
+      if (!r.ok) return
+      const j = await r.json()
+      const photos = (j && j.photoset && j.photoset.photo) || []
+      const anchor = a.createEpoch ? a.createEpoch * 1000 : Date.now()
+      const lo = anchor - 60 * 86400000, hi = anchor + 2 * 86400000
+      const counts = new Map()
+      for (const p of photos) {
+        const dt = p.datetaken || ''
+        if (!/^\d{4}-\d{2}-\d{2}/.test(dt)) continue
+        const ms = new Date(dt.replace(' ', 'T')).getTime()
+        if (Number.isNaN(ms) || ms < lo || ms > hi) continue // drop wrong-clock outliers
+        const day = dt.slice(0, 10)
+        counts.set(day, (counts.get(day) || 0) + 1)
+      }
+      let best = '', bestN = 0
+      for (const [day, n] of counts) if (n > bestN) { bestN = n; best = day }
+      if (best) { a.date = best; eventDateCache.set(a.id, best) }
+    } catch { /* keep the date_create fallback */ }
+  }))
+}
+
 export async function fetchAlbums(apiKey, userId) {
   const key = apiKey || DEFAULT_API_KEY
   if (!userId) throw new Error('no flickr nsid')
@@ -56,7 +91,7 @@ export async function fetchAlbums(apiKey, userId) {
     method: 'flickr.photosets.getList',
     api_key: key,
     user_id: userId,
-    primary_photo_extras: 'url_z,url_c,url_m,date_taken',
+    primary_photo_extras: 'url_z,url_c,url_m',
     format: 'json',
     nojsoncallback: '1',
   })
@@ -71,17 +106,18 @@ export async function fetchAlbums(apiKey, userId) {
     const cover =
       ex.url_z || ex.url_c || ex.url_m ||
       (ex.server ? `https://live.staticflickr.com/${ex.server}/${s.primary}_${ex.secret}_z.jpg` : '')
+    const createEpoch = Number(s.date_create) || 0
     return {
+      id: s.id,
       name: (s.title && s.title._content) || 'Untitled album',
       coverImageUrl: cover,
       flickrUrl: `https://www.flickr.com/photos/${userId}/albums/${s.id}`,
       count: Number(s.photos || 0),
-      // Prefer the primary photo's date TAKEN (the actual event day) over date_create
-      // (when it was uploaded to Flickr, often a day or two later).
-      date: (ex.datetaken && /^\d{4}-\d{2}-\d{2}/.test(ex.datetaken))
-        ? ex.datetaken.slice(0, 10)
-        : (s.date_create ? new Date(Number(s.date_create) * 1000).toISOString().slice(0, 10) : ''),
+      createEpoch,
+      // date_create is the UPLOAD day; refined to the real EVENT day in applyEventDates.
+      date: createEpoch ? new Date(createEpoch * 1000).toISOString().slice(0, 10) : '',
     }
   })
+  await applyEventDates(albums, key)
   return applyAlbumTitles(albums)
 }
