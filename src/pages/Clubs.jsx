@@ -261,7 +261,7 @@ export default function Clubs() {
               <SectionHeader eyebrow="Start a club" title="How to start a club" className="mb-4 sm:mb-5" />
               <p className="text-body leading-relaxed">
                 Three steps to get on the Official Clubs List, then the things every club does during the year to stay on it.
-                The Club Handbook has the full rules and this year’s dates.
+                The Club Handbook has the full rules.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Button href={links.clubHandbook} variant="primary" external>Read the Club Handbook</Button>

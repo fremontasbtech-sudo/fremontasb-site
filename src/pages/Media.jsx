@@ -31,11 +31,9 @@ export default function Media() {
     [episodes],
   )
   const latest = sorted[0]
-  // The featured episode is not repeated in the archive.
-  const rest = useMemo(
-    () => (latest ? sorted.filter((e) => e.youtubeId !== latest.youtubeId) : sorted),
-    [sorted, latest],
-  )
+  // Archive lists every video, including the featured latest one, so the newest episode is
+  // always in the grid and under its category filter below (not only the hero above).
+  const rest = sorted
   const [kind, setKind] = useState('All')
 
   const counts = useMemo(() => {
@@ -93,7 +91,7 @@ export default function Media() {
         <div className="container-site">
           {/* Title + filters: one render; the filter row drops below the title until lg. */}
           <div className="mb-8 flex flex-wrap items-end justify-between gap-x-8 gap-y-5 sm:mb-10">
-            <SectionHeader title="Archive" eyebrow={`${rest.length} earlier videos`} className="!mb-0" />
+            <SectionHeader title="Archive" eyebrow={`${rest.length} videos`} className="!mb-0" />
             <Filters kind={kind} setKind={setKind} counts={counts} className="w-full lg:w-auto" />
           </div>
 

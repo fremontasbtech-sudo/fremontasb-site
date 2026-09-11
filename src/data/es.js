@@ -73,7 +73,7 @@ export const ES = {
   'ASB cards, dance tickets, gear': 'Tarjetas ASB, boletos de baile y mercancía',
 
   // ── Home / DownloadApp: app band ──
-  'The stuff the website can’t do lives in the app.': 'Lo que el sitio no puede hacer está en la app.',
+  "What the website can't do, the app can.": 'Lo que el sitio no puede hacer, la app sí.',
   "Submit club forms, check spirit points, pull up today's bell schedule, and log teacher bonuses. Sign in with your school Google account.":
     'Envía formularios de clubes, revisa puntos de espíritu, consulta el horario de campanas de hoy y registra bonos de maestros. Inicia sesión con tu cuenta de Google escolar.',
   'In development. Store links post here first.': 'En desarrollo: los enlaces de las tiendas se publicarán aquí primero.',
@@ -159,8 +159,8 @@ export const ES = {
   'The Clubs Commission’s info deck: how to start a club, how to stay official, the strike system, and the events for the year. Tap through it here, or open it full screen.':
     'La presentación informativa de la Comisión de Clubes: cómo iniciar un club, cómo mantenerse oficial, el sistema de strikes y los eventos del año. Pásala aquí o ábrela en pantalla completa.',
   'Open the slides': 'Abrir la presentación',
-  'Three steps to get on the Official Clubs List, then the things every club does during the year to stay on it. The Club Handbook has the full rules and this year’s dates.':
-    'Tres pasos para entrar en la Lista Oficial de Clubes, y luego lo que todo club hace durante el año para permanecer en ella. El Manual de Clubes tiene las reglas completas y las fechas de este año.',
+  'Three steps to get on the Official Clubs List, then the things every club does during the year to stay on it. The Club Handbook has the full rules.':
+    'Tres pasos para entrar en la Lista Oficial de Clubes, y luego lo que todo club hace durante el año para permanecer en ella. El Manual de Clubes tiene las reglas completas.',
   'Find a teacher advisor.': 'Encuentra un asesor docente.',
   'A Fremont staff member has to agree to advise the club and host its meetings. Ask before you do anything else.':
     'Un miembro del personal de Fremont debe aceptar asesorar el club y albergar sus reuniones. Pregúntale antes que nada.',

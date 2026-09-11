@@ -576,7 +576,7 @@ function AppBanner() {
         <div className="lg:col-span-8">
           <p className="eyebrow-on-dark">Fremont ASB app</p>
           <h2 id="app-banner-title" className="mt-3 font-display text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl">
-            The stuff the website can't do lives in the app.
+            What the website can't do, the app can.
           </h2>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/90 sm:text-lg">
             Submit club forms, check spirit points, pull up today's bell schedule, and log teacher bonuses. Sign in with
