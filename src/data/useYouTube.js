@@ -20,7 +20,7 @@ import { useEffect, useState } from 'react'
  *
  * Returns { rows, loading, source }  (source: 'youtube' | 'local').
  */
-const CACHE_KEY = 'fasb.media.v1'
+const CACHE_KEY = 'fasb.media.v2'
 function readCache() {
   try { const raw = localStorage.getItem(CACHE_KEY); const a = raw && JSON.parse(raw); return Array.isArray(a) && a.length ? a : null } catch { return null }
 }
@@ -54,13 +54,14 @@ export function useYouTube(overlayRows = []) {
         // title + hosts from the channel's naming convention so new uploads look curated.
         const merged = live.map((v) => {
           const o = overlayById[v.youtubeId] || {}
-          const p = parseEpisode(v.title)
+          const p = parseEpisode(v.title) // client fallback if the server didn't send clean fields
+          const title = o.title || v.cleanTitle || p.title || v.title
           return {
             youtubeId: v.youtubeId,
-            title: o.title || p.title || v.title,
+            title,
             date: o.date || v.date,
-            hosts: (o.hosts ?? '') || p.hosts,
-            kind: o.kind || guessKind(o.title || p.title || v.title),
+            hosts: (o.hosts ?? '') || v.hosts || p.hosts,
+            kind: o.kind || guessKind(title),
           }
         })
         // Older curated episodes that have scrolled out of the feed.

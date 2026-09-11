@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     const videos = await fetchChannelVideos(youtubeFeed.channelId)
     // Cache at the edge for 30 min, serve stale up to 1h while revalidating.
     res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate=3600')
-    res.status(200).json({ videos })
+    res.status(200).json({ videos, titleSource: videos.titleSource || 'heuristic', titleError: videos.titleError || '' })
   } catch (err) {
     // Never hard-fail: the page falls back to media.json when videos is empty.
     res.status(200).json({ videos: [], error: String(err && err.message || err) })
