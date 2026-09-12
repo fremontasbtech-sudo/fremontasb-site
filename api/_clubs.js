@@ -165,6 +165,52 @@ const TEXT_INSTRUCTION = [
 const endPunct = (s) => { const t = String(s).trim(); return t && !/[.?!]$/.test(t) ? t + '.' : t }
 const heuristicText = (s) => { const t = String(s).trim(); if (!t) return t; return endPunct(t.charAt(0).toUpperCase() + t.slice(1)) }
 
+// -- Category (fixed taxonomy) so the app can group + filter clubs. Classified by the LLM
+//    (cached by "name - purpose"); heuristic fallback keeps it working with no key. --
+const CATEGORIES = ['STEM', 'Arts & Media', 'Culture & Language', 'Service & Advocacy', 'Academics & Business', 'Sports & Games', 'Special Interest']
+const CATEGORY_SET = new Set(CATEGORIES)
+const categoryCache = new Map()
+const CATEGORY_INSTRUCTION = [
+  'You sort high school clubs into EXACTLY ONE category.',
+  'The categories, and the ONLY allowed outputs, are:',
+  '"STEM" (science, math, engineering, coding, robotics, medicine, research);',
+  '"Arts & Media" (visual art, music, dance, theater, film, photography, design, creative writing, journalism);',
+  '"Culture & Language" (cultural, heritage, language, religion, or identity clubs);',
+  '"Service & Advocacy" (community service, volunteering, charity, awareness, environment, mental health, equity);',
+  '"Academics & Business" (business, entrepreneurship, debate, speech, Model UN, academic competitions, honor societies, finance, law);',
+  '"Sports & Games" (sports, fitness, board or video games, chess, esports);',
+  '"Special Interest" (use ONLY when none of the others clearly fit).',
+  'Each input is "Club name - purpose". Return ONLY a JSON array of strings, one per input in the same order, each EXACTLY one of the seven labels.',
+].join(' ')
+const CAT_RULES = [
+  ['STEM', /\b(stem|science|scientific|physics|astro|astronom|robot|engineer|coding|code|computer|cs|technolog|tech|math|biolog|chem|medic|aerospace|aviation|uav|rocket|data|ai|neuro|research|cyber|hack)\b/i],
+  ['Arts & Media', /\b(art|paint|draw|anim|music|band|orchestra|choir|sing|dance|film|movie|photo|media|design|creativ|drama|theat|writ|poetry|journal|craft|fashion|sculpt)\b/i],
+  ['Culture & Language', /\b(cultur|language|chinese|mandarin|spanish|french|korean|japanese|hindi|indian|desi|asian|latin|hispanic|black|african|muslim|islam|jewish|christ|hindu|faith|religio|heritage|bsu|international|diversity)\b/i],
+  ['Service & Advocacy', /\b(service|volunteer|communit|charit|advoca|awareness|mental health|environment|green|sustain|equit|justice|change|outreach|red cross|key club|interact|unicef|kindness|donat|fundrais|nonprofit|activis)\b/i],
+  ['Academics & Business', /\b(business|entrepreneur|fbla|deca|debate|speech|model un|mun|scholar|academ|finance|econ|invest|law|mock trial|honor societ|csf|nhs|quiz|decathlon|olympiad|competition|spelling)\b/i],
+  ['Sports & Games', /\b(sport|basketball|soccer|tennis|volleyball|badminton|cricket|chess|game|gaming|esport|ping pong|table tennis|fitness|yoga|climb|martial|karate|spikeball|frisbee|dodgeball|pickleball|weightlift)\b/i],
+]
+function guessCategory(name, purpose) {
+  const text = `${name} ${purpose || ''}`
+  for (const [cat, re] of CAT_RULES) if (re.test(text)) return cat
+  return 'Special Interest'
+}
+async function classifyCategories(clubs) {
+  const inputs = clubs.map((c) => `${c.name} - ${String(c.purpose || c.other || '').slice(0, 160)}`)
+  const need = [...new Set(inputs.filter((v) => v && !categoryCache.has(v)))].slice(0, 200)
+  let used = false
+  for (let i = 0; i < need.length; i += 20) {
+    const chunk = need.slice(i, i + 20)
+    const out = await llmTitles(chunk, CATEGORY_INSTRUCTION)
+    if (out) { used = true; chunk.forEach((raw, j) => { const k = String(out[j] || '').trim(); if (CATEGORY_SET.has(k)) categoryCache.set(raw, k) }) }
+  }
+  clubs.forEach((c, i) => {
+    const key = inputs[i]
+    c.category = categoryCache.has(key) ? categoryCache.get(key) : guessCategory(c.name, c.purpose || c.other)
+  })
+  return used
+}
+
 function toCsvUrl(url) {
   if (!url.includes('docs.google.com/spreadsheets') || url.includes('output=csv')) return url
   const id = url.match(/\/d\/([a-zA-Z0-9-_]+)/)?.[1]
@@ -183,9 +229,10 @@ export async function fetchClubs(sheetUrl) {
   const m = await cleanField(clubs, ['meetingInfo'], meetingCache, MEETING_INSTRUCTION, 20, null, null)
   const n = await cleanField(clubs, ['studentAdvisors', 'teacherAdvisor'], nameCache, NAME_INSTRUCTION, 20, null, titleCaseNames)
   const t = await cleanField(clubs, ['purpose', 'other'], textCache, TEXT_INSTRUCTION, 10, endPunct, heuristicText)
+  const cat = await classifyCategories(clubs) // sets c.category on every club
 
   clubs.meetingSource = m ? 'llm' : 'heuristic'
-  clubs.tidySource = (m || n || t) ? 'llm' : 'heuristic'
+  clubs.tidySource = (m || n || t || cat) ? 'llm' : 'heuristic'
   clubs.meetingError = (m || n || t) ? '' : llmError()
   return clubs
 }
