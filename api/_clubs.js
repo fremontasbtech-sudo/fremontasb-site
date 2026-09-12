@@ -1,27 +1,24 @@
-// Shared server-side helper: fetch the Official Clubs List sheet, normalize each
-// row into one clean shape, and use the LLM (api/_llm.js) to CONDENSE the free-text
-// "Meeting Location & Times" cell so it fits the small "Meets" line on the Clubs page.
-// Used by api/clubs.js (Vercel) and the dev middleware in vite.config.js.
-//
-// The sheet is public + keyless. Advisors type meeting info freely ("Mrs. Stebbins
-// room, during wed and Friday during lunch every other week"), so we ask the model to
-// rewrite each one as a tidy "Room · Days Time" line. Cached by the raw cell text, so a
-// NEW/edited club is condensed automatically next fetch. When there's no LLM key or the
-// call fails, the raw cell is used unchanged — the page always renders.
+// Shared server-side helper: fetch the Official Clubs List sheet, normalize each row
+// into one clean shape, and use the LLM (api/_llm.js — Gemini/Anthropic/OpenAI) to tidy it:
+//   • meetingInfo  — condense the free-text "Meeting Location & Times" to a short line
+//   • studentAdvisors / teacherAdvisor — capitalize names and comma-separate the people
+//     (advisors often type "Vidyuth Pasumarthi Ayush Anarkat …" with no commas)
+//   • purpose / other — fix sentence capitalization and end punctuation, wording untouched
+// Used by api/clubs.js (Vercel) and the dev middleware in vite.config.js. Everything is
+// cached by the raw cell text, so an edited/new club is re-tidied automatically on the next
+// fetch and unchanged cells are never re-sent. No LLM key / any failure ⇒ a safe heuristic,
+// so the page always renders.
 
 import { llmTitles, llmError } from './_llm.js'
 
 const EMAIL_RE = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g
 
-// Same header→camelCase rule the client uses (src/data/useSheetData.js toKey),
-// but empty headers (the sheet's trailing blank columns) map to '' and are dropped.
 function toKey(h) {
   const words = String(h).trim().replace(/[^a-zA-Z0-9 ]/g, ' ').split(/\s+/).filter(Boolean)
   if (!words.length) return ''
   return words.map((w, i) => (i ? w[0].toUpperCase() + w.slice(1).toLowerCase() : w.toLowerCase())).join('')
 }
 
-// Minimal RFC-4180 CSV parser (mirrors the client one) → array of row objects.
 function parseCsv(text) {
   const rows = []
   let row = [], cell = '', inQuotes = false
@@ -62,9 +59,6 @@ function pick(row, keys) {
   return ''
 }
 
-// Normalize one sheet row into the exact shape the Clubs page expects (matches the
-// client normalizeClub in src/pages/Clubs.jsx). meetingInfo is the RAW cell here;
-// condensing happens after, in applyMeetingInfo, so it can be batched + cached.
 function normalizeRow(row) {
   const name =
     pick(row, ['name', 'f', 'club', 'clubName', 'clubs']) ||
@@ -98,8 +92,30 @@ function normalizeRow(row) {
   }
 }
 
-// LLM-condensed meeting lines. Cached by the raw cell text so a new/edited entry is
-// condensed on the next fetch, and re-fetches don't re-call the model for unchanged cells.
+// ── Generic LLM helper: clean a set of field values across all clubs, cached by raw text,
+//    chunked so llmTitles' strict count-check stays reliable. `post` runs on each cleaned
+//    value; `fallback` runs when the LLM has nothing for that value. Mutates in place. ──
+async function cleanField(clubs, fields, cache, instruction, chunkSize, post, fallback) {
+  const need = [...new Set(
+    clubs.flatMap((c) => fields.map((f) => c[f])).filter((v) => v && !cache.has(v)),
+  )].slice(0, 200)
+  let used = false
+  for (let i = 0; i < need.length; i += chunkSize) {
+    const chunk = need.slice(i, i + chunkSize)
+    const cleaned = await llmTitles(chunk, instruction)
+    if (cleaned) { used = true; chunk.forEach((raw, j) => { if (cleaned[j]) cache.set(raw, post ? post(cleaned[j]) : cleaned[j]) }) }
+  }
+  for (const c of clubs) {
+    for (const f of fields) {
+      const v = c[f]
+      if (!v) continue
+      c[f] = cache.has(v) ? cache.get(v) : (fallback ? fallback(v) : v)
+    }
+  }
+  return used
+}
+
+// Meeting location & times → short "Room · Days Time" line.
 const meetingCache = new Map()
 const MEETING_INSTRUCTION = [
   'You tidy free-text "meeting location & time" notes for a high school club list, shown on a small one-line field on the school website.',
@@ -116,27 +132,43 @@ const MEETING_INSTRUCTION = [
   'No ending punctuation, no surrounding quotes. Return ONLY a JSON array of strings, one per note, in the same order.',
 ].join(' ')
 
-async function applyMeetingInfo(clubs) {
-  const need = [...new Set(clubs.map((c) => c.meetingInfo).filter((m) => m && !meetingCache.has(m)))].slice(0, 120)
-  let used = false
-  // Chunk so the strict count-check in llmTitles stays reliable (one giant batch makes
-  // the model drop/merge items and the whole call is rejected).
-  for (let i = 0; i < need.length; i += 20) {
-    const chunk = need.slice(i, i + 20)
-    const cleaned = await llmTitles(chunk, MEETING_INSTRUCTION)
-    if (cleaned) { used = true; chunk.forEach((raw, j) => { if (cleaned[j]) meetingCache.set(raw, cleaned[j]) }) }
-  }
-  const out = clubs.map((c) => ({ ...c, meetingInfo: (c.meetingInfo && meetingCache.get(c.meetingInfo)) || c.meetingInfo }))
-  out.meetingSource = used ? 'llm' : 'heuristic'
-  out.meetingError = used ? '' : llmError()
-  return out
-}
+// Student / teacher names → Capitalized, comma-separated between distinct people.
+const nameCache = new Map()
+const NAME_INSTRUCTION = [
+  'You clean up lists of people\'s names for a high school club roster.',
+  'For EACH input, the text is one or more names — often run together with no commas and with inconsistent capitalization.',
+  'Return the SAME names, Capitalized Properly, with ", " between distinct people.',
+  'Do NOT add, remove, translate, re-spell, or invent any name — only insert commas between people and fix capitalization.',
+  'If the input is empty or has no names, return it unchanged.',
+  'Examples:',
+  '"Vidyuth Pasumarthi Ayush Anarkat Allyson Chan Joshua Charnota" -> "Vidyuth Pasumarthi, Ayush Anarkat, Allyson Chan, Joshua Charnota"',
+  '"lotem mechlovich ahinava sivakumaran" -> "Lotem Mechlovich, Ahinava Sivakumaran"',
+  '"Aaron Eeg" -> "Aaron Eeg"',
+  'Return ONLY a JSON array of strings, one per input, in the same order.',
+].join(' ')
+// Heuristic fallback: title-case each word (can't guess name boundaries without the LLM).
+const titleCaseNames = (s) => String(s).replace(/\b([a-z])/g, (c) => c.toUpperCase())
+
+// Purpose / other → fix capitalization + end punctuation only, wording untouched.
+const textCache = new Map()
+const TEXT_INSTRUCTION = [
+  'You lightly copy-edit short club descriptions for a high school website.',
+  'For EACH input, fix ONLY capitalization and end punctuation: capitalize the first letter of every sentence and the word "I", and make sure it ends with a period (unless it already ends with ? or !).',
+  'Do NOT reword, rephrase, translate, summarize, shorten, expand, add, or remove anything. Keep every word exactly as written.',
+  'If it is already correct, return it unchanged. If it is empty, return it empty.',
+  'Examples:',
+  '"we play chess every week and compete in tournaments" -> "We play chess every week and compete in tournaments."',
+  '"This club will go into " -> "This club will go into."',
+  'Return ONLY a JSON array of strings, one per input, in the same order.',
+].join(' ')
+// llmTitles strips a trailing period, so re-add terminal punctuation after it returns.
+const endPunct = (s) => { const t = String(s).trim(); return t && !/[.?!]$/.test(t) ? t + '.' : t }
+const heuristicText = (s) => { const t = String(s).trim(); if (!t) return t; return endPunct(t.charAt(0).toUpperCase() + t.slice(1)) }
 
 function toCsvUrl(url) {
   if (!url.includes('docs.google.com/spreadsheets') || url.includes('output=csv')) return url
   const id = url.match(/\/d\/([a-zA-Z0-9-_]+)/)?.[1]
   const gid = url.match(/[#&?]gid=(\d+)/)?.[1] ?? '0'
-  // Cache-bust so a sheet edit isn't served from Google's gviz cache.
   return `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&gid=${gid}&_cb=${Date.now()}`
 }
 
@@ -146,5 +178,14 @@ export async function fetchClubs(sheetUrl) {
   if (!r.ok) throw new Error(`clubs sheet returned ${r.status}`)
   const text = await r.text()
   const clubs = parseCsv(text).map(normalizeRow).filter((c) => c.name && c.name !== 'Untitled club')
-  return applyMeetingInfo(clubs)
+
+  // Tidy each field with the LLM (all cached by raw text ⇒ only new/changed cells hit it).
+  const m = await cleanField(clubs, ['meetingInfo'], meetingCache, MEETING_INSTRUCTION, 20, null, null)
+  const n = await cleanField(clubs, ['studentAdvisors', 'teacherAdvisor'], nameCache, NAME_INSTRUCTION, 20, null, titleCaseNames)
+  const t = await cleanField(clubs, ['purpose', 'other'], textCache, TEXT_INSTRUCTION, 10, endPunct, heuristicText)
+
+  clubs.meetingSource = m ? 'llm' : 'heuristic'
+  clubs.tidySource = (m || n || t) ? 'llm' : 'heuristic'
+  clubs.meetingError = (m || n || t) ? '' : llmError()
+  return clubs
 }
