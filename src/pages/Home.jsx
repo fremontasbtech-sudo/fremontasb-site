@@ -368,9 +368,17 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = []) {
   const cutoff = new Date(syStart, 7, 1) // Aug 1
   // Curated upcoming events + pinned games lead the feed, soonest first; the dated/recent
   // items fill the rest, freshest first. Cap the lead so real news still shows through.
-  return [...manual, ...vids, ...albs, ...games]
+  const ranked = [...manual, ...vids, ...albs, ...games]
     .filter((it) => it.title && it.when && it.when >= cutoff)
     .sort((x, y) => (Number(y.pinned) - Number(x.pinned)) || ((y.when?.getTime() ?? 0) - (x.when?.getTime() ?? 0)))
+  // At most ONE FremontTV item in Latest News (the newest). 'kind' is classified by the LLM
+  // server-side (api/_feed.js), so a future episode is caught even if it's titled differently.
+  let fremontTVShown = false
+  return ranked
+    .filter((it) => {
+      if (it.type === 'FremontTV') { if (fremontTVShown) return false; fremontTVShown = true }
+      return true
+    })
     .slice(0, 5)
 }
 

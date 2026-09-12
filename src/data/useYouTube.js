@@ -61,7 +61,7 @@ export function useYouTube(overlayRows = []) {
             title,
             date: o.date || v.date,
             hosts: (o.hosts ?? '') || v.hosts || p.hosts,
-            kind: o.kind || guessKind(title),
+            kind: o.kind || v.kind || guessKind(title),
           }
         })
         // Older curated episodes that have scrolled out of the feed.

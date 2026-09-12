@@ -66,6 +66,15 @@ const TITLE_INSTRUCTION = [
   'Return ONLY a JSON array of strings, one per title, in the same order.',
 ].join(' ')
 
+const kindCache = new Map()
+const VALID_KINDS = new Set(['FremontTV', 'Rally', 'Event'])
+const KIND_INSTRUCTION = [
+  "Classify each of a high school ASB's YouTube video titles into exactly one category.",
+  'The categories are: "FremontTV" (the ASB\'s recurring news-show episodes, usually titled "Fremont TV" / "FremontTV" / with "Episode"),',
+  '"Rally" (a spirit or pep rally), or "Event" (anything else: graduations, senior videos, performances, one-off events).',
+  'Return ONLY a JSON array of strings, one per title in the same order, each exactly one of: FremontTV, Rally, Event.',
+].join(' ')
+
 export async function applyEpisodeTitles(videos) {
   // Heuristic first: a clean title + hosts parsed from the channel's naming convention.
   // This is both the no-key fallback and where hosts always come from.
@@ -81,6 +90,17 @@ export async function applyEpisodeTitles(videos) {
     if (titles) { used = true; chunk.forEach((raw, j) => { if (titles[j]) titleCache.set(raw, titles[j]) }) }
   }
   for (const v of videos) { if (titleCache.has(v.title)) v.cleanTitle = titleCache.get(v.title) }
+
+  // Kind (FremontTV / Rally / Event) — classified by the LLM so the "one FremontTV in Latest
+  // News" rule catches future uploads whatever they're titled. Heuristic guess is the fallback.
+  for (const v of videos) v.kind = guessKind(v.cleanTitle || v.title)
+  const kneed = [...new Set(videos.map((v) => v.title).filter((t) => t && !kindCache.has(t)))].slice(0, 60)
+  for (let i = 0; i < kneed.length; i += 20) {
+    const chunk = kneed.slice(i, i + 20)
+    const kinds = await llmTitles(chunk, KIND_INSTRUCTION)
+    if (kinds) { used = true; chunk.forEach((raw, j) => { const k = String(kinds[j] || '').trim(); if (VALID_KINDS.has(k)) kindCache.set(raw, k) }) }
+  }
+  for (const v of videos) { if (kindCache.has(v.title)) v.kind = kindCache.get(v.title) }
 
   videos.titleSource = used ? 'llm' : 'heuristic'
   videos.titleError = used ? '' : llmError()
