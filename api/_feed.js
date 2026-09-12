@@ -126,3 +126,11 @@ const MONTHS = /\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i
 function isDateish(p) {
   return /^\d{1,2}\/\d{1,2}/.test(p) || /\b\d{1,2}(st|nd|rd|th)\b/i.test(p) || MONTHS.test(p)
 }
+
+// Best-effort category when the LLM classifier is unavailable.
+function guessKind(title) {
+  const t = String(title).toLowerCase()
+  if (t.includes('rally')) return 'Rally'
+  if (t.includes('fremonttv') || t.includes('fremont tv') || t.includes('episode')) return 'FremontTV'
+  return 'Event'
+}
