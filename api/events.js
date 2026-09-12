@@ -6,6 +6,8 @@ import { fetchEvents } from './_events.js'
 import { eventsSheet } from '../src/data/sources.js'
 
 export default async function handler(req, res) {
+  // Allow the Firebird Hub app (different origin) to read this feed.
+  res.setHeader('Access-Control-Allow-Origin', '*')
   try {
     const { events, games } = await fetchEvents(eventsSheet)
     // Short CDN cache so sheet edits (adding/removing a featured=YES or push=y flag)
