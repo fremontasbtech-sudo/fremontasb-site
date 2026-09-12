@@ -184,11 +184,11 @@ const CATEGORY_INSTRUCTION = [
 ].join(' ')
 const CAT_RULES = [
   ['STEM', /\b(stem|science|scientific|physics|astro|astronom|robot|engineer|coding|code|computer|cs|technolog|tech|math|biolog|chem|medic|aerospace|aviation|uav|rocket|data|ai|neuro|research|cyber|hack)\b/i],
-  ['Arts & Media', /\b(art|paint|draw|anim|music|band|orchestra|choir|sing|dance|film|movie|photo|media|design|creativ|drama|theat|writ|poetry|journal|craft|fashion|sculpt)\b/i],
-  ['Culture & Language', /\b(cultur|language|chinese|mandarin|spanish|french|korean|japanese|hindi|indian|desi|asian|latin|hispanic|black|african|muslim|islam|jewish|christ|hindu|faith|religio|heritage|bsu|international|diversity)\b/i],
-  ['Service & Advocacy', /\b(service|volunteer|communit|charit|advoca|awareness|mental health|environment|green|sustain|equit|justice|change|outreach|red cross|key club|interact|unicef|kindness|donat|fundrais|nonprofit|activis)\b/i],
-  ['Academics & Business', /\b(business|entrepreneur|fbla|deca|debate|speech|model un|mun|scholar|academ|finance|econ|invest|law|mock trial|honor societ|csf|nhs|quiz|decathlon|olympiad|competition|spelling)\b/i],
   ['Sports & Games', /\b(sport|basketball|soccer|tennis|volleyball|badminton|cricket|chess|game|gaming|esport|ping pong|table tennis|fitness|yoga|climb|martial|karate|spikeball|frisbee|dodgeball|pickleball|weightlift)\b/i],
+  ['Arts & Media', /\b(art|paint|draw|anim|music|band|orchestra|choir|sing|dance|film|movie|photo|media|design|creativ|drama|theat|writ|poetry|journal|craft|fashion|sculpt)\b/i],
+  ['Academics & Business', /\b(business|entrepreneur|fbla|deca|debate|speech|model un|mun|scholar|academ|finance|econ|invest|law|mock trial|honor societ|csf|nhs|quiz|decathlon|olympiad|spelling)\b/i],
+  ['Culture & Language', /\b(cultur|language|chinese|mandarin|spanish|french|korean|japanese|hindi|indian|desi|asian|latin|hispanic|black|african|muslim|islam|jewish|christ|hindu|faith|religio|heritage|bsu|diversity)\b/i],
+  ['Service & Advocacy', /\b(service|volunteer|charit|advoca|awareness|mental health|environment|sustain|equit|justice|outreach|red cross|key club|interact|unicef|fundrais|nonprofit|donat|activis|philanthro)\b/i],
 ]
 function guessCategory(name, purpose) {
   const text = `${name} ${purpose || ''}`
