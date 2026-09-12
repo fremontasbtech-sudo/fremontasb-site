@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
  * the channel's public RSS feed, see api/youtube.js and vite.config.js).
  *
  *  - Live videos come from the feed; media.json (overlayRows) is the OVERLAY:
- *    it supplies "hosts" and "kind" (FremontTV/Rally/Event) the feed can't give,
+ *    it supplies "hosts" and "kind" (Fremont TV/Rally/Event) the feed can't give,
  *    and its older episodes are kept in the archive after they age out of the feed.
  *  - A new upload NOT yet in media.json still looks right: its clean title and hosts
  *    are parsed from the channel's own "Fremont TV | <label> | <date> | <hosts>" naming
@@ -20,7 +20,7 @@ import { useEffect, useState } from 'react'
  *
  * Returns { rows, loading, source }  (source: 'youtube' | 'local').
  */
-const CACHE_KEY = 'fasb.media.v2'
+const CACHE_KEY = 'fasb.media.v3'
 function readCache() {
   try { const raw = localStorage.getItem(CACHE_KEY); const a = raw && JSON.parse(raw); return Array.isArray(a) && a.length ? a : null } catch { return null }
 }
@@ -84,7 +84,7 @@ export function useYouTube(overlayRows = []) {
   return state
 }
 
-// FremontTV titles are typed as "Fremont TV | <label> | <date> | <hosts>", e.g.
+// Fremont TV titles are typed as "Fremont TV | <label> | <date> | <hosts>", e.g.
 // "Fremont TV | '26-'27: Episode 2 | 9/11 | Shraddha & Sahana". Pull the clean display
 // title (everything up to the date) and the hosts out of that, so a brand-new upload
 // matches the curated episodes without waiting for a media.json entry. A title that
@@ -113,6 +113,6 @@ function isDateish(p) {
 function guessKind(title) {
   const t = String(title).toLowerCase()
   if (t.includes('rally')) return 'Rally'
-  if (t.includes('fremonttv') || t.includes('fremont tv') || t.includes('episode')) return 'FremontTV'
+  if (t.includes('fremonttv') || t.includes('fremont tv') || t.includes('episode')) return 'Fremont TV'
   return 'Event'
 }

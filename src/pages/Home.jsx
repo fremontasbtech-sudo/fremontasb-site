@@ -88,11 +88,11 @@ function Hero() {
           </h1>
           <div className="mt-5 h-1 w-14 bg-brand" aria-hidden="true" />
           <p className="mt-5 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">
-            We're the students behind the rallies, the clubs, and FremontTV, plus the spirit points race that keeps
+            We're the students behind the rallies, the clubs, and Fremont TV, plus the spirit points race that keeps
             all four grades going. Glad you're here, Firebird.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <Button to="/media" text="Watch FremontTV" />
+            <Button to="/media" text="Watch Fremont TV" />
             <a
               href="#spirit-points"
               className="group inline-flex min-h-[44px] items-center gap-2 font-display font-bold text-white underline-offset-4 hover:underline"
@@ -184,7 +184,7 @@ function SpiritPoints() {
 /* ───────────────────────── 3. Latest News ───────────────────────── */
 
 const quickLinks = [
-  { to: '/media', label: 'Media', note: 'FremontTV episodes and rally videos' },
+  { to: '/media', label: 'Media', note: 'Fremont TV episodes and rally videos' },
   { to: '/photos', label: 'Photos', note: 'Event albums on Flickr' },
   { to: '/clubs', label: 'Clubs', note: 'Official list, handbook, renewal forms' },
   { to: '/resources', label: 'School Store', note: 'ASB cards, dance tickets, gear' },
@@ -207,7 +207,7 @@ function LatestNews({ eventsRecent = [], eventsUpcoming = [], eventsLoading = fa
           <div>
             <SectionHeader eyebrow="From ASB" title="Latest News" />
             {source !== 'sheet' && (
-              <DevNote>Auto-feed: newest FremontTV episodes + photo albums. Connect sheets.news in sources.js to add written announcements on top.</DevNote>
+              <DevNote>Auto-feed: newest Fremont TV episodes + photo albums. Connect sheets.news in sources.js to add written announcements on top.</DevNote>
             )}
             {loading && <Loading label="Loading the latest…" />}
             {!loading && items.length > 0 && (
@@ -273,7 +273,7 @@ const TYPE_STYLES = {
   Event: 'bg-brand-tint text-brand',
   Rally: 'bg-brand-tint text-brand',
   Sports: 'bg-brand-tint text-brand',
-  FremontTV: 'bg-ink/5 text-ink',
+  'Fremont TV': 'bg-ink/5 text-ink',
   Photos: 'bg-ink/5 text-ink',
 }
 
@@ -291,7 +291,7 @@ function TypeBadge({ type }) {
  *  - Written announcements from the news Google Sheet, but ONLY when one is connected
  *    (source === 'sheet'); we never render the local sample as if it were real news.
  *    Optional sheet columns: type, link, pinned (pinned rows stay on top).
- *  - Auto items from the already-live feeds: newest FremontTV episodes + photo albums.
+ *  - Auto items from the already-live feeds: newest Fremont TV episodes + photo albums.
  * Result: the section is always real and current, even before anyone writes an announcement.
  */
 function buildNews(newsRows, source, videos, albums, eventsRecent = []) {
@@ -308,14 +308,14 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = []) {
     : []
 
   const vids = (videos || []).slice(0, 3).map((v) => {
-    const kind = v.kind || 'FremontTV'
+    const kind = v.kind || 'Fremont TV'
     return {
       key: `v-${v.youtubeId}`,
       type: kind,
       title: v.title,
       blurb: v.hosts
         ? `Hosted by ${v.hosts}`
-        : kind === 'FremontTV' ? 'New FremontTV episode' : `New ${kind.toLowerCase()} video`,
+        : kind === 'Fremont TV' ? 'New Fremont TV episode' : `New ${kind.toLowerCase()} video`,
       href: `https://www.youtube.com/watch?v=${v.youtubeId}`,
       when: parseDate(v.date),
       pinned: false,
@@ -371,12 +371,12 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = []) {
   const ranked = [...manual, ...vids, ...albs, ...games]
     .filter((it) => it.title && it.when && it.when >= cutoff)
     .sort((x, y) => (Number(y.pinned) - Number(x.pinned)) || ((y.when?.getTime() ?? 0) - (x.when?.getTime() ?? 0)))
-  // At most ONE FremontTV item in Latest News (the newest). 'kind' is classified by the LLM
+  // At most ONE Fremont TV item in Latest News (the newest). 'kind' is classified by the LLM
   // server-side (api/_feed.js), so a future episode is caught even if it's titled differently.
   let fremontTVShown = false
   return ranked
     .filter((it) => {
-      if (it.type === 'FremontTV') { if (fremontTVShown) return false; fremontTVShown = true }
+      if (it.type === 'Fremont TV') { if (fremontTVShown) return false; fremontTVShown = true }
       return true
     })
     .slice(0, 5)

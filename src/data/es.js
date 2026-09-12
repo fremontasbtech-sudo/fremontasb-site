@@ -22,8 +22,8 @@ export const ES = {
   'Main': 'Principal',
 
   // ── Footer ──
-  'The Associated Student Body of Fremont High School: rallies, clubs, FremontTV, dances, and everything in between.':
-    'El cuerpo estudiantil (ASB) de Fremont High School: rallies, clubes, FremontTV, bailes y todo lo demás.',
+  'The Associated Student Body of Fremont High School: rallies, clubs, Fremont TV, dances, and everything in between.':
+    'El cuerpo estudiantil (ASB) de Fremont High School: rallies, clubes, Fremont TV, bailes y todo lo demás.',
   'Find us': 'Encuéntranos',
   'Follow': 'Síguenos',
   'Address': 'Dirección',
@@ -34,9 +34,9 @@ export const ES = {
   'Flickr: event photos': 'Flickr: fotos de eventos',
 
   // ── Home: hero + spirit ──
-  "We're the students behind the rallies, the clubs, and FremontTV, plus the spirit points race that keeps all four grades going. Glad you're here, Firebird.":
-    'Somos los estudiantes detrás de los rallies, los clubes y FremontTV, además de la competencia de puntos de espíritu que mantiene activos a los cuatro grados. Nos alegra que estés aquí.',
-  'Watch FremontTV': 'Ver FremontTV',
+  "We're the students behind the rallies, the clubs, and Fremont TV, plus the spirit points race that keeps all four grades going. Glad you're here, Firebird.":
+    'Somos los estudiantes detrás de los rallies, los clubes y Fremont TV, además de la competencia de puntos de espíritu que mantiene activos a los cuatro grados. Nos alegra que estés aquí.',
+  'Watch Fremont TV': 'Ver Fremont TV',
   'Spirit points': 'Puntos de espíritu',
   'Class competition': 'Competencia entre clases',
   'Spirit Points Tracker': 'Marcador de puntos de espíritu',
@@ -65,9 +65,9 @@ export const ES = {
   'Announcement': 'Anuncio',
   'Event': 'Evento',
   'Nothing posted yet. Check back once school events get going.': 'Aún no hay nada publicado: vuelve cuando comiencen los eventos escolares.',
-  'New FremontTV episode': 'Nuevo episodio de FremontTV',
+  'New Fremont TV episode': 'Nuevo episodio de Fremont TV',
   'New album on Flickr': 'Nuevo álbum en Flickr',
-  'FremontTV episodes and rally videos': 'Episodios de FremontTV y videos de rallies',
+  'Fremont TV episodes and rally videos': 'Episodios de Fremont TV y videos de rallies',
   'Event albums on Flickr': 'Álbumes de eventos en Flickr',
   'Official list, handbook, renewal forms': 'Lista oficial, manual y formularios de renovación',
   'ASB cards, dance tickets, gear': 'Tarjetas ASB, boletos de baile y mercancía',
@@ -97,9 +97,9 @@ export const ES = {
   'Fremont ASB app': 'App de Fremont ASB',
 
   // ── Media page ──
-  'FremontTV episodes and event photos': 'Episodios de FremontTV y fotos de eventos',
-  'FremontTV video announcements are created by the ASB Technology and Content Creation Commission and are played bi-weekly during 4th block.':
-    'Los anuncios en video de FremontTV son creados por la Comisión de Tecnología y Creación de Contenido de ASB y se transmiten cada dos semanas durante el 4.º bloque.',
+  'Fremont TV episodes and event photos': 'Episodios de Fremont TV y fotos de eventos',
+  'Fremont TV video announcements are created by the ASB Technology and Content Creation Commission and are played bi-weekly during 4th block.':
+    'Los anuncios en video de Fremont TV son creados por la Comisión de Tecnología y Creación de Contenido de ASB y se transmiten cada dos semanas durante el 4.º bloque.',
   'New episodes play in 4th block every other week. Missed one? Everything we’ve published is in the archive below.':
     'Los nuevos episodios se transmiten en el 4.º bloque cada dos semanas. ¿Te perdiste uno? Todo lo que hemos publicado está en el archivo de abajo.',
   'Latest episode': 'Último episodio',
@@ -114,7 +114,7 @@ export const ES = {
   'Older videos and full rally recordings live on the channel.': 'Los videos antiguos y las grabaciones completas de rallies están en el canal.',
   'YouTube channel': 'Canal de YouTube',
   'Filter videos by type': 'Filtrar videos por tipo',
-  'FremontTV · Rallies · Events': 'FremontTV · Rallies · Eventos',
+  'Fremont TV · Rallies · Events': 'Fremont TV · Rallies · Eventos',
 
   // ── Photos page ──
   'Click a photo below to see all photos from individual events, or click the button below to be redirected to the Fremont ASB Flickr page.':

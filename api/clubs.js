@@ -6,6 +6,7 @@ import { sheets } from '../src/data/sources.js'
 
 export default async function handler(req, res) {
   try {
+    res.setHeader('Access-Control-Allow-Origin', '*')  // let the Firebird Hub app read this feed
     const clubs = await fetchClubs(sheets.clubs)
     // Short CDN cache so sheet edits show within a few minutes, not per-user recompute.
     res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=1800')

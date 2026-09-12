@@ -7,13 +7,13 @@ import overlay from '../data/media.json'
 import { useYouTube } from '../data/useYouTube'
 
 /**
- * Media - FremontTV + rally/event videos in one place.
+ * Media - Fremont TV + rally/event videos in one place.
  * Data: src/data/media.json  [{ title, date, youtubeId, hosts, kind }]
  * Swap rows in that file and this page updates; nothing here is hardcoded to an episode.
  * Newest row = featured player. Everything else = archive.
  */
 
-const KINDS = ['FremontTV', 'Rally', 'Event']
+const KINDS = ['Fremont TV', 'Rally', 'Event']
 
 const embedUrl = (id) => `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`
 const watchUrl = (id) => `https://www.youtube.com/watch?v=${id}`
@@ -48,8 +48,8 @@ export default function Media() {
     <>
       <PageHero
         title="Media"
-        eyebrow="FremontTV · Rallies · Events"
-        subtext="FremontTV video announcements are created by the ASB Technology and Content Creation Commission and are played bi-weekly during 4th block."
+        eyebrow="Fremont TV · Rallies · Events"
+        subtext="Fremont TV video announcements are created by the ASB Technology and Content Creation Commission and are played bi-weekly during 4th block."
       >
         <Button variant="secondary" href={links.youtube} external>YouTube channel</Button>
       </PageHero>

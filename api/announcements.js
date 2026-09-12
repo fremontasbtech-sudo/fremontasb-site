@@ -6,6 +6,7 @@ import { announcementsSheet } from '../src/data/sources.js'
 
 export default async function handler(req, res) {
   try {
+    res.setHeader('Access-Control-Allow-Origin', '*')  // let the Firebird Hub app read this feed
     const announcements = await fetchAnnouncements(announcementsSheet)
     // Short CDN cache so sheet edits show within a few minutes, not up to 15.
     res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=1800')

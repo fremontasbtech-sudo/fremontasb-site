@@ -17,7 +17,7 @@ const STORES = [
 const WEBSITE = [
   'Latest news and spirit points totals',
   'Club list, handbook and accountability tracker',
-  'FremontTV episodes and event photos',
+  'Fremont TV episodes and event photos',
   'Homecoming Court, Elections, Opportunities',
   'School Store and Contact links',
 ]

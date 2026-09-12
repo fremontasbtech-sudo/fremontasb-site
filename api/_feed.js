@@ -52,7 +52,7 @@ export async function fetchChannelVideos(channelId) {
 const titleCache = new Map()
 const TITLE_INSTRUCTION = [
   "You write clean display titles for a high school ASB's YouTube videos, shown on the school website.",
-  'Most are "FremontTV" episodes titled like "Fremont TV | <label> | <airdate> | <hosts>".',
+  'Most are "Fremont TV" episodes titled like "Fremont TV | <label> | <airdate> | <hosts>".',
   'For EACH raw title, return the show and episode label ONLY: keep the "Fremont TV | <label>" part',
   '(the season/episode name, e.g. "\'26-\'27: Episode 2" or "Episode 3: Homecoming") and REMOVE the airdate and the host names.',
   'For a non-episode video (a rally, a graduation, an event), return a tidy version of its title with any trailing',
@@ -61,18 +61,18 @@ const TITLE_INSTRUCTION = [
   'Examples:',
   '"Fremont TV | \'26-\'27: Episode 2 | 9/11 | Shraddha & Sahana" -> "Fremont TV | \'26-\'27: Episode 2"',
   '"Fremont TV | Episode 3: Homecoming | October 17th | Saisha, Ella, & Yomna" -> "Fremont TV | Episode 3: Homecoming"',
-  '"25-26 FremontTV | Episode 1 | 9/19 | Ryan & Ayush" -> "FremontTV | Episode 1"',
+  '"25-26 Fremont TV | Episode 1 | 9/19 | Ryan & Ayush" -> "Fremont TV | Episode 1"',
   '"Class of 2025 Graduation Student Speeches By Jaidyn Balsara &Zaynab Mohiuddeen" -> "Class of 2025 Graduation Student Speeches"',
   'Return ONLY a JSON array of strings, one per title, in the same order.',
 ].join(' ')
 
 const kindCache = new Map()
-const VALID_KINDS = new Set(['FremontTV', 'Rally', 'Event'])
+const VALID_KINDS = new Set(['Fremont TV', 'Rally', 'Event'])
 const KIND_INSTRUCTION = [
   "Classify each of a high school ASB's YouTube video titles into exactly one category.",
-  'The categories are: "FremontTV" (the ASB\'s recurring news-show episodes, usually titled "Fremont TV" / "FremontTV" / with "Episode"),',
+  'The categories are: "Fremont TV" (the ASB\'s recurring news-show episodes, usually titled "Fremont TV" / "Fremont TV" / with "Episode"),',
   '"Rally" (a spirit or pep rally), or "Event" (anything else: graduations, senior videos, performances, one-off events).',
-  'Return ONLY a JSON array of strings, one per title in the same order, each exactly one of: FremontTV, Rally, Event.',
+  'Return ONLY a JSON array of strings, one per title in the same order, each exactly one of: Fremont TV, Rally, Event.',
 ].join(' ')
 
 export async function applyEpisodeTitles(videos) {
@@ -91,7 +91,7 @@ export async function applyEpisodeTitles(videos) {
   }
   for (const v of videos) { if (titleCache.has(v.title)) v.cleanTitle = titleCache.get(v.title) }
 
-  // Kind (FremontTV / Rally / Event) — classified by the LLM so the "one FremontTV in Latest
+  // Kind (Fremont TV / Rally / Event) — classified by the LLM so the "one Fremont TV in Latest
   // News" rule catches future uploads whatever they're titled. Heuristic guess is the fallback.
   for (const v of videos) v.kind = guessKind(v.cleanTitle || v.title)
   const kneed = [...new Set(videos.map((v) => v.title).filter((t) => t && !kindCache.has(t)))].slice(0, 60)
@@ -131,6 +131,6 @@ function isDateish(p) {
 function guessKind(title) {
   const t = String(title).toLowerCase()
   if (t.includes('rally')) return 'Rally'
-  if (t.includes('fremonttv') || t.includes('fremont tv') || t.includes('episode')) return 'FremontTV'
+  if (t.includes('fremonttv') || t.includes('fremont tv') || t.includes('episode')) return 'Fremont TV'
   return 'Event'
 }

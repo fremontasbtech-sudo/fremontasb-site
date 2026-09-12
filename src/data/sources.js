@@ -96,7 +96,7 @@ export const embeds = {
 //   feed is fetched server-side by /api/youtube (api/youtube.js on Vercel in
 //   production; the dev middleware in vite.config.js on localhost), both reading
 //   the channelId below. media.json is the OVERLAY: it supplies "hosts" and
-//   "kind" (FremontTV/Rally/Event) the feed can't provide, and keeps older
+//   "kind" (Fremont TV/Rally/Event) the feed can't provide, and keeps older
 //   episodes in the archive after they scroll out of the feed.
 //   To point at a different channel, change channelId (the "UC…" id).
 // ─────────────────────────────────────────────────────────────────────────────
