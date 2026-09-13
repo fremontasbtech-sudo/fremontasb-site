@@ -368,9 +368,22 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = []) {
   const cutoff = new Date(syStart, 7, 1) // Aug 1
   // Curated upcoming events + pinned games lead the feed, soonest first; the dated/recent
   // items fill the rest, freshest first. Cap the lead so real news still shows through.
+  const dayKey = (d) => (d ? d.getFullYear() * 10000 + d.getMonth() * 100 + d.getDate() : 0)
   const ranked = [...manual, ...vids, ...albs, ...games]
     .filter((it) => it.title && it.when && it.when >= cutoff)
-    .sort((x, y) => (Number(y.pinned) - Number(x.pinned)) || ((y.when?.getTime() ?? 0) - (x.when?.getTime() ?? 0)))
+    .sort((x, y) => {
+      const p = Number(y.pinned) - Number(x.pinned)
+      if (p) return p
+      const xk = dayKey(x.when), yk = dayKey(y.when)
+      if (xk !== yk) return yk - xk // newer day first
+      // Same day: Fremont TV leads. It airs first thing in the morning (4th block), before a
+      // game or event later that day, so it sits above same-day items in Latest News. 'type'
+      // is the LLM-classified kind (api/_feed.js), so this holds for any future episode.
+      const fx = x.type === 'Fremont TV' ? 0 : 1
+      const fy = y.type === 'Fremont TV' ? 0 : 1
+      if (fx !== fy) return fx - fy
+      return (y.when?.getTime() ?? 0) - (x.when?.getTime() ?? 0) // else newest first
+    })
   // At most ONE Fremont TV item in Latest News (the newest). 'kind' is classified by the LLM
   // server-side (api/_feed.js), so a future episode is caught even if it's titled differently.
   let fremontTVShown = false
