@@ -99,7 +99,6 @@ export default function Clubs() {
     [rows],
   )
   const active = useMemo(() => clubs.filter((c) => !c.disbanded), [clubs])
-  const placeholder = useMemo(() => buildSearchPlaceholder(active), [active])
   const disbanded = useMemo(() => clubs.filter((c) => c.disbanded), [clubs])
 
   const q = query.trim().toLowerCase()
@@ -153,7 +152,7 @@ export default function Clubs() {
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder={placeholder}
+                placeholder="Astrophysics Club, Mr. Bloom, 91"
                 autoComplete="off"
                 className="w-full rounded-btn border border-rule bg-paper py-3 pl-10 pr-4 text-base text-ink placeholder:text-body/50 focus:border-brand min-h-[44px]"
               />
@@ -451,21 +450,6 @@ function Detail({ label, children, className = '' }) {
       <div className="text-sm text-ink leading-relaxed">{children}</div>
     </div>
   )
-}
-
-// A randomized search hint built from REAL current clubs: two club names + one advisor,
-// reshuffled each load, so the examples are always relevant instead of a fixed placeholder.
-function buildSearchPlaceholder(clubs) {
-  if (!clubs || !clubs.length) return 'Search clubs…'
-  const pickN = (arr, n) => {
-    const a = arr.slice(); const out = []
-    while (out.length < n && a.length) out.push(a.splice(Math.floor(Math.random() * a.length), 1)[0])
-    return out
-  }
-  const parts = pickN(clubs.map((c) => c.name).filter(Boolean), 2)
-  const advisors = clubs.map((c) => c.teacherAdvisor).filter(Boolean)
-  if (advisors.length) parts.push(pickN(advisors, 1)[0])
-  return parts.length ? parts.join(', ') + '…' : 'Search clubs…'
 }
 
 function splitNames(s) {
