@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { makeCache, fetchJsonRetry } from './liveData'
+import eventsSnapshot from './events.json'
 
 /**
  * useEvents() - the curated items from the shared Firebird Hub Events sheet
@@ -99,7 +100,12 @@ function shape(data) {
 export function useEvents() {
   const [state, setState] = useState(() => {
     const cached = readCache()
-    return cached ? { ...shape(cached), loading: false } : { upcoming: [], recent: [], loading: true }
+    if (cached) return { ...shape(cached), loading: false }
+    // First-ever visit: render the bundled snapshot INSTANTLY (shape() re-windows it to the
+    // current date), then refresh from the live API in the background — so Upcoming Events never
+    // waits on the slow athletics scores feed.
+    if (eventsSnapshot && (Array.isArray(eventsSnapshot.events) || Array.isArray(eventsSnapshot.games))) return { ...shape(eventsSnapshot), loading: false }
+    return { upcoming: [], recent: [], loading: true }
   })
 
   useEffect(() => {
