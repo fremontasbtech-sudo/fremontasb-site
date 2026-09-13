@@ -9,8 +9,10 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*')  // let the Firebird Hub app read this feed
     const clubs = await fetchClubs(sheets.clubs)
     if (clubs && clubs.length) {
-      // Short CDN cache so sheet edits show within a few minutes, not per-user recompute.
-      res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=1800')
+      // Serve a good result from the edge for 10 min, and keep serving it (stale) for up to a
+      // week while revalidating in the BACKGROUND — so the slow LLM recompute never blocks a
+      // visitor; at worst one background request pays for it. Sheet edits still land in ~10 min.
+      res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=604800')
     } else {
       res.setHeader('Cache-Control', 'no-store') // don't cache an empty clubs pull
     }

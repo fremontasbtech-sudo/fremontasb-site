@@ -1,12 +1,1071 @@
 [
-  { "name": "Badminton Club", "purpose": "Promote the sport of badminton by teaching the basics in classroom meetings and running open gyms where members can try what they learned.", "studentAdvisors": "Vibha Sriram, Aryav Tyagi, Arman Shaik, Neakail David, Dhruv Chugh", "teacherAdvisor": "Mr. Chen", "meetingInfo": "Large Gym", "email": "vsriram104@student.fuhsd.org" },
-  { "name": "Chess Club", "purpose": "A place to hang out, play chess, and learn the game.", "studentAdvisors": "Vivek Kommu, Nikash Malhotra, Sreegurunath Siva", "teacherAdvisor": "Mr. Beckstrom", "meetingInfo": "B-202", "email": "vkommu091@student.fuhsd.org" },
-  { "name": "Chinese Club / NCHS", "purpose": "Expose students to Chinese culture and language through games, cultural presentations, volunteering, and other activities.", "studentAdvisors": "Caelen Chin, Karina Wang, Arden Zhang, Guy Elyashar, Mackenzie Wong", "teacherAdvisor": "Freya Li", "meetingInfo": "Room C-209", "email": "cchin661@student.fuhsd.org" },
-  { "name": "Creative Tutors Club (CTC)", "purpose": "Free tutoring plus a calming space to de-stress with arts and crafts.", "studentAdvisors": "Sam Castillo, Daniel Quintanilla, Camilo Rojas", "teacherAdvisor": "Tara Wojcik", "meetingInfo": "A-205", "email": "tcastillopimente273@student.fuhsd.org" },
-  { "name": "Environmental Club", "purpose": "Reduce the school's environmental impact and spread awareness of climate change and sustainable living.", "studentAdvisors": "Katherine Park, Smera Jain", "teacherAdvisor": "Jeske Glen", "meetingInfo": "The garden / pond", "email": "kpark529@student.fuhsd.org" },
-  { "name": "Everyday Hardware Essentials Club", "purpose": "Spread essential knowledge about the components inside everyday devices like phones and computers.", "studentAdvisors": "Namar Lamba, Aditya Bansal, Michael Chang", "teacherAdvisor": "Mr. Capriles", "meetingInfo": "Bi-weekly Tuesdays at lunch, Room 153", "email": "nlamba926@student.fuhsd.org" },
-  { "name": "F1 Club", "purpose": "Educate people about Formula 1 and bring fans together to enjoy the sport.", "studentAdvisors": "Mahesh Kodam, Hasini Musunuru, Nithya Nukala", "teacherAdvisor": "Ms. Snyder", "meetingInfo": "Bi-weekly Mondays, Room A-202", "email": "mkodam023@student.fuhsd.org" },
-  { "name": "FHS Robotics", "purpose": "Design, build, and compete with robots while learning engineering and teamwork.", "studentAdvisors": "", "teacherAdvisor": "", "meetingInfo": "", "email": "" },
-  { "name": "Filipino Youth Organization (FYO)", "purpose": "Celebrate Filipino culture and community at Fremont.", "studentAdvisors": "", "teacherAdvisor": "", "meetingInfo": "", "email": "" },
-  { "name": "Girls Who Code", "purpose": "Close the gender gap in tech through project-based coding sessions.", "studentAdvisors": "", "teacherAdvisor": "", "meetingInfo": "", "email": "" }
+ {
+  "__normalized": true,
+  "name": "4kidz",
+  "purpose": "The purpose of 4KIDZ Fremont High School Chapter stands to bring joy, hope, and comfort to kids in pediatric care through volunteer service, fundraising, and creative projects. Members will work together to make a positive impact in the lives of pediatric children. Our purpose is to encourage youth leadership and volunteerism, and to partner with other hospitals to amplify our impact. During meetings, officers will lead presentations and activities that are fun and interactive. Additionally, we plan to host outings, and interactive activities with kids in pediatric care.",
+  "studentAdvisors": "Amina Ranjit, Addison Wong, Abigail Min",
+  "teacherAdvisor": "Stacey Stebbins",
+  "meetingInfo": "Mrs. Stebbins’ room · Wed & Fri lunch, biweekly",
+  "emails": [
+   "aranjit458@student.fuhsd.org",
+   "awong930@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Service & Advocacy"
+ },
+ {
+  "__normalized": true,
+  "name": "Aerospace and UAV Society",
+  "purpose": "The Aerospace & UAV Society is established to provide students with a technical foundation in aerospace engineering and Unmanned Aerial Systems (UAS). The club’s objectives are to educate members on the principles of flight, prepare students for FAA recreational safety certification (TRUST), and explore the practical applications of drone technology in cinematography, mapping and Search and Rescue (SaR). The club will also provide video services by request to the school yearbook. (This has been approved by Ms. Woo).",
+  "studentAdvisors": "Asher Mehta, Edvin Hedborg",
+  "teacherAdvisor": "Liz Jacobs",
+  "meetingInfo": "B-208 · Mon lunch, biweekly",
+  "emails": [
+   "amehta926@student.fuhsd.org",
+   "ehedborg563@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "STEM"
+ },
+ {
+  "__normalized": true,
+  "name": "Art and animation club",
+  "purpose": "This club will go into.",
+  "studentAdvisors": "Lotem Mechlovich, Ahinava Sivakumaran",
+  "teacherAdvisor": "Melisa Lu",
+  "meetingInfo": "Room 213-A · Mon lunch",
+  "emails": [
+   "lmechlovich249@student.fuhsd.org",
+   "abalaji283@student.fuhsd"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Arts & Media"
+ },
+ {
+  "__normalized": true,
+  "name": "Astrophysics Club",
+  "purpose": "We're a student-led club that explores modern astrophysics and cosmology beyond what our regular science classes cover. At our meetings, we run student-led presentations and open discussions on topics like black hole physics, inflationary and pre-Big Bang cosmology, general relativity, and the black hole information paradox. Beyond our regular meetings, we bring in guest speakers — professors, graduate students, and researchers from universities and national labs — to share their work and give our members a real look at what modern astrophysics research looks like. We also connect members with outside opportunities like summer programs, competitions, and research experiences. Our goal is to build a community of curious students, make research-level ideas approachable, and give everyone a path into physics and astronomy beyond the classroom.",
+  "studentAdvisors": "Abir Mehta, Dhruv Lagu, Saanvi Doshi",
+  "teacherAdvisor": "Josh Bloom",
+  "meetingInfo": "Room 91 · Wed lunch, biweekly",
+  "emails": [
+   "amehta251@student.fuhsd.org",
+   "dlagu234@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "STEM"
+ },
+ {
+  "__normalized": true,
+  "name": "Basketball Club",
+  "purpose": "The club focuses on basketball, mentorship, and community involvement. The club connects Fremont students with younger children through basketball activities and coaching. Members will help teach basic basketball skills in a positive and supportive environment. The club also encourages teamwork, communication, leadership, responsibility, and sportsmanship. Through volunteering and coaching, members can develop leadership skills while helping younger students enjoy basketball.",
+  "studentAdvisors": "Kota Xu, Yu Chia Lu, Damon Uyehara",
+  "teacherAdvisor": "Jason Townsend",
+  "meetingInfo": "C107 · Mon, biweekly",
+  "emails": [
+   "kxu088@student.fuhsd.org",
+   "ylu150@student.fuhsd.org",
+   "duyehara831@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Sports & Games"
+ },
+ {
+  "__normalized": true,
+  "name": "Bring Change 2 Mind",
+  "purpose": "Raise awareness and break the stigma around mental health by having open conversations and informing others.",
+  "studentAdvisors": "Saisha Bidarkar, Urja Ingle, Jayvani Balsara, Yuval Kopel",
+  "teacherAdvisor": "Stacey Stebbins",
+  "meetingInfo": "Room 83 · Mon or Fri, biweekly",
+  "emails": [
+   "sbidarkar199@student.fuhsd.org",
+   "uingle782@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Service & Advocacy"
+ },
+ {
+  "__normalized": true,
+  "name": "California Scholarship Federation (CSF)",
+  "purpose": "The California Scholarship Federation (CSF) is an honor society that recognizes the academic achievement and dedication to service of California high school juniors and seniors. We provide scholarship and volunteering opportunities like SAT tutoring for students to build volunteering hours and become eligible for CSF scholarships.",
+  "studentAdvisors": "Ella Cheng, Kavya Iyer Srinivasan",
+  "teacherAdvisor": "Chris Ho",
+  "meetingInfo": "Room A-212 · Tue lunch, biweekly",
+  "emails": [
+   "echeng312@student.fuhsd.org",
+   "kiyersrinivasan792@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Academics & Business"
+ },
+ {
+  "__normalized": true,
+  "name": "Ceramics Club",
+  "purpose": "To teach students about the art of ceramics and give them the option to create ceramic pieces outside of the ceramic classes. In our club, students will be able to make projects they can use, display, or even just for fun, while meeting new people and creating new friends. We will provide all the materials, so student can sit back, relax, and create.",
+  "studentAdvisors": "Nett Weissman (President), Lotem Mechlovich (Vice President), Phoebe Chan (Student Advisor), Savannah Shortz (Student Advisor)",
+  "teacherAdvisor": "Timna Naim",
+  "meetingInfo": "Room 161 · Tue & Fri",
+  "emails": [
+   "nweissman088@student.fuhsd.org",
+   "lmechlovich249@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Arts & Media"
+ },
+ {
+  "__normalized": true,
+  "name": "Cheese Club",
+  "purpose": "To introduce the students of fremont to the wonders of cheese.",
+  "studentAdvisors": "Agastya Raja, Soham Sahasrabuddhe, Vibhav Chincholi",
+  "teacherAdvisor": "Shannon Andres",
+  "meetingInfo": "B-106 · Mon or Fri, biweekly",
+  "emails": [
+   "araja429@student.fuhsd.org",
+   "ssahasrabuddhe543@student.fuhsd.org",
+   "vchincholi328@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Special Interest"
+ },
+ {
+  "__normalized": true,
+  "name": "Chinese club/NCHS",
+  "purpose": "Encourage awareness and learning of Chinese culture, learn about Chinese history, participate in the setting up of the annual Chinese new year event, learn how to use chopsticks, play numerous traditional Chinese games. Members are exposed and updated to Chinese learning opportunities, programs, and NCHS.",
+  "studentAdvisors": "Harry Luo, Ilias Stork, Sophia Liu, Yuan Tang, Addelyn Chin",
+  "teacherAdvisor": "Freya Li",
+  "meetingInfo": "C-209 · Wed lunch, biweekly",
+  "emails": [
+   "hluo054@student.fuhsd.org",
+   "istork814@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Culture & Language"
+ },
+ {
+  "__normalized": true,
+  "name": "Chinese Song Club",
+  "purpose": "Bring joy to everyone who likes singing Chinese songs,let them have fun either singing Chinese songs or just listening.",
+  "studentAdvisors": "Vanessa Zhang, Kareena Zhu",
+  "teacherAdvisor": "Weihsiu Chang",
+  "meetingInfo": "C-209 · Thu, twice a month",
+  "emails": [
+   "xzhang427@student.fuhsd.org",
+   "yzhu604@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Culture & Language"
+ },
+ {
+  "__normalized": true,
+  "name": "Climate Collective",
+  "purpose": "FHS Climate Collective is a branch of the District-wide FUHSD Climate Collective which is dedicated to improving environmental literacy and promoting sustainable practices in FUHSD.",
+  "studentAdvisors": "Kavya Iyer-Srinivasan, Vibhav Chincholi",
+  "teacherAdvisor": "Jeske Gillis",
+  "meetingInfo": "A-203 · Mon lunch, biweekly",
+  "emails": [
+   "kiyersrinivasan792@student.fuhsd.org",
+   "vchincholi328@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Service & Advocacy"
+ },
+ {
+  "__normalized": true,
+  "name": "Cloud Computing",
+  "purpose": "Teach students about the history and basics of computing.",
+  "studentAdvisors": "Arjun Tulpule, Dhruv Prasade",
+  "teacherAdvisor": "Bob Capriles",
+  "meetingInfo": "Room 153 · Mon lunch, biweekly",
+  "emails": [
+   "atulpule394@student.fuhsd.org",
+   "dprasade489@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "STEM"
+ },
+ {
+  "__normalized": true,
+  "name": "culinary for community",
+  "purpose": "Allow students to come together and make food while also helping the community by donating the meals.",
+  "studentAdvisors": "Addelyn Chin, Daniella Drenan, Aasha Krishnan",
+  "teacherAdvisor": "Nicole Harnett",
+  "meetingInfo": "C-104 · Tue or Thu lunch, monthly",
+  "emails": [
+   "achin154@student.fuhsd.org",
+   "ddrenan432@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Service & Advocacy"
+ },
+ {
+  "__normalized": true,
+  "name": "Cybersecurity Club",
+  "purpose": "Teach and educate people on online security and also teach people cybersecurity skills and concepts in the industry.",
+  "studentAdvisors": "Vedaant Adavikolanu, Abhinav Suresh",
+  "teacherAdvisor": "Jeske Gillis",
+  "meetingInfo": "A-203 · Fri lunch",
+  "emails": [
+   "vadavikolanu007@student.fuhsd.org",
+   "asuresh730@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "STEM"
+ },
+ {
+  "__normalized": true,
+  "name": "Developer Club",
+  "purpose": "The Fremont Developer Club exists as a place for individuals interested in software development to share their interests, learn, and build real projects. We believe that all students should learn not only how to code, but how to apply that coding knowledge to build actual projects to showcase and learn from. We also want to give students the ability to actually choose their interests, and build projects that they actually want to build. We will adapt with them. As a club, we exist to bridge the gap between theoretical knowledge and practical execution, providing every student with the mentorship, tools, and collaboration necessary to turn creative ideas into functional applications.",
+  "studentAdvisors": "Avi Malhotra, Aarav Agarwal, Raghav Joshi, Puneeth Salgundi, Kunal Jaiswal",
+  "teacherAdvisor": "Jenna Morgan",
+  "meetingInfo": "Room 76 · Mon",
+  "emails": [
+   "amalhotra284@student.fuhsd.org",
+   "aagarwal235@student.fuhsd.org",
+   "psalgundi347@student.fuhsd.org",
+   "rjoshi280@student.fuhsd.org",
+   "kjaiswal342@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "STEM"
+ },
+ {
+  "__normalized": true,
+  "name": "Environmental Club",
+  "purpose": "To educate students and promote environmental opportunities.",
+  "studentAdvisors": "Mia Sun, Mydhili Manoj",
+  "teacherAdvisor": "Jeske Gillis",
+  "meetingInfo": "Mrs. Glenn's or Mr. Gamboa's room · Lunch",
+  "emails": [
+   "msun727@student.fuhsd.org",
+   "mmanoj285@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Service & Advocacy"
+ },
+ {
+  "__normalized": true,
+  "name": "Everyday Hardware Essentials Club",
+  "purpose": "The Everyday Hardware Essentials Club aims to teach members about core computer hardware and how all these components work together as one system.",
+  "studentAdvisors": "Namar Lamba, Aditya Bansal, Michael Chang",
+  "teacherAdvisor": "Mr. Bob Capriles",
+  "meetingInfo": "Room 153 · Thu lunch, monthly",
+  "emails": [
+   "nlamba926@student.fuhsd.org",
+   "mchang263@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "STEM"
+ },
+ {
+  "__normalized": true,
+  "name": "FHS Badminton Club",
+  "purpose": "Hosts open gyms in the large gym for badminton games. Occasional contests, potential collabs with other schools.",
+  "studentAdvisors": "Soham Sahasrabuddhe, Jai Rathee, Jaitresh Paruvada, Ken Huang",
+  "teacherAdvisor": "Mac Chen",
+  "meetingInfo": "Large Gym · Tue or Thu lunch, biweekly",
+  "emails": [
+   "ssahasrabuddhe543@student.fuhsd.org",
+   "jrathee463@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Sports & Games"
+ },
+ {
+  "__normalized": true,
+  "name": "Fhs Christian Club",
+  "purpose": "The purpose of the Breakthrough Christian Club is to be an inclusive place, where both Christians and non-Christians can gather to support each other, ask any questions, and most importantly learn about Jesus together. Some of our objectives include sharing the message of God’s love on our campus, helping Christians learn and practice their beliefs as a community, and most importantly being a good representation of Jesus’ love at our school - caring for the needs of our students and communities, and welcoming anyone who is curious or wants to learn more about God and what our club is about.",
+  "studentAdvisors": "Jet Cheng, Nina Liang, Thanos Cocoles, Liam Kao, Ken Huang",
+  "teacherAdvisor": "Thomas Hammond",
+  "meetingInfo": "B-209 · Wed lunch",
+  "emails": [
+   "ncheng170@student.fuhsd.orgnliang072"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Culture & Language"
+ },
+ {
+  "__normalized": true,
+  "name": "Filipino Youth Organization",
+  "purpose": "Represent the Filipino Community, and bring awareness to Filipino Culture at Fremont High School.",
+  "studentAdvisors": "Charlin Joy Marasigan, Dwight Cahiga, Joanna Lynn Ramirez, Gabriella Santos, Keen Jayden Manahan",
+  "teacherAdvisor": "Chary Salvador",
+  "meetingInfo": "Room B-102 · 2nd Wed monthly lunch",
+  "emails": [
+   "cmarasigan201@student.fuhsd.org",
+   "dcahiga251@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Culture & Language"
+ },
+ {
+  "__normalized": true,
+  "name": "Firebird Buddies",
+  "purpose": "Our mission is to foster meaningful and personalized friendships between special education and general education students.",
+  "studentAdvisors": "Avani Kumar, Charlotte Painter",
+  "teacherAdvisor": "Joe Garvin",
+  "meetingInfo": "C-112 · Mon lunch",
+  "emails": [
+   "akumar997@student.fuhsd.org",
+   "cpainter823@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Service & Advocacy"
+ },
+ {
+  "__normalized": true,
+  "name": "Fremont GSA",
+  "purpose": "To provide a safe, supportive, and educational environment and community for the students of Fremont.",
+  "studentAdvisors": "Harper Roth, June Diamond",
+  "teacherAdvisor": "Alyssa Long",
+  "meetingInfo": "Room A106 · Tue, biweekly",
+  "emails": [
+   "hroth605@student.fuhsd.org",
+   "jdiamond444@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Culture & Language"
+ },
+ {
+  "__normalized": true,
+  "name": "Fremont Hack Club (Programming Club)",
+  "purpose": "Introduce programming and technology through engaging real-world projects.",
+  "studentAdvisors": "Sid Senthil, Parneel Bhakhri",
+  "teacherAdvisor": "David Dobervich",
+  "meetingInfo": "Room 72 · Mon lunch",
+  "emails": [
+   "sidsenthil2010@gmail.com",
+   "pbhakhrism@gmail.com"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "STEM"
+ },
+ {
+  "__normalized": true,
+  "name": "Fremont High Robotics",
+  "purpose": "To create a safe and supportive environment for students to develop their interest in STEAM through hands-on experiences and direct guidance from other students and mentors. By enabling students of all backgrounds to participate in robotics, we proudly stand by the idea that success in engineering, business, and positive collaboration can be achieved by anyone with an appreciation for STEAM.",
+  "studentAdvisors": "Arjun Vuppaladadium, Sophia Hoang, Sid Senthil, Rishan Checker, Puneeth Salgundi, Dhruv Lagu, Vidyuth Pasumarthi, Maya Panse, Saketh Giri, Aaditri Ramisetty",
+  "teacherAdvisor": "Sohini Stone",
+  "meetingInfo": "Fieldhouse · Mon & Wed 6:30-9:30",
+  "emails": [
+   "sohiniss@gmail.com",
+   "arjunv.lzp@gmail.com"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "STEM"
+ },
+ {
+  "__normalized": true,
+  "name": "Fremont High School Folklórico",
+  "purpose": "We want to spread México's culture through teaching our traditional dances!",
+  "studentAdvisors": "Quetzali Celaya Nuñez, Victoria Andrade Vargas, Bridgette Martinez Moya, Luis Muñiz Ramos, J. Sophia Reyes",
+  "teacherAdvisor": "Israel Gonzalez, Carlos Torres García",
+  "meetingInfo": "Wed 3:15-4:30 & Wed lunch",
+  "emails": [
+   "qcelayanunez681@student.fuhsd.org",
+   "vandradevargas771@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Arts & Media"
+ },
+ {
+  "__normalized": true,
+  "name": "Fremont Pickleball Club",
+  "purpose": "Expand and grow the sport of pickleball within the school.",
+  "studentAdvisors": "Natalie Kwan, Allison Brunnings",
+  "teacherAdvisor": "Jordan Serpe, Luke Sigmon",
+  "meetingInfo": "Outside field house · Wed lunch, biweekly",
+  "emails": [
+   "nkwan011@student.fuhsd.org",
+   "abrunnings230@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Sports & Games"
+ },
+ {
+  "__normalized": true,
+  "name": "Fremont Rocketry",
+  "purpose": "To compete in the American Rocketry Challenge by designing, building, testing, and launching model rockets that meet the competition’s annual requirements, while developing students’ skills in engineering, problem-solving, teamwork, leadership, and aerospace science.",
+  "studentAdvisors": "Tejas Panicker, Danson Cheng",
+  "teacherAdvisor": "Jeske Gillis",
+  "meetingInfo": "A-203 · Tue lunch, monthly",
+  "emails": [
+   "tpanicker341@student.fuhsd.org",
+   "dcheng395@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "STEM"
+ },
+ {
+  "__normalized": true,
+  "name": "Fremont Speech and Debate",
+  "purpose": "Speech and Debate seeks to provide students academic outlooks for developing their public speaking, researching, and argumentative skills.",
+  "studentAdvisors": "Himaja Inturi, Fatema Shiyaji",
+  "teacherAdvisor": "Mary Sargious",
+  "meetingInfo": "Room 131 & Science bldg · Wed lunch & Wed after school",
+  "emails": [
+   "fshiyaji651@student.fuhsd.org",
+   "hinturi700@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Academics & Business"
+ },
+ {
+  "__normalized": true,
+  "name": "Fremont Zahraa",
+  "purpose": "Bollywood dance club.",
+  "studentAdvisors": "Tanishka Sharma, Laasya Priya Mariboyina",
+  "teacherAdvisor": "Camila Torres",
+  "meetingInfo": "Outside Room 70 · Mon lunch",
+  "emails": [
+   "tsharma621@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Arts & Media"
+ },
+ {
+  "__normalized": true,
+  "name": "French club/honors society",
+  "purpose": "Spreading French culture and language opens the door to a rich tapestry of history, art, and global connection. By sharing the beauty of the language and the traditions of the Francophone world, we can foster a deeper understanding and appreciation for diverse perspectives. Whether through literature, cinema, or everyday conversation, embracing French allows us to build bridges across continents and celebrate a shared heritage of creativity and diplomacy.",
+  "studentAdvisors": "",
+  "teacherAdvisor": "Janene Rich",
+  "meetingInfo": "Room C-111 · Mon lunch, biweekly",
+  "emails": [
+   "vgarg537@student.fuhsd.org",
+   "nmunro209@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Culture & Language"
+ },
+ {
+  "__normalized": true,
+  "name": "Future Business Leaders of America",
+  "purpose": "To prepare students for college and career pathways in business and relevant specialized disciplines: Members are granted the unique opportunity to compete against students of other schools at the regional, state, and national level in their topic of choice. Said competitions aim to develop the necessary skills for success in a business environment, both in the workplace as well as in higher education.",
+  "studentAdvisors": "Vidyuth Pasumarthi, Ayush Anarkat, Allyson Chan, Joshua Charnota",
+  "teacherAdvisor": "Aaron Eeg",
+  "meetingInfo": "Student Center · Thu lunch, biweekly",
+  "emails": [
+   "vpasumarthi355@student.fuhsd.org",
+   "aanarkat060@student.fuhsd.org",
+   "jcharnota273@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Academics & Business"
+ },
+ {
+  "__normalized": true,
+  "name": "Garden Club",
+  "purpose": "To teach students how to care for plants, build a community, and create a safe space for everyone to take a break.",
+  "studentAdvisors": "Phoebe Chan, Alma Abu Rajab, Anna Proskuryakova, Lailiana Schenk",
+  "teacherAdvisor": "Julia Coe",
+  "meetingInfo": "Room 132 · Thu lunch, biweekly",
+  "emails": [],
+  "other": "",
+  "disbanded": false,
+  "category": "Service & Advocacy"
+ },
+ {
+  "__normalized": true,
+  "name": "Geography Club",
+  "purpose": "The purpose of geography club is to educate people about geography and have fun doing it.",
+  "studentAdvisors": "Jason Levasseur, Ethan Kelly, and Rishit Pandey",
+  "teacherAdvisor": "David Rognas",
+  "meetingInfo": "B-202 · Wed lunch, biweekly",
+  "emails": [
+   "ekelly824@student.fuhsd.org",
+   "rpandey339@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Academics & Business"
+ },
+ {
+  "__normalized": true,
+  "name": "Geopolitics and History",
+  "purpose": "",
+  "studentAdvisors": "Joel Gonzalez, Ryan Lin, Ethan Lin",
+  "teacherAdvisor": "Wei Hsiu Chang",
+  "meetingInfo": "",
+  "emails": [
+   "jgonzales568@student.fuhsd.org",
+   "rlin099@student.fuhsd.org",
+   "elin091@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Academics & Business"
+ },
+ {
+  "__normalized": true,
+  "name": "Girls in Business",
+  "purpose": "The purpose of the Girls in Business club is to introduce girls in high school and middle school to the world of business through engaging after-school sessions. The club aims to connect with the broader community, including students from our district ranging from ages 10-16, by organizing business workshops and events. Additionally, we aim to foster an interest in entrepreneurship and to encourage creating their own small businesses in a supportive and approachable way. At the end of our workshops, we want to simulate a marketplace where our students can try to market their products in competition with one another!",
+  "studentAdvisors": "Vivian Chang, Aadhya Ganesh, Verna Pickett, Bindya Rajendrakumar, Jolie Chan, Shraddha Kotakonda",
+  "teacherAdvisor": "Stephanie Fujii",
+  "meetingInfo": "Room B-101 · Wed lunch, monthly",
+  "emails": [
+   "vchang266@student.fuhsd.org",
+   "aganesh526@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Academics & Business"
+ },
+ {
+  "__normalized": true,
+  "name": "Girls Who Code",
+  "purpose": "Teach girls about coding and learn about Women in STEAM.",
+  "studentAdvisors": "Maya Panse and Aishi Nanda",
+  "teacherAdvisor": "Chris Ho",
+  "meetingInfo": "Room A-212 · Mon lunch",
+  "emails": [
+   "mpanse343@student.fuhsd.org",
+   "ananda240@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "STEM"
+ },
+ {
+  "__normalized": true,
+  "name": "HOSA",
+  "purpose": "The Fremont High School HOSA Club exists to prepare students for careers in health professions by providing leadership development, career exploration, and community service opportunities centered on health and medicine. In alignment with the mission of HOSA, Future Health Professionals, the club's objectives are to expose members to the wide range of careers available in healthcare, connect them with professionals and mentors in the field, and give them opportunities to build skills through competitive events, guest speakers, workshops, competitions, and volunteer projects. Through these efforts, the club aims to support members in exploring and pursuing health-related career paths while fostering leadership, teamwork, and a commitment to community health.",
+  "studentAdvisors": "Aaditri Ramisetty",
+  "teacherAdvisor": "Melisa Lu, Jenna Smith",
+  "meetingInfo": "Room A-213 · Fri lunch, biweekly",
+  "emails": [
+   "aramisetty449@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "STEM"
+ },
+ {
+  "__normalized": true,
+  "name": "Indian Student Association (formerly Indian recognition society)",
+  "purpose": "ISA stands to connect and bring together not only the Indian students at Fremont, but every student. We want students to have a place where they feel welcome and respected for who they are.",
+  "studentAdvisors": "Ayush Anarkat (pres)\nRuchika Villivalam (pres)\nAmina Ranjit\nAnton Pesich\nDhruv Prasade\nSaanvi Doshi\nKrithika Duvvuri",
+  "teacherAdvisor": "Chris Filice",
+  "meetingInfo": "Choir room · Wed lunch, monthly",
+  "emails": [
+   "rvillivalam872@student.fuhsd.org",
+   "aanarkat060@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Culture & Language"
+ },
+ {
+  "__normalized": true,
+  "name": "Interact Club",
+  "purpose": "To allow students to serve and be part of a greater community. We provide opp.",
+  "studentAdvisors": "Aadhya Badrinath",
+  "teacherAdvisor": "Wynn Nojopranoto, Madison Martinez",
+  "meetingInfo": "Room B-208/C-202 · Mon lunch, biweekly",
+  "emails": [
+   "abadrinath116@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Service & Advocacy"
+ },
+ {
+  "__normalized": true,
+  "name": "Investing Club",
+  "purpose": "The Investing Club aims to teach members core investing knowledge by focusing on building a strong foundation in the first semester, and more complex concepts such as index funds in the second semester.",
+  "studentAdvisors": "Namar Lamba, Aditya Davasam",
+  "teacherAdvisor": "Mr. Bob Capriles",
+  "meetingInfo": "Room 153 · Fri lunch, monthly",
+  "emails": [
+   "nlamba926@student.fuhsd.org",
+   "adavasam385@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Academics & Business"
+ },
+ {
+  "__normalized": true,
+  "name": "Jewish Student union",
+  "purpose": "To strengthen and teach Judiasm, learn about the history and take pride in it!",
+  "studentAdvisors": "Mia Katz",
+  "teacherAdvisor": "Timna Naim",
+  "meetingInfo": "A-106 · Mon 1:25",
+  "emails": [
+   "miakatzmk@gmail.com"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Culture & Language"
+ },
+ {
+  "__normalized": true,
+  "name": "Just Dance club",
+  "purpose": "The Just Dance Club is a fun and energetic club where students come together to enjoy dancing using the Just Dance video game.",
+  "studentAdvisors": "Allyson Chan, Sanvitti Machanda",
+  "teacherAdvisor": "Aisha Lomando",
+  "meetingInfo": "Ms. Lomando’s room · Fri, monthly",
+  "emails": [
+   "achan282@student.fuhsd.org",
+   "smanchanda193@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Sports & Games"
+ },
+ {
+  "__normalized": true,
+  "name": "Key Club",
+  "purpose": "Service and Volunteering events, especially with elementary schools.",
+  "studentAdvisors": "Anaya Gulati, Aadhya Ganesh, Gizelea Kwan, Angelica Hsu, Kaavya Raman",
+  "teacherAdvisor": "Alissa Laferriere",
+  "meetingInfo": "A-216 · Mon lunch, biweekly",
+  "emails": [
+   "agulati596@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Service & Advocacy"
+ },
+ {
+  "__normalized": true,
+  "name": "Knitting & Crochet Club",
+  "purpose": "Hobbies and community service.",
+  "studentAdvisors": "Khadija Azim, Karen Roncal, Anne Fakava",
+  "teacherAdvisor": "Chary Salvador",
+  "meetingInfo": "Room B-102 · Thu lunch, biweekly",
+  "emails": [
+   "fhs.kac.club@gmail.com"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Service & Advocacy"
+ },
+ {
+  "__normalized": true,
+  "name": "Konnect Dance Troupe (KDT)",
+  "purpose": "KDT is a K-Pop related club that strives to bring together a community of individuals with similar interests together such as K-Pop dances and Korean culture. We hope to unite fans by providing a safe space to interact, share experiences and connect with other enthusiasts.",
+  "studentAdvisors": "Khadija Azim, Emma Tran, Amber Maningas, Ankita Canakoti, Sophia Hoang, Mya Lee",
+  "teacherAdvisor": "Joseph Kelly",
+  "meetingInfo": "Music Room · Thu lunch, biweekly",
+  "emails": [
+   "kazim107@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Culture & Language"
+ },
+ {
+  "__normalized": true,
+  "name": "LSU",
+  "purpose": "To bring the Latino community together and create events for the Latino community.",
+  "studentAdvisors": "Samantha Rojas, Isabella Poo, Victoria Andrade, Kaitlin Wilbur",
+  "teacherAdvisor": "Mr. Torres, Ms. Flores, Mr. Flores",
+  "meetingInfo": "Room 70 · 1st Mon of month",
+  "emails": [
+   "srojas597@student.fuhsd.org",
+   "kwilbur289@student.fuhsd.org",
+   "vandradevargas771@student.fuhsd.org",
+   "ipoo638@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Culture & Language"
+ },
+ {
+  "__normalized": true,
+  "name": "Magic: the Gathering Club",
+  "purpose": "To teach and play the trading card game Magic: the Gathering during club time.",
+  "studentAdvisors": "Amy Doherty\nCarsten Spies\nEmile Thiers",
+  "teacherAdvisor": "Aaron Eeg",
+  "meetingInfo": "Room C-107 · Tue lunch",
+  "emails": [
+   "adoherty076@student.fuhsd.org",
+   "ethiers087@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Sports & Games"
+ },
+ {
+  "__normalized": true,
+  "name": "Math Club",
+  "purpose": "To train students for math competitions such as the AMC 10 and AMC 12.",
+  "studentAdvisors": "Tejo Madhavarapu, Raghav Joshi, Avi Malhotra, Puneeth Salgundi",
+  "teacherAdvisor": "Zachary Epperson",
+  "meetingInfo": "Room 93 · Thu lunch",
+  "emails": [
+   "tmadhavarapu472@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "STEM"
+ },
+ {
+  "__normalized": true,
+  "name": "Mock Trial",
+  "purpose": "To prepare for and compete at local mock trial competitions and to educate students on law and the real proceedings of a trial.",
+  "studentAdvisors": "Ava Malashock, Shriya Singh, Samaira Tanwar, Esther Dal Porto",
+  "teacherAdvisor": "Christina Brown",
+  "meetingInfo": "Room 76 & EdOps Building · Mon lunch, biweekly & Wed 5:30-7:30",
+  "emails": [
+   "avamalashock@gmail.com",
+   "ssingh671@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Academics & Business"
+ },
+ {
+  "__normalized": true,
+  "name": "Model United nations",
+  "purpose": "To simulate international diplomacy so students can learn about global issues, practice public speaking, and build leadership skills.",
+  "studentAdvisors": "Agastya Raja, Allyson Chan, Puneeth Salgundi",
+  "teacherAdvisor": "Jeske Gillis",
+  "meetingInfo": "A-203 · Fri lunch, biweekly",
+  "emails": [
+   "araja429@student.fuhsd.org",
+   "psalgundi347@student.fuhsd.org",
+   "achan282@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Academics & Business"
+ },
+ {
+  "__normalized": true,
+  "name": "Movie Club",
+  "purpose": "Movie Club is a community for students who share a passion for movies and want to explore what happens behind the scenes. We’ll dive into the filmmaking process, from scriptwriting and acting to filming, editing, and production design. Members will analyze films ranging from blockbusters and Disney animations to Hollywood classics to understand the creative choices behind them. Through screenings, activities, discussions, and Q&As, members can apply what they learn and create their own short films, experiencing the filmmaking process firsthand.",
+  "studentAdvisors": "Shriya Singh, Lynette Lopez, Mayar Alshathr",
+  "teacherAdvisor": "Antonio Gamboa",
+  "meetingInfo": "Room 134 · Wed lunch, bimonthly",
+  "emails": [
+   "ssingh671@student.fuhsd.org",
+   "llopez034@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Arts & Media"
+ },
+ {
+  "__normalized": true,
+  "name": "Multicultural club",
+  "purpose": "So people know about different countries and cultures.",
+  "studentAdvisors": "Maria",
+  "teacherAdvisor": "Amy Gibson",
+  "meetingInfo": "Room B-107 · Last Wed of month lunch",
+  "emails": [
+   "mpovedazamora846@student.fushd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Culture & Language"
+ },
+ {
+  "__normalized": true,
+  "name": "Muslim Community Association (MSA)",
+  "purpose": "The purpose of this club is to combat negative stereotypes about Muslims in the media, create a safe and welcoming environment for Muslim and non Muslim students. To learn about Islam and cultures where Islam is present. And finally, to raise awareness about world issues faced by Muslims today.",
+  "studentAdvisors": "Hiba Rao\nMariam Al Temimi\nZainab Aziz\nAlma Abu Rajab\nAlya Ismail\nSalma Elsanhawy",
+  "teacherAdvisor": "Emer Martin",
+  "meetingInfo": "Room A-206 · 3rd Mon of month lunch",
+  "emails": [
+   "zaziz297@student.fuhsd.org",
+   "fremontmsa@gmail.com"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Culture & Language"
+ },
+ {
+  "__normalized": true,
+  "name": "National Honor Society",
+  "purpose": "The purpose of the National Honor Society (NHS) chapter is to recognize and honor outstanding high school students who have demonstrated excellence in scholarship, leadership, service, and character. Beyond mere recognition, our chapter aims to cultivate a culture of service and leadership development among its members. Through various activities and initiatives, we seek to not only celebrate academic achievement but also to instill in our members a sense of responsibility towards their community and a commitment to making a positive impact in the world.",
+  "studentAdvisors": "Himaja Inturi Sofia Ortega",
+  "teacherAdvisor": "Moris Clark",
+  "meetingInfo": "Student Center · 2nd Fri of month",
+  "emails": [
+   "sortega383@student.fuhsd.org",
+   "hinturi@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Academics & Business"
+ },
+ {
+  "__normalized": true,
+  "name": "Neuroscience Club",
+  "purpose": "The Neuroscience Club at Fremont High School inspires, educates, and welcomes students who want to learn about neuroscience. The objectives of this club are to bring awareness about the field of neuroscience to the school and youth, to learn how to analyze neuroscience-based scientific literature, to understand how mental health correlates to neuroscience, and to research the differences in the brain for different types of people. The club will also explore the human brain's evolution based on cultures, demographics, and environments. AI will also be used to gain a deeper understanding of the human brain and the field of neuroscience. With various discussions and projects, students will gain a greater appreciation for how the brain works and learn how fascinating our brains are.",
+  "studentAdvisors": "Rishan Checker, Saanvi Doshi, Livia Isaksson, Nitin Krishna",
+  "teacherAdvisor": "Mr. Bob Capriles",
+  "meetingInfo": "Room 153 · Fri lunch, biweekly",
+  "emails": [
+   "rchecker226@student.fuhsd.org",
+   "sdoshi468@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "STEM"
+ },
+ {
+  "__normalized": true,
+  "name": "Octagon Club",
+  "purpose": "To provide opportunities like volunteering at local elementary schools, park clean ups, and volunteering at community events to our members.",
+  "studentAdvisors": "Mihika Nerurkar, Kashika Poogalia",
+  "teacherAdvisor": "Kristel Chew",
+  "meetingInfo": "Room 80 · Mon lunch, biweekly",
+  "emails": [
+   "mnerurkar265@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Service & Advocacy"
+ },
+ {
+  "__normalized": true,
+  "name": "Poetry Club",
+  "purpose": "I want to build a community where people can gather in a energetic setting focused on socializing around appreciating and engaging in various forms of creative writing such as poetry, slam, spoken word or rap. Audience members can gather and read poetry, poets can compete in open mic slam format competitions periodically.",
+  "studentAdvisors": "Hudson Kodama",
+  "teacherAdvisor": "Alyssa A Long",
+  "meetingInfo": "A-106 · Mon lunch",
+  "emails": [
+   "hhkodama08@gmail.com"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Arts & Media"
+ },
+ {
+  "__normalized": true,
+  "name": "Radical Researchers Club",
+  "purpose": "Our Society is a place on campus with a community of students who are passionate about research and knowledge, and who are willing both to share what they have learned and to learn from others. We cultivate a culture of rigor and quality such that we can be recognized for their excellence.",
+  "studentAdvisors": "Liam Kao, Rihaan Jain, Tejo Madhavarapu",
+  "teacherAdvisor": "Kayla Kim",
+  "meetingInfo": "Room 136 · Tue lunch, biweekly",
+  "emails": [
+   "lkao267@student.fuhsd.org",
+   "rjain360@student.fuhsd.org",
+   "tmadhavarapu472@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "STEM"
+ },
+ {
+  "__normalized": true,
+  "name": "Red Cross",
+  "purpose": "The Fremont High School Red Cross Club exists to build a student community dedicated to humanitarian service, disaster preparedness, and public health education, in alignment with the mission of the American Red Cross. The club's objectives are provide first aid and CPR training opportunities, disaster relief awareness campaigns, and community service projects that benefit Fremont and the surrounding area. Through these efforts, the club aims to instill in its members the Red Cross's core values of service, compassion, and community responsibility, while giving students hands-on experience in activities such as first aid and CPR.",
+  "studentAdvisors": "Aaditri Ramisetty\nSaanvi Halambi\nRishan Checker\nAsher Mehta\nHimaja Inturi\nSofia Patou",
+  "teacherAdvisor": "Jenna Smith",
+  "meetingInfo": "Room 130 · Wed lunch, biweekly",
+  "emails": [
+   "aramisetty449@student.fuhsd.org",
+   "shalambi685@student.fuhsd.org",
+   "rchecker226@student.fuhsd.org",
+   "amehta926@student.fuhsd.org",
+   "hinturi700@student.fuhsd.org",
+   "spatou068@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Service & Advocacy"
+ },
+ {
+  "__normalized": true,
+  "name": "Science Olympiad",
+  "purpose": "The Fremont High School Science Olympiad program functions as an umbrella organization designed to foster student passion for STEM disciplines through teamwork, mentorship, and competition.",
+  "studentAdvisors": "Avani Kumar, Vidyuth Pasumarthi",
+  "teacherAdvisor": "Antonio Gamboa",
+  "meetingInfo": "Room 134 · Tue lunch",
+  "emails": [
+   "akumar997@student.fuhsd.org",
+   "vpasumarthi355@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "STEM"
+ },
+ {
+  "__normalized": true,
+  "name": "Scientist Societea",
+  "purpose": "The goal of Scientist Societea is to encourage science communication at Fremont and create a science community in our school. Science communications is a very important field, as it is crucial that the public is updated on current science findings and is involved in science. We achieve these goals by hosting speaker events with academics and industry professionals that discuss their research and career paths, allowing students to ask questions and network with the research community.",
+  "studentAdvisors": "Aadhya Ganesh, Vivian Chang, Aaditri Ramisetty, Asher Mehta, Amina Ranjit",
+  "teacherAdvisor": "David Dobervich",
+  "meetingInfo": "Room 72 · Fri lunch, monthly",
+  "emails": [
+   "aganesh526@student.fuhsd.org",
+   "vchang266@student.fuhsd.org",
+   "aramisetty449@student.fuhsd.org",
+   "amehta926@student.fuhsd.org",
+   "aranjit458@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "STEM"
+ },
+ {
+  "__normalized": true,
+  "name": "Self-Defense Club",
+  "purpose": "Our mission is to better understand and promote martial arts so that people will have a better understanding of how to protect themselves and others in dangerous situations.",
+  "studentAdvisors": "Jet Cheng, Haziah Engay",
+  "teacherAdvisor": "Daniel McCune",
+  "meetingInfo": "Wrestling room · Thu lunch",
+  "emails": [
+   "ncheng170@student.fuhsd.org",
+   "hengay454@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Sports & Games"
+ },
+ {
+  "__normalized": true,
+  "name": "Sports Medicine",
+  "purpose": "Educate students about sports related injuries and treatments.",
+  "studentAdvisors": "Alya Ismail, David Kofman, Addison Wong, Nora Whelan, Salma Elsanhawy",
+  "teacherAdvisor": "Jenna Smith",
+  "meetingInfo": "Room 131 · Wed lunch, biweekly",
+  "emails": [
+   "aismail705@student.fuhsd.org",
+   "awong930@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "STEM"
+ },
+ {
+  "__normalized": true,
+  "name": "Teenswithmed",
+  "purpose": "To teach others about the medical field and about different medical careers.",
+  "studentAdvisors": "Gracie Padilla And Mariam Altemimi",
+  "teacherAdvisor": "Ms. Scholten",
+  "meetingInfo": "A-214 · Fri lunch, biweekly",
+  "emails": [
+   "gpadilla396@student.fuhsd.org",
+   "maltemimi035@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "STEM"
+ },
+ {
+  "__normalized": true,
+  "name": "The Book Club",
+  "purpose": "Our purpose is to provide a space where people can share their opinions on books, participate in various literature related activities, and just have fun.",
+  "studentAdvisors": "Shrivalli Kalla, Sophia Hoang, Agrima Dutt",
+  "teacherAdvisor": "Monica Dery",
+  "meetingInfo": "Room 87 · Thu lunch, biweekly",
+  "emails": [
+   "skalla855@student.fuhsd.org",
+   "shoang733@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Arts & Media"
+ },
+ {
+  "__normalized": true,
+  "name": "Theatre club",
+  "purpose": "To make a community withing theatre for those in and out of the classes.",
+  "studentAdvisors": "Malena Andrade Priscilla Benitez-Hernandez Miguel Marcos\nPhoebe Chen\nMayar Alshathr",
+  "teacherAdvisor": "Tanya Fox",
+  "meetingInfo": "C-100 · Tue lunch, monthly",
+  "emails": [
+   "mandrade065@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Arts & Media"
+ },
+ {
+  "__normalized": true,
+  "name": "Tri-M Music Honor Society",
+  "purpose": "The Tri-M Music Honor Society is a program of the National Association for Music Education (NAfME), which focuses on creating future leaders in music education and music advocacy. Tri-M provides students leadership opportunities to make a difference in their community through music-based service projects. Tri-M also gives students many opportunities to perform and showcase their musical abilities.",
+  "studentAdvisors": "Aadhya Ganesh, Himaja Inturi, Zoe Grant, Ella Cheng, Vivienne Frecceri, Anaya Gulati, Hannah Kelly",
+  "teacherAdvisor": "Chris Filice",
+  "meetingInfo": "Choir room · Tue lunch, monthly",
+  "emails": [
+   "aganesh526@student.fuhsd.org",
+   "zgrant578@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Arts & Media"
+ },
+ {
+  "__normalized": true,
+  "name": "UNICEF",
+  "purpose": "UNICEF is an international humanitarian aid organization founded in 1946, New York. The purpose of this club is to carry on UNICEF’s mission to protect children’s rights, advocate for those living in underprivileged situations, and support children across the world. This club encourages and provides students a place to contribute in helping adolescents around the world struggling with malnutrition, lack of safe shelter, natural conflicts, etc. UNICEF will host fundraisers, community service events, campaigns, other special events, and more along the way where members can make a positive impact while simultaneously gaining volunteer hours. By showing their dedication to the cause, members can be recognized and rewarded.",
+  "studentAdvisors": "Emma Tran, Esther Dal Porto, Hiba Rao",
+  "teacherAdvisor": "Alissa Laferriere",
+  "meetingInfo": "A-216 · Mon lunch, monthly",
+  "emails": [
+   "etran793@student.fuhsd.org",
+   "edalporto880@student.fuhsd.org",
+   "hrao212@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "Service & Advocacy"
+ },
+ {
+  "__normalized": true,
+  "name": "USABO",
+  "purpose": "To allow students to compete and learn about biology.",
+  "studentAdvisors": "Kai Ling Chia, Avani Kumar",
+  "teacherAdvisor": "Julia Coe",
+  "meetingInfo": "Rm. 132 · 1st Fri lunch of month",
+  "emails": [
+   "kchia324@student.fuhsd.org",
+   "akumar997@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "STEM"
+ },
+ {
+  "__normalized": true,
+  "name": "Vet Connect",
+  "purpose": "FHS Vet Connect is dedicated to closing the gap between students and the veterinary world through hands-on experience and networking. Our objective is to operate as a club at school focusing on animal advocacy and education. Outside of school, the club will produce podcasts and interviews with professionals including vets, vet techs, shelter workers, and more to discuss critical topics like mental health, school requirements, and career burnout. Additionally, we will partner with local institutions such as the SPCA, Animal Assisted Happiness, and Happy Hollow to provide members with various volunteer opportunities.",
+  "studentAdvisors": "Vivian Chang, Saanvi Doshi, Livia Isaksson",
+  "teacherAdvisor": "Antonia Gamboa",
+  "meetingInfo": "Room 134 · Thu lunch, monthly",
+  "emails": [
+   "vchang266@student.fuhsd.org",
+   "sdoshi468@student.fuhsd.org",
+   "lisaksson785@student.fuhsd.org"
+  ],
+  "other": "",
+  "disbanded": false,
+  "category": "STEM"
+ }
 ]

@@ -14,9 +14,12 @@ const cache = makeCache(CACHE_KEY, CACHE_TTL)
 export function useClubs(fallbackRows = []) {
   const [state, setState] = useState(() => {
     const cached = cache.read()
-    return Array.isArray(cached) && cached.length
-      ? { rows: cached, loading: false, error: null, source: 'sheet' }
-      : { rows: [], loading: true, error: null, source: 'sheet' }
+    if (Array.isArray(cached) && cached.length) return { rows: cached, loading: false, error: null, source: 'sheet' }
+    // No cache yet (e.g. a first-ever visit): render the bundled snapshot INSTANTLY instead of a
+    // spinner, then the effect refreshes from the live API in the background. This is why the
+    // Official Clubs List never makes anyone wait on the server-side LLM pipeline.
+    if (Array.isArray(fallbackRows) && fallbackRows.length) return { rows: fallbackRows, loading: false, error: null, source: 'snapshot' }
+    return { rows: [], loading: true, error: null, source: 'sheet' }
   })
 
   useEffect(() => {
