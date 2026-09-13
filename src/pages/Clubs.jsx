@@ -58,6 +58,7 @@ function normalizeClub(row) {
     emails,
     other,
     disbanded,
+    category: pick(row, ['category']) || '',
   }
 }
 
@@ -66,9 +67,30 @@ const uniq = (arr) => Array.from(new Set(arr.map((s) => s.toLowerCase())))
 // Hover colour only on devices that actually hover, otherwise the rust "sticks" after a tap on phones.
 const HOVER_BRAND = '[@media(hover:hover)]:hover:text-brand'
 
+// The fixed taxonomy /api/clubs classifies every club into (Gemini, server-side).
+const CATEGORY_ORDER = ['STEM', 'Arts & Media', 'Culture & Language', 'Service & Advocacy', 'Academics & Business', 'Sports & Games', 'Special Interest']
+
+function CatChip({ active, onClick, children }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`inline-flex min-h-[40px] items-center rounded-full border px-4 font-display text-sm font-bold transition-colors ${
+        active
+          ? 'border-brand bg-brand text-white'
+          : 'border-rule text-ink [@media(hover:hover)]:hover:border-brand [@media(hover:hover)]:hover:text-brand'
+      }`}
+    >
+      {children}
+    </button>
+  )
+}
+
 export default function Clubs() {
   const { rows, loading, error, source } = useClubs(clubsJson)
   const [query, setQuery] = useState('')
+  const [cat, setCat] = useState('all')
   const [showDisbanded, setShowDisbanded] = useState(false)
   const [showAll, setShowAll] = useState(false)
 
@@ -80,16 +102,22 @@ export default function Clubs() {
   const disbanded = useMemo(() => clubs.filter((c) => c.disbanded), [clubs])
 
   const q = query.trim().toLowerCase()
+  const cats = useMemo(() => {
+    const present = new Set(active.map((c) => c.category).filter(Boolean))
+    return CATEGORY_ORDER.filter((c) => present.has(c))
+  }, [active])
+  const filtering = Boolean(q) || cat !== 'all'
   const results = useMemo(() => {
-    if (!q) return active
-    return active.filter((c) =>
-      [c.name, c.purpose, c.studentAdvisors, c.teacherAdvisor, c.meetingInfo].join(' ').toLowerCase().includes(q),
-    )
-  }, [active, q])
+    return active.filter((c) => {
+      if (cat !== 'all' && c.category !== cat) return false
+      if (!q) return true
+      return [c.name, c.purpose, c.studentAdvisors, c.teacherAdvisor, c.meetingInfo].join(' ').toLowerCase().includes(q)
+    })
+  }, [active, q, cat])
 
-  // Keep the page short: show a first batch, reveal the rest on demand. A search shows every match.
+  // Keep the page short: show a first batch, reveal the rest on demand. Search/filter shows every match.
   const INITIAL_COUNT = 6
-  const visibleResults = q || showAll ? results : results.slice(0, INITIAL_COUNT)
+  const visibleResults = filtering || showAll ? results : results.slice(0, INITIAL_COUNT)
 
   return (
     <>
@@ -133,9 +161,11 @@ export default function Clubs() {
             <p className="mt-4 text-sm text-body" aria-live="polite">
               {loading ? (
                 'Loading the list…'
-              ) : q ? (
+              ) : filtering ? (
                 <>
-                  <span className="font-bold text-ink">{results.length}</span> of {active.length} clubs match “{query.trim()}”
+                  <span className="font-bold text-ink">{results.length}</span> of {active.length} clubs
+                  {q && <> match “{query.trim()}”</>}
+                  {cat !== 'all' && <> in {cat}</>}
                 </>
               ) : (
                 <>
@@ -158,14 +188,23 @@ export default function Clubs() {
 
           {/* Results */}
           <div className="lg:col-span-8">
+            {cats.length > 1 && (
+              <div className="mb-6 flex flex-wrap gap-2" role="group" aria-label="Filter clubs by category">
+                <CatChip active={cat === 'all'} onClick={() => setCat('all')}>All</CatChip>
+                {cats.map((c) => (
+                  <CatChip key={c} active={cat === c} onClick={() => setCat(c)}>{c}</CatChip>
+                ))}
+              </div>
+            )}
             {loading ? (
               <Loading label="Loading the Official Clubs List…" />
             ) : results.length === 0 ? (
               <div className="border-t border-rule py-10">
-                <p className="font-display text-lg font-bold text-ink">No club matches “{query.trim()}”.</p>
+                <p className="font-display text-lg font-bold text-ink">
+                  {q ? <>No club matches “{query.trim()}”{cat !== 'all' && <> in {cat}</>}.</> : <>No clubs in {cat}.</>}
+                </p>
                 <p className="mt-2 text-sm text-body">
-                  Try a shorter word, or{' '}
-                  <button type="button" onClick={() => setQuery('')} className="link-brand">clear the search</button>.
+                  <button type="button" onClick={() => { setQuery(''); setCat('all') }} className="link-brand">Clear search &amp; filters</button>.
                 </p>
               </div>
             ) : (
@@ -175,7 +214,7 @@ export default function Clubs() {
                     <ClubRow key={`${club.name}-${index}`} club={club} />
                   ))}
                 </ul>
-                {!q && results.length > INITIAL_COUNT && (
+                {!filtering && results.length > INITIAL_COUNT && (
                   <div className="mt-6 flex justify-center border-t border-rule pt-6">
                     <button
                       type="button"
@@ -191,7 +230,7 @@ export default function Clubs() {
               </>
             )}
 
-            {!loading && disbanded.length > 0 && !q && (
+            {!loading && disbanded.length > 0 && !filtering && (
               <div className="mt-8">
                 <button
                   type="button"
