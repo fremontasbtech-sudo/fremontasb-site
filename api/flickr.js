@@ -8,7 +8,11 @@ import { flickrFeed } from '../src/data/sources.js'
 export default async function handler(req, res) {
   try {
     const albums = await fetchAlbums(process.env.FLICKR_API_KEY, flickrFeed.nsid)
-    res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400')
+    if (albums && albums.length) {
+      res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400')
+    } else {
+      res.setHeader('Cache-Control', 'no-store') // don't cache an empty/failed Flickr pull
+    }
     res.status(200).json({ albums, titleSource: albums.titleSource || 'heuristic', titleError: albums.titleError || '' })
   } catch (err) {
     // Never hard-fail: the page falls back to photos.json when albums is empty.

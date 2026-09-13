@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { makeCache, fetchJsonRetry } from './liveData'
 
 /**
  * useEvents() - the curated items from the shared Firebird Hub Events sheet
@@ -16,21 +17,17 @@ import { useEffect, useState } from 'react'
  * (no spinner for repeat visitors), then revalidated in the background.
  * Returns { upcoming: [items asc], recent: [items desc], loading }.
  */
-const CACHE_KEY = 'fasb.events.v1'
+const CACHE_KEY = 'fasb.events.v2'
+const CACHE_TTL = 6 * 60 * 60 * 1000 // ignore a cache older than 6h so it can't flash stale data
 const HORIZON_DAYS = 21   // upcoming window: the next 3 weeks only
 const PAST_DAYS = 14      // how long a finished flagged game lingers
 
+const _cache = makeCache(CACHE_KEY, CACHE_TTL)
 function readCache() {
-  try {
-    const raw = localStorage.getItem(CACHE_KEY)
-    if (!raw) return null
-    const d = JSON.parse(raw)
-    return d && Array.isArray(d.events) && Array.isArray(d.games) ? d : null
-  } catch { return null }
+  const d = _cache.read()
+  return d && Array.isArray(d.events) && Array.isArray(d.games) ? d : null
 }
-function writeCache(d) {
-  try { localStorage.setItem(CACHE_KEY, JSON.stringify(d)) } catch { /* ignore */ }
-}
+function writeCache(d) { _cache.write(d) }
 
 function parseIso(iso) {
   const m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(String(iso || '').trim())
@@ -107,8 +104,7 @@ export function useEvents() {
 
   useEffect(() => {
     let cancelled = false
-    fetch('/api/events')
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`http ${r.status}`))))
+    fetchJsonRetry('/api/events', { isEmpty: (d) => !((d.events && d.events.length) || (d.games && d.games.length)) })
       .then((data) => {
         if (cancelled) return
         const clean = { events: Array.isArray(data.events) ? data.events : [], games: Array.isArray(data.games) ? data.games : [] }

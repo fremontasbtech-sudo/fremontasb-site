@@ -8,8 +8,12 @@ export default async function handler(req, res) {
   try {
     res.setHeader('Access-Control-Allow-Origin', '*')  // let the Firebird Hub app read this feed
     const announcements = await fetchAnnouncements(announcementsSheet)
-    // Short CDN cache so sheet edits show within a few minutes, not up to 15.
-    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=1800')
+    if (announcements && announcements.length) {
+      // Short CDN cache so sheet edits show within a few minutes; SWR keeps it instant.
+      res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=1800')
+    } else {
+      res.setHeader('Cache-Control', 'no-store') // don't cache an empty parse
+    }
     res.status(200).json({ announcements, titleSource: announcements.titleSource || 'heuristic', titleError: announcements.titleError || '' })
   } catch (err) {
     res.status(200).json({ announcements: [], error: String(err && err.message || err) })

@@ -1,33 +1,24 @@
 import { useEffect, useState } from 'react'
+import { makeCache, fetchJsonRetry } from './liveData'
 
 /**
- * useAnnouncements() - morning announcements pulled from /api/announcements
- * (a server-parsed view of the ASB sheet; the sheet itself is never linked/embedded).
- *
- * The sheet holds the whole year up front, so the site reveals each announcement only
- * once its morning has arrived: we keep entries whose date is in the PAST, using an
- * 8:30 AM local cutoff (when announcements are read Wed/Fri). No cron, the date does it.
- *
- * Instant load: the last server response is cached in localStorage and rendered on the
- * spot (no "Loading…" flash for repeat visitors), then revalidated in the background so
- * new announcements still appear. The past-only/8:30 filter re-runs against the CURRENT
- * time every render, so a cached list still reveals rows exactly on their morning.
+ * useAnnouncements() — morning announcements from /api/announcements. The server returns the
+ * WHOLE year's parsed items; the client reveals each only once its morning has arrived (8:30 AM
+ * Wed/Fri cutoff), re-evaluated against the current time every render. Robust like the other
+ * live-data hooks: a TTL'd cache seeds the first paint, a flaky sheet pull is retried, and a good
+ * render is never downgraded to empty. No item cap — the calendar marks EVERY past day, all the
+ * way back to the first week of the year (that cap is what hid August).
  */
-const CACHE_KEY = 'fasb.announcements.v1'
+const CACHE_KEY = 'fasb.announcements.v2'
+const CACHE_TTL = 6 * 60 * 60 * 1000
+const cache = makeCache(CACHE_KEY, CACHE_TTL)
 
-function readCache() {
-  try {
-    const raw = localStorage.getItem(CACHE_KEY)
-    if (!raw) return null
-    const all = JSON.parse(raw)
-    return Array.isArray(all) ? all : null
-  } catch { return null }
-}
-function writeCache(all) {
-  try { localStorage.setItem(CACHE_KEY, JSON.stringify(all)) } catch { /* private mode / full: ignore */ }
+function parseLocal(iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || '').trim())
+  return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null
 }
 
-// Reveal only past mornings (8:30 AM cutoff), newest-first, capped. Pure fn of the raw list + now.
+// Reveal every past morning (8:30 AM cutoff), newest-first. Pure fn of the raw list + now.
 function visible(all) {
   const now = new Date()
   return all
@@ -38,25 +29,22 @@ function visible(all) {
       return d <= now
     })
     .sort((x, y) => (x.date < y.date ? 1 : x.date > y.date ? -1 : 0))
-    .slice(0, 12)
     .map((a, i) => ({ ...a, key: `${a.date}-${i}` }))
 }
 
 export function useAnnouncements() {
-  // Seed synchronously from cache so the first paint already has content (no spinner).
   const [state, setState] = useState(() => {
-    const cached = readCache()
-    return cached ? { items: visible(cached), loading: false } : { items: [], loading: true }
+    const cached = cache.read()
+    return Array.isArray(cached) && cached.length ? { items: visible(cached), loading: false } : { items: [], loading: true }
   })
 
   useEffect(() => {
     let cancelled = false
-    fetch('/api/announcements')
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`http ${r.status}`))))
+    fetchJsonRetry('/api/announcements', { isEmpty: (d) => !(Array.isArray(d && d.announcements) && d.announcements.length) })
       .then((data) => {
         if (cancelled) return
-        const all = Array.isArray(data && data.announcements) ? data.announcements : []
-        writeCache(all)
+        const all = data.announcements
+        cache.write(all)
         setState({ items: visible(all), loading: false })
       })
       .catch(() => { if (!cancelled) setState((s) => ({ items: s.items, loading: false })) })
@@ -64,9 +52,4 @@ export function useAnnouncements() {
   }, [])
 
   return state
-}
-
-function parseLocal(iso) {
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || '').trim())
-  return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null
 }
