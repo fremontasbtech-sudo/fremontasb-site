@@ -7,8 +7,14 @@ import { youtubeFeed } from '../src/data/sources.js'
 export default async function handler(req, res) {
   try {
     const videos = await fetchChannelVideos(youtubeFeed.channelId)
-    // Cache at the edge for 30 min, serve stale up to 1h while revalidating.
-    res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate=3600')
+    if (videos.length) {
+      // Cache a good result at the edge for 30 min, serve stale up to 1h while revalidating.
+      res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate=3600')
+    } else {
+      // Do NOT cache an empty feed: a transient RSS hiccup must not pin every viewer to the
+      // older media.json fallback for 30 min. Let the next request re-hit the RSS.
+      res.setHeader('Cache-Control', 'no-store')
+    }
     res.status(200).json({ videos, titleSource: videos.titleSource || 'heuristic', titleError: videos.titleError || '' })
   } catch (err) {
     // Never hard-fail: the page falls back to media.json when videos is empty.

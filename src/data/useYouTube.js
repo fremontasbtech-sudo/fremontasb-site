@@ -47,13 +47,20 @@ export function useYouTube(overlayRows = []) {
 
   useEffect(() => {
     let cancelled = false
-    fetch('/api/youtube')
+    const softFallback = () =>
+      // Never downgrade a good render (cached latest episode) to the older bundled overlay;
+      // only use the overlay when we truly have nothing yet.
+      setState((s) => (s.rows && s.rows.length ? { ...s, loading: false, source: s.source } : { rows: overlayRows, loading: false, source: 'local' }))
+    const retry = (attempt) => { if (!cancelled && attempt < 3) setTimeout(() => load(attempt + 1), 1500); else softFallback() }
+    const load = (attempt) => {
+      fetch('/api/youtube')
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`http ${r.status}`))))
       .then((data) => {
         if (cancelled) return
         const live = Array.isArray(data && data.videos) ? data.videos : []
         if (!live.length) {
-          setState({ rows: overlayRows, loading: false, source: 'local' })
+          // Transient empty feed (RSS hiccup): retry a few times, then soft-fallback.
+          retry(attempt)
           return
         }
         const overlayById = Object.fromEntries(overlayRows.map((r) => [r.youtubeId, r]))
@@ -84,9 +91,9 @@ export function useYouTube(overlayRows = []) {
         writeCache(rows)
         setState({ rows, loading: false, source: 'youtube' })
       })
-      .catch(() => {
-        if (!cancelled) setState((s) => ({ rows: s.rows.length ? s.rows : overlayRows, loading: false, source: 'local' }))
-      })
+      .catch(() => { if (!cancelled) retry(attempt) })
+    }
+    load(0)
     return () => { cancelled = true }
   }, [])
 
