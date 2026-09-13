@@ -20,12 +20,21 @@ import { useEffect, useState } from 'react'
  *
  * Returns { rows, loading, source }  (source: 'youtube' | 'local').
  */
-const CACHE_KEY = 'fasb.media.v3'
+const CACHE_KEY = 'fasb.media.v4'
+// A cache older than this is ignored, so a stale snapshot left by an old session or a
+// previous deploy (e.g. a title from before the "Fremont TV" rename) can never flash as
+// the "latest episode" on reload. Within the window it still gives an instant first paint.
+const CACHE_TTL = 6 * 60 * 60 * 1000 // 6 hours
 function readCache() {
-  try { const raw = localStorage.getItem(CACHE_KEY); const a = raw && JSON.parse(raw); return Array.isArray(a) && a.length ? a : null } catch { return null }
+  try {
+    const obj = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null')
+    if (!obj || !Array.isArray(obj.rows) || !obj.rows.length) return null
+    if (!obj.t || Date.now() - obj.t > CACHE_TTL) return null
+    return obj.rows
+  } catch { return null }
 }
 function writeCache(rows) {
-  try { localStorage.setItem(CACHE_KEY, JSON.stringify(rows)) } catch { /* private mode / full: ignore */ }
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), rows })) } catch { /* private mode / full: ignore */ }
 }
 
 export function useYouTube(overlayRows = []) {
