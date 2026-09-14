@@ -374,18 +374,16 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = []) {
     .sort((x, y) => {
       const p = Number(y.pinned) - Number(x.pinned)
       if (p) return p // a human-pinned announcement still wins the very top
-      // Fremont TV ALWAYS leads Latest News, above every dated game/album/announcement - it's
-      // the flagship show and "the first thing in the morning". This is a HARD first-place
-      // rule, not just a same-day tiebreak, so a newer-dated game can't push it down and a
-      // stale media cache showing an older episode can't either: an FTV item is first either
-      // way. 'type' is the LLM-classified kind (api/_feed.js), so it holds for any future
-      // episode no matter how the title is written.
-      const fx = x.type === 'Fremont TV' ? 0 : 1
-      const fy = y.type === 'Fremont TV' ? 0 : 1
-      if (fx !== fy) return fx - fy
       const xk = dayKey(x.when), yk = dayKey(y.when)
-      if (xk !== yk) return yk - xk // otherwise newest day first
-      return (y.when?.getTime() ?? 0) - (x.when?.getTime() ?? 0) // then newest first
+      if (xk !== yk) return yk - xk // newer day first
+      // Same day: Fremont TV SINKS BELOW the day's games/events. It's the morning show (airs
+      // first thing, 4th period), so it's the earliest thing that day; a game or event happens
+      // later, so in a newest-first feed it sits ABOVE the episode. 'type' is the LLM-classified
+      // kind (api/_feed.js), so this holds for any future episode regardless of its title.
+      const fx = x.type === 'Fremont TV' ? 1 : 0
+      const fy = y.type === 'Fremont TV' ? 1 : 0
+      if (fx !== fy) return fx - fy // FTV last among same-day items
+      return (y.when?.getTime() ?? 0) - (x.when?.getTime() ?? 0) // else newest first
     })
   // At most ONE Fremont TV item in Latest News (the newest). 'kind' is classified by the LLM
   // server-side (api/_feed.js), so a future episode is caught even if it's titled differently.
