@@ -3,6 +3,8 @@ import { Loading, DevNote } from '../components/DataState'
 import { sheets } from '../data/sources'
 import { useSheetData, isHidden } from '../data/useSheetData'
 import localCourt from '../data/homecomingCourt.json'
+import NominationForm from '../components/NominationForm'
+import { useNominationConfig } from '../data/useNominationConfig'
 
 /**
  * Homecoming Court - seasonal, view-only.
@@ -22,17 +24,66 @@ import localCourt from '../data/homecomingCourt.json'
  */
 export default function HomecomingCourt() {
   const { rows, loading, error, source } = useSheetData(sheets.homecomingCourt, localCourt.candidates)
+  const { config: nom, loading: nomLoading } = useNominationConfig()
 
   const candidates = rows.filter((r) => (r.name || '').trim() !== '' && !isHidden(r.active))
   const active = source === 'sheet' ? candidates.length > 0 : localCourt.active !== false
   const cycle =
-    rows.find((r) => (r.cycle || '').trim())?.cycle.trim() || localCourt.cycle || 'Homecoming Court'
+    rows.find((r) => (r.cycle || '').trim())?.cycle.trim() || nom?.cycle || localCourt.cycle || 'Homecoming Court'
 
-  if (loading) {
+  if (loading || nomLoading) {
     return (
       <>
         <PageHero title="Homecoming Court" />
         <div className="container-site section-space"><Loading label="Loading the court…" /></div>
+      </>
+    )
+  }
+
+  // Phase 1 - nominations window. A single Config cell in the Sheet (read via the Apps
+  // Script Web App) opens this; the court display below only appears after nominations close
+  // and the final 12 are entered. See useNominationConfig + NominationForm.
+  if (nom?.open) {
+    return (
+      <>
+        <PageHero
+          title="Homecoming Court"
+          eyebrow={cycle !== 'Homecoming Court' ? cycle : 'Nominations'}
+          subtext="Nominations are open. Nominate up to 4 senior classmates for the Homecoming Court."
+        />
+        <section className="container-site section-space">
+          <div className="mx-auto max-w-xl">
+            <p className="eyebrow mb-2">Peer nominations</p>
+            <h2 className="font-display text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">
+              Nominate up to 4 seniors
+            </h2>
+            <div className="rule-accent-left" />
+            <div className="mt-5 space-y-4 leading-relaxed text-body">
+              <p>
+                You can nominate up to 4 SENIOR Fremont students. To be inclusive of all students, Court
+                will be made up of 12 students regardless of gender identity. 8 of the Court will be
+                determined by student nomination, and the other 4 will be selected by teachers.
+              </p>
+              <div className="rounded-lg border border-rule bg-[#F6F4F2] p-4 text-sm">
+                <p className="font-display font-bold text-ink">Two rules</p>
+                <ol className="mt-2 list-decimal space-y-1 pl-5">
+                  <li>Do not nominate the same senior more than once, or all your nominations will be thrown out.</li>
+                  <li>Use real names, not nicknames &mdash; spelling has to be close enough to identify the student.</li>
+                </ol>
+              </div>
+              <p className="text-sm">
+                Once the final 12 candidates are set, voting for the 2 Homecoming Royalty winners happens
+                during Homecoming Week.
+              </p>
+              {nom?.deadline ? (
+                <p className="text-sm font-bold text-ink">Nominations close {nom.deadline}.</p>
+              ) : null}
+            </div>
+          </div>
+          <div className="mt-8">
+            <NominationForm mode={nom.mode} />
+          </div>
+        </section>
       </>
     )
   }

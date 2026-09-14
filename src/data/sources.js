@@ -36,6 +36,16 @@ export const sheets = {
   elections: null,
 }
 
+// Homecoming Court -> Nominations form (peer nomination, seasonal).
+// This is a Google Apps Script WEB APP url (ends in /exec), NOT a Sheet - so it lives
+// outside `sheets` and is used as-is (no CSV conversion). The script is bound to the
+// nominations Google Sheet; its "Config" tab (open / mode / cycle / deadline cells) is the
+// single toggle that both shows/hides this form AND picks the tab a submission is written
+// to (Test Submissions while testing, Nominations when live). Deploy: New deployment ->
+// Web app -> Execute as: Me, Who has access: Anyone -> paste the /exec url below.
+// Leave null until deployed: the form stays hidden and the page shows the court / off state.
+export const homecomingNominationsApi = null
+
 export const links = {
   clubAccountabilityTracker:
     'https://docs.google.com/spreadsheets/d/1ZpDVioKRc0TDzUSYpGspEOOEEM9TXBVjk8Tl6wzirJE/edit',

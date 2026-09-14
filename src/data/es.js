@@ -3,6 +3,39 @@
 // - that's intentional for dynamic feed content (video titles, album names, club
 // names, announcements, people, dates). Edit/extend here; the switch is in the navbar.
 export const ES = {
+  // -- Homecoming Court: nominations form --
+  'Nominations': 'Nominaciones',
+  'Peer nominations': 'Nominaciones entre estudiantes',
+  'Nominate up to 4 seniors': 'Nomina hasta 4 estudiantes de último año',
+  'Nominations are open. Nominate up to 4 senior classmates for the Homecoming Court.':
+    'Las nominaciones están abiertas. Nomina hasta 4 compañeros de último año para la Corte de Homecoming.',
+  'You can nominate up to 4 SENIOR Fremont students. To be inclusive of all students, Court will be made up of 12 students regardless of gender identity. 8 of the Court will be determined by student nomination, and the other 4 will be selected by teachers.':
+    'Puedes nominar hasta 4 estudiantes de último año de Fremont. Para incluir a todos los estudiantes, la Corte estará formada por 12 estudiantes sin importar su identidad de género. 8 de la Corte se decidirán por nominación estudiantil y los otros 4 los elegirán los maestros.',
+  'Two rules': 'Dos reglas',
+  'Do not nominate the same senior more than once, or all your nominations will be thrown out.':
+    'No nomines al mismo estudiante más de una vez, o todas tus nominaciones serán descartadas.',
+  'Use real names, not nicknames — spelling has to be close enough to identify the student.':
+    'Usa nombres reales, no apodos — la ortografía debe ser lo bastante cercana para identificar al estudiante.',
+  'Once the final 12 candidates are set, voting for the 2 Homecoming Royalty winners happens during Homecoming Week.':
+    'Una vez definidos los 12 candidatos finales, la votación por los 2 ganadores de la Realeza de Homecoming será durante la Semana de Homecoming.',
+  'Your school email': 'Tu correo escolar',
+  'Your senior nominees': 'Tus nominados de último año',
+  'Up to 4. Leave slots blank if you have fewer.': 'Hasta 4. Deja los espacios en blanco si tienes menos.',
+  'First name': 'Nombre',
+  'Last name': 'Apellido',
+  'Submit nominations': 'Enviar nominaciones',
+  'Submitting…': 'Enviando…',
+  'Real names only — spelling close enough to identify the student.':
+    'Solo nombres reales — con ortografía suficiente para identificar al estudiante.',
+  'Test mode — these submissions go to the Test tab, not the real tally.':
+    'Modo de prueba — estos envíos van a la pestaña de prueba, no al conteo real.',
+  'Nominations submitted': 'Nominaciones enviadas',
+  'Thanks for nominating. Only your first submission from this email counts, so there’s no need to send it again.':
+    'Gracias por nominar. Solo cuenta tu primer envío desde este correo, así que no necesitas enviarlo de nuevo.',
+  'Please fix the following:': 'Corrige lo siguiente:',
+  'Add at least one senior to nominate.': 'Agrega al menos un estudiante de último año para nominar.',
+  'Enter your school email so your nominations can be counted.':
+    'Ingresa tu correo escolar para que tus nominaciones cuenten.',
   // ── Navbar / chrome ──
   'Home': 'Inicio',
   'Media': 'Multimedia',
