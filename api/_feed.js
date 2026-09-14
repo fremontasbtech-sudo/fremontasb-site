@@ -102,6 +102,12 @@ export async function applyEpisodeTitles(videos) {
   }
   for (const v of videos) { if (kindCache.has(v.title)) v.kind = kindCache.get(v.title) }
 
+  // Feed-ordering rule, declared HERE (right where the LLM classifies the kind) so it's owned
+  // by the API and true for every future upload, not a per-episode client tweak: Fremont TV is
+  // the ASB's MORNING news show (airs 4th period), so in a newest-first feed it must sit BELOW
+  // the same day's later games/events. The site's Latest News sort reads this flag.
+  for (const v of videos) v.morningShow = v.kind === 'Fremont TV'
+
   videos.titleSource = used ? 'llm' : 'heuristic'
   videos.titleError = used ? '' : llmError()
   return videos

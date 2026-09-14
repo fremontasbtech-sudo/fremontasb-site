@@ -319,6 +319,9 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = []) {
       href: `https://www.youtube.com/watch?v=${v.youtubeId}`,
       when: parseDate(v.date),
       pinned: false,
+      // Ordering flag from the Gemini feed (api/_feed.js). Fallback keeps it correct offline,
+      // where only the bundled media.json overlay is available and morningShow isn't set.
+      morningShow: v.morningShow ?? (kind === 'Fremont TV'),
     }
   })
 
@@ -376,13 +379,13 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = []) {
       if (p) return p // a human-pinned announcement still wins the very top
       const xk = dayKey(x.when), yk = dayKey(y.when)
       if (xk !== yk) return yk - xk // newer day first
-      // Same day: Fremont TV SINKS BELOW the day's games/events. It's the morning show (airs
-      // first thing, 4th period), so it's the earliest thing that day; a game or event happens
-      // later, so in a newest-first feed it sits ABOVE the episode. 'type' is the LLM-classified
-      // kind (api/_feed.js), so this holds for any future episode regardless of its title.
-      const fx = x.type === 'Fremont TV' ? 1 : 0
-      const fy = y.type === 'Fremont TV' ? 1 : 0
-      if (fx !== fy) return fx - fy // FTV last among same-day items
+      // Same day: a morning show SINKS BELOW the day's games/events. Fremont TV airs 4th period,
+      // so it's the earliest thing that day; a game or event happens later, so in a newest-first
+      // feed it sits ABOVE the episode. `morningShow` is set by the Gemini feed (api/_feed.js)
+      // off the LLM-classified kind, so this rule holds for every future episode automatically.
+      const fx = x.morningShow ? 1 : 0
+      const fy = y.morningShow ? 1 : 0
+      if (fx !== fy) return fx - fy // morning show last among same-day items
       return (y.when?.getTime() ?? 0) - (x.when?.getTime() ?? 0) // else newest first
     })
   // At most ONE Fremont TV item in Latest News (the newest). 'kind' is classified by the LLM
