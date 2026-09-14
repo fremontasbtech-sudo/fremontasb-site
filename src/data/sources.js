@@ -44,7 +44,7 @@ export const sheets = {
 // to (Test Submissions while testing, Nominations when live). Deploy: New deployment ->
 // Web app -> Execute as: Me, Who has access: Anyone -> paste the /exec url below.
 // Leave null until deployed: the form stays hidden and the page shows the court / off state.
-export const homecomingNominationsApi = null
+export const homecomingNominationsApi = 'https://script.google.com/macros/s/AKfycbyGZ8M4yXzqgyx6985ITpaS9fBkPM89ro-98zc2oTwMWg0ntWHVGu1Bn6-mSz8qxmSlpA/exec'
 
 export const links = {
   clubAccountabilityTracker:
