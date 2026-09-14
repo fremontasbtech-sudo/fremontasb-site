@@ -99,10 +99,13 @@ export default function NominationForm({ mode = 'test' }) {
   return (
     <form onSubmit={onSubmit} noValidate className="mx-auto max-w-xl">
       {mode === 'test' && (
-        <div className="mb-6">
-          <Notice tone="neutral">
-            Test mode &mdash; these submissions go to the Test tab, not the real tally.
-          </Notice>
+        <div className="mb-6 rounded-lg border-2 border-brand bg-brand-tint px-4 py-3">
+          <p className="font-display text-sm font-extrabold uppercase tracking-[0.12em] text-brand">
+            Test preview &mdash; not the real nominations
+          </p>
+          <p className="mt-1 text-sm text-ink">
+            This is a test of the form. Anything you submit here will <strong>not</strong> count toward Homecoming Court.
+          </p>
         </div>
       )}
 

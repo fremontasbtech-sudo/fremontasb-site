@@ -48,8 +48,10 @@ export default function HomecomingCourt() {
       <>
         <PageHero
           title="Homecoming Court"
-          eyebrow={cycle !== 'Homecoming Court' ? cycle : 'Nominations'}
-          subtext="Nominations are open. Nominate up to 4 senior classmates for the Homecoming Court."
+          eyebrow={nom.mode === 'test' ? 'Test preview' : (cycle !== 'Homecoming Court' ? cycle : 'Nominations')}
+          subtext={nom.mode === 'test'
+            ? 'Test preview \u2014 this is NOT the real nomination round yet, and anything submitted here will not count.'
+            : 'Nominations are open. Nominate up to 4 senior classmates for the Homecoming Court.'}
         />
         <section className="container-site section-space">
           <div className="mx-auto max-w-xl">
