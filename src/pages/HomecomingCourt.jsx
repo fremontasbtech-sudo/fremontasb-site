@@ -50,7 +50,7 @@ export default function HomecomingCourt() {
           title="Homecoming Court"
           eyebrow={nom.mode === 'test' ? 'Test preview' : (cycle !== 'Homecoming Court' ? cycle : 'Nominations')}
           subtext={nom.mode === 'test'
-            ? 'Test preview \u2014 this is NOT the real nomination round yet, and anything submitted here will not count.'
+            ? 'Test preview. This is NOT the real nomination round yet, and anything submitted here will not count.'
             : 'Nominations are open. Nominate up to 4 senior classmates for the Homecoming Court.'}
         />
         <section className="container-site section-space">
@@ -70,7 +70,7 @@ export default function HomecomingCourt() {
                 <p className="font-display font-bold text-ink">Two rules</p>
                 <ol className="mt-2 list-decimal space-y-1 pl-5">
                   <li>Do not nominate the same senior more than once, or all your nominations will be thrown out.</li>
-                  <li>Use real names, not nicknames &mdash; spelling has to be close enough to identify the student.</li>
+                  <li>Use real names, not nicknames. Spelling has to be close enough to identify the student.</li>
                 </ol>
               </div>
               <p className="text-sm">

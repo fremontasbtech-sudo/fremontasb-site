@@ -14,8 +14,8 @@ export const ES = {
   'Two rules': 'Dos reglas',
   'Do not nominate the same senior more than once, or all your nominations will be thrown out.':
     'No nomines al mismo estudiante más de una vez, o todas tus nominaciones serán descartadas.',
-  'Use real names, not nicknames — spelling has to be close enough to identify the student.':
-    'Usa nombres reales, no apodos — la ortografía debe ser lo bastante cercana para identificar al estudiante.',
+  'Use real names, not nicknames. Spelling has to be close enough to identify the student.':
+    'Usa nombres reales, no apodos. La ortografía debe ser lo bastante cercana para identificar al estudiante.',
   'Once the final 12 candidates are set, voting for the 2 Homecoming Royalty winners happens during Homecoming Week.':
     'Una vez definidos los 12 candidatos finales, la votación por los 2 ganadores de la Realeza de Homecoming será durante la Semana de Homecoming.',
   'Your school email': 'Tu correo escolar',
@@ -25,8 +25,8 @@ export const ES = {
   'Last name': 'Apellido',
   'Submit nominations': 'Enviar nominaciones',
   'Submitting…': 'Enviando…',
-  'Real names only — spelling close enough to identify the student.':
-    'Solo nombres reales — con ortografía suficiente para identificar al estudiante.',
+  'Real names only. Spelling close enough to identify the student.':
+    'Solo nombres reales. Con ortografía suficiente para identificar al estudiante.',
   'Test mode — these submissions go to the Test tab, not the real tally.':
     'Modo de prueba — estos envíos van a la pestaña de prueba, no al conteo real.',
   'Nominations submitted': 'Nominaciones enviadas',

@@ -39,7 +39,7 @@ export default function NominationForm({ mode = 'test' }) {
       .filter((s) => s.first || s.last)
 
     if (!email.trim()) errs.push('Enter your school email so your nominations can be counted.')
-    else if (!/^\S+@\S+\.\S+$/.test(email.trim())) errs.push('That email doesn’t look right — double-check it.')
+    else if (!/^\S+@\S+\.\S+$/.test(email.trim())) errs.push('That email doesn’t look right. Double-check it.')
 
     if (filled.length === 0) errs.push('Add at least one senior to nominate.')
 
@@ -52,7 +52,7 @@ export default function NominationForm({ mode = 'test' }) {
     for (const s of filled) {
       if (!s.first || !s.last) continue
       const key = normName(s.first, s.last)
-      if (seen.has(key)) errs.push(`You’ve listed ${s.first} ${s.last} more than once — each nominee must be a different senior.`)
+      if (seen.has(key)) errs.push(`You’ve listed ${s.first} ${s.last} more than once. Each nominee must be a different senior.`)
       else seen.set(key, true)
     }
     return errs
@@ -77,7 +77,7 @@ export default function NominationForm({ mode = 'test' }) {
       await fetch(homecomingNominationsApi, { method: 'POST', mode: 'no-cors', body })
       setDone(true)
     } catch {
-      setErrors(['Couldn’t submit — check your connection and try again.'])
+      setErrors(['Couldn’t submit. Check your connection and try again.'])
       requestAnimationFrame(() => errRef.current?.focus())
     } finally {
       setSubmitting(false)
@@ -101,7 +101,7 @@ export default function NominationForm({ mode = 'test' }) {
       {mode === 'test' && (
         <div className="mb-6 rounded-lg border-2 border-brand bg-brand-tint px-4 py-3">
           <p className="font-display text-sm font-extrabold uppercase tracking-[0.12em] text-brand">
-            Test preview &mdash; not the real nominations
+            Test preview: not the real nominations
           </p>
           <p className="mt-1 text-sm text-ink">
             This is a test of the form. Anything you submit here will <strong>not</strong> count toward Homecoming Court.
@@ -183,7 +183,7 @@ export default function NominationForm({ mode = 'test' }) {
         <button type="submit" className={submitting ? 'btn-disabled' : 'btn-primary'} aria-disabled={submitting}>
           {submitting ? 'Submitting…' : 'Submit nominations'}
         </button>
-        <p className="text-xs text-body">Real names only &mdash; spelling close enough to identify the student.</p>
+        <p className="text-xs text-body">Real names only. Spelling close enough to identify the student.</p>
       </div>
     </form>
   )
