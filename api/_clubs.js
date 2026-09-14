@@ -169,6 +169,10 @@ const heuristicText = (s) => { const t = String(s).trim(); if (!t) return t; ret
 //    (cached by "name - purpose"); heuristic fallback keeps it working with no key. --
 const CATEGORIES = ['STEM', 'Arts & Media', 'Culture & Language', 'Service & Advocacy', 'Academics & Business', 'Sports & Games', 'Special Interest']
 const CATEGORY_SET = new Set(CATEGORIES)
+// Manual category overrides (win over the LLM classifier). Normalized club name -> category.
+const CATEGORY_OVERRIDES = new Map([
+  ['fremont high robotics', 'STEM'],
+])
 const categoryCache = new Map()
 const CATEGORY_INSTRUCTION = [
   'You sort high school clubs into EXACTLY ONE category.',
@@ -206,7 +210,8 @@ async function classifyCategories(clubs) {
   }
   clubs.forEach((c, i) => {
     const key = inputs[i]
-    c.category = categoryCache.has(key) ? categoryCache.get(key) : guessCategory(c.name, c.purpose || c.other)
+    const override = CATEGORY_OVERRIDES.get(String(c.name || '').trim().toLowerCase())
+    c.category = override || (categoryCache.has(key) ? categoryCache.get(key) : guessCategory(c.name, c.purpose || c.other))
   })
   return used
 }
