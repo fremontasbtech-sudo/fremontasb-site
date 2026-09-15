@@ -1,6 +1,7 @@
 // Shared server-side helper: pull the Firebird Hub "Events (26-27)" Google Sheet
 // (the SAME sheet the app reads) and return the CURATED items only:
-//   • events — Events tab (gid=0) rows where featured = YES
+//   • events — the 'Events' tab (read BY NAME, not gid): EVERY dated row shows,
+//             unless a 'hide' column marks it (opt-out). featured/red is emphasis only.
 //   • games  — Sports tab rows where push = y (column A) OR that are senior nights
 //             (seniorNight column = YES, or "SENIOR NIGHT" in the title)
 // Public gviz CSV, no key. The CLIENT windows these to the upcoming range
@@ -51,6 +52,14 @@ const isYes = (v) => {
   return t !== '' && (t === 'y' || t === 'yes' || t === 'true' || t === 'x' || t === '✓' || t === '1' || t === 'done' || t.startsWith('y'))
 }
 
+// Opt-OUT flag: an event is visible by default; it is removed ONLY when a human puts an
+// explicit no/hide in a 'hide' column. Blank = show. This is why a forgotten red
+// highlight can never silently drop an event from the site again.
+const isNo = (v) => {
+  const t = clean(v).toLowerCase()
+  return t === 'no' || t === 'n' || t === 'false' || t === '0' || t === 'hide' || t === 'hidden' || t === 'off' || t === 'skip'
+}
+
 // Normalize a date cell to YYYY-MM-DD. Accepts ISO (2026-09-16) OR US M/D/YYYY,
 // M/D/YY (9/16/2026, 9/16/26). Anything else (blank, banner rows, "Use this red")
 // returns '' and is skipped — that's also how divider/legend rows drop out.
@@ -75,7 +84,8 @@ function parseEvents(rows) {
     date: col('date') >= 0 ? col('date') : 1,
     endDate: col('enddate'), time: col('time'), location: col('location'),
     description: col('description'), tags: col('tags'),
-    featured: col('featured') >= 0 ? col('featured') : head.length - 1, // last col by convention
+    featured: col('featured') >= 0 ? col('featured') : head.length - 1, // emphasis only now
+    hide: col('hide'), // optional opt-out column; -1 (absent) => nothing hidden
   }
   const get = (r, i) => (i >= 0 ? clean(r[i]) : '')
   const out = []
@@ -83,11 +93,12 @@ function parseEvents(rows) {
     const r = rows[i]
     const date = normDate(r[ci.date])
     if (!date) continue                // skips the "Use this red -->" legend row and blanks
-    if (!isYes(r[ci.featured])) continue
+    if (ci.hide >= 0 && isNo(r[ci.hide])) continue // opt-out: only an explicit hide removes an event
     out.push({
       name: get(r, ci.name), date, endDate: normDate(r[ci.endDate]),
       time: get(r, ci.time), location: get(r, ci.location),
       description: get(r, ci.description), tags: get(r, ci.tags),
+      featured: isYes(r[ci.featured]),
     })
   }
   return out.filter((e) => e.name)
@@ -147,7 +158,7 @@ export async function fetchEvents(sheetUrl) {
   const id = idOf(sheetUrl)
   if (!id) return { events: [], games: [] }
   const [eventsRows, sportsRows, scores] = await Promise.all([
-    fetchRows(csvUrl(id, { gid: 0 })).catch(() => []),
+    fetchRows(csvUrl(id, { sheet: 'Events' })).catch(() => []),
     fetchRows(csvUrl(id, { sheet: 'Sports' })).catch(() => []),
     fetchScores(),
   ])
