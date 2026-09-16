@@ -51,6 +51,7 @@ export function titleOf(text) {
   const strip = /^(hey|hi|hello|attention|calling all|good morning|firebirds|students|seniors|juniors|sophomores|freshmen|fremont)\b[^.!?:,]*[.!?:,]\s*/i
   while (strip.test(t)) t = t.replace(strip, '')
   const map = [
+    [/study abroad|sister city|homestay|exchange (?:trip|program|student)|foreign exchange/i, 'Exchange Trip'],
     [/water\s*melon\s*run/i, 'Watermelon Run'], [/yearbook/i, 'Yearbook Sales'], [/senior ads?/i, 'Senior Ads'],
     [/haunted house/i, 'Haunted House Auditions'], [/astrophysics/i, 'Astrophysics Club'],
     [/\bbeam\b|rideshare/i, 'Sunnyvale Beam Rideshare'], [/\bbikes?\b/i, 'Bike Policy'], [/parking/i, 'Parking Permits'],
@@ -119,14 +120,21 @@ export function parseAnnouncements(rows, now = new Date()) {
       if (WEEK_RE.test(cell)) continue          // stray "Week of" text
       if (DAY_HEADER_RE.test(cell)) continue    // stray lone date/day label
       if (sawWeek && cell.length < 3) continue  // tiny noise on the week row
-      const text = cleanText(cell)
-      for (const date of dates) out.push({ date, text })
+      // Explicit title override: start a cell with [[My Title]] to force the headline
+      // shown on the site; the marker is stripped from the body. Gives ASB direct
+      // control over any announcement's title instead of the auto keyword guess.
+      const ov = cell.match(/^\[\[\s*([^\]]{1,60}?)\s*\]\]\s*([\s\S]*)$/)
+      const xtitle = ov ? ov[1].trim() : ''
+      const body = ov ? ov[2].trim() : cell
+      if (!body) continue
+      const text = cleanText(body)
+      for (const date of dates) out.push({ date, text, xtitle })
     }
   }
   const seen = new Set()
   const uniq = out.filter((a) => { const k = a.date + '|' + a.text; if (seen.has(k)) return false; seen.add(k); return true })
   uniq.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0))
-  return uniq.map((a) => ({ ...a, title: titleOf(a.text) }))
+  return uniq.map((a) => ({ ...a, title: a.xtitle || titleOf(a.text) }))
 }
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
@@ -182,13 +190,13 @@ const TITLE_INSTRUCTION = [
 ].join(' ')
 
 async function applyTitles(items) {
-  const need = [...new Set(items.map((it) => it.text).filter((t) => !titleCache.has(t)))].slice(0, 80)
+  const need = [...new Set(items.filter((it) => !it.xtitle).map((it) => it.text).filter((t) => !titleCache.has(t)))].slice(0, 80)
   let usedLLM = false
   if (need.length) {
     const titles = await llmTitles(need, TITLE_INSTRUCTION)
     if (titles) { usedLLM = true; need.forEach((t, i) => { if (titles[i]) titleCache.set(t, titles[i]) }) }
   }
-  const out = items.map((it) => ({ ...it, title: titleCache.get(it.text) || it.title }))
+  const out = items.map((it) => ({ ...it, title: it.xtitle || titleCache.get(it.text) || it.title }))
   out.titleSource = usedLLM ? 'llm' : 'heuristic'
   out.titleError = usedLLM ? '' : llmError()
   return out
