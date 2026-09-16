@@ -53,6 +53,10 @@ export function toCsvUrl(url) {
   // Already a "Publish to web" CSV link or any non-Google URL → use as is.
   if (!url.includes('docs.google.com/spreadsheets') || url.includes('output=csv')) return url
   const id = url.match(/\/d\/([a-zA-Z0-9-_]+)/)?.[1]
+  // Prefer a tab NAME when given (?sheetName=...): stable across tab recreation,
+  // unlike a gid (which can silently fall back to the first tab if it no longer exists).
+  const name = url.match(/[?&]sheetName=([^&#]+)/)?.[1]
+  if (name) return `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&sheet=${name}`
   const gid = url.match(/[#&?]gid=(\d+)/)?.[1] ?? '0'
   return `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&gid=${gid}`
 }

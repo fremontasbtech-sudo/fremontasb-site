@@ -15,7 +15,9 @@ export const sheets = {
   // Sheet is a matrix: first column = class (Freshmen/Sophomores/Juniors/Seniors),
   // each following column = an event (BTS Rally, Homecoming, ...). A class's total
   // is the sum of its row, so adding an event = adding a column. Nothing else to do.
-  spiritPoints: 'https://docs.google.com/spreadsheets/d/1gS0bbOGgpjMpCfeYOUBI4B39oPEtNU-1Y2n1nEWkZ7o/edit?gid=0#gid=0',
+  // Spirit Points now lives as a TAB in the shared Firebird Hub Events sheet (one sheet for everything);
+  // read by tab name so it can't break if the tab's gid changes. Old standalone sheet is kept but dormant.
+  spiritPoints: 'https://docs.google.com/spreadsheets/d/11Pm2zUc_O40E0oTZekYvsD_D8FenH9s7PiJ43m7JCH0/edit?sheetName=Spirit%20Points',
 
   // Home → Latest News.  Columns: title | date | blurb   (newest rows first or last, we sort by date)
   news: null,
@@ -143,15 +145,16 @@ export const announcementsSheet =
 // -----------------------------------------------------------------------------
 // EVENTS + SPORTS -- the SAME sheet the Firebird Hub app reads, so website + app
 // never drift. Home -> Latest News surfaces the curated items:
-//   * Events tab (gid=0): rows flagged featured = YES (ASB highlights the row red;
-//     an Apps Script turns red -> YES). Cols: name,date,endDate,time,location,
-//     description,tags,featured.
+//   * 'Events' tab (read BY NAME): EVERY dated row shows on its date(s) - just add a
+//     row and it appears (opt-out: put no/hide in an optional 'hide' column to skip one).
+//     Red/featured is emphasis only now, not a visibility gate. Cols: name,date,endDate,
+//     time,location,description,tags,featured.
 //   * Sports tab: games flagged push = y in column A (type "y" in a game's first
 //     cell to pin it). The 3-hour SportsSync rewrite preserves that y.
 // Pulled server-side (/api/events, keyless); the client (src/data/useEvents.js)
 // windows it for Home -> Upcoming Events with these rules:
 //   * Only the NEXT 3 WEEKS show.
-//   * Featured events: all of them in that window.
+//   * Events: all of them in that window (every row shows unless hidden).
 //   * push=y games: only the SOONEST upcoming game PER SPORT shows (one football,
 //     one volleyball...), so flagging a whole season still shows one row at a time;
 //     when that game's day passes it drops out and that sport's next y-game appears
