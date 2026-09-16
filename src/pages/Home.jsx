@@ -578,7 +578,9 @@ function AnnouncementRow({ item }) {
       </button>
       {open && (
         <div className="pb-6">
-          <p className="max-w-4xl text-base leading-relaxed text-body [overflow-wrap:anywhere]">{item.text}</p>
+          {String(item.text).split(/\n{2,}/).map((para, i) => (
+            <p key={i} className={`max-w-4xl text-base leading-relaxed text-body [overflow-wrap:anywhere]${i ? ' mt-3' : ''}`}>{para}</p>
+          ))}
         </div>
       )}
     </div>

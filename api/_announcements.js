@@ -200,6 +200,20 @@ const TITLE_INSTRUCTION = [
   'No ending punctuation, no quotes around the title. Return ONLY a JSON array of strings, one per blurb, in the same order.',
 ].join(' ')
 
+// Collapse announcements that land on the SAME DAY with the SAME title into ONE card
+// (the auto-titler gives same-topic blurbs the same label, e.g. two "Yearbook Sales"
+// notes on one day). Bodies are merged (identical ones deduped) so nothing is lost and
+// the day never shows look-alike repeats. General: applies to any day/title, any week.
+function mergeSameDayTitle(items) {
+  const groups = new Map(); const order = []
+  for (const it of items) {
+    const key = it.date + '||' + String(it.title || '').trim().toLowerCase()
+    if (!groups.has(key)) { groups.set(key, { item: { ...it }, texts: [it.text] }); order.push(key) }
+    else { const g = groups.get(key); if (!g.texts.includes(it.text)) g.texts.push(it.text) }
+  }
+  return order.map((k) => { const g = groups.get(k); return { ...g.item, text: g.texts.join('\n\n') } })
+}
+
 async function applyTitles(items) {
   const need = [...new Set(items.filter((it) => !it.xtitle).map((it) => it.text).filter((t) => !titleCache.has(t)))].slice(0, 80)
   let usedLLM = false
@@ -207,7 +221,8 @@ async function applyTitles(items) {
     const titles = await llmTitles(need, TITLE_INSTRUCTION)
     if (titles) { usedLLM = true; need.forEach((t, i) => { if (titles[i]) titleCache.set(t, titles[i]) }) }
   }
-  const out = items.map((it) => ({ ...it, title: it.xtitle || titleCache.get(it.text) || it.title }))
+  let out = items.map((it) => ({ ...it, title: it.xtitle || titleCache.get(it.text) || it.title }))
+  out = mergeSameDayTitle(out)
   out.titleSource = usedLLM ? 'llm' : 'heuristic'
   out.titleError = usedLLM ? '' : llmError()
   return out
