@@ -179,13 +179,14 @@ const titleCache = new Map()
 const TITLE_INSTRUCTION = [
   'You write short topic titles for a high school\'s morning announcements, shown on the school website.',
   'For EACH blurb, return a clean title of 2 to 5 words in Title Case that names the specific club, event,',
-  'program, deadline, or notice. Drop greetings ("Hey Fremont"), filler, dates, room numbers and calls to action.',
+  'program, deadline, or notice. Name what the opportunity IS for a student (a trip, club, audition, sale, deadline) - NOT the formal name of the sponsoring organization behind it. Drop greetings ("Hey Fremont"), filler, dates, room numbers and calls to action.',
   'Examples:',
   '"Come join Friday Night Live! This club meets every Thursday..." -> "Friday Night Live"',
   '"For open tutorials there will be Yoga in the Nest on Wednesdays..." -> "Open Tutorials"',
   '"The Sunnyvale Library will be outside the FHS Library today during lunch..." -> "Sunnyvale Library Visit"',
   '"Hey Fremont! Are you interested in space? Join Astrophysics Club..." -> "Astrophysics Club"',
   '"If you like folklore and acting, audition for the Haunted House..." -> "Haunted House Auditions"',
+  '"Do you want a once in a lifetime study abroad experience? Sunnyvale Sister City Program is looking for candidates to homestay with a Japanese family in Tokyo..." -> "Exchange Trip"',
   'No ending punctuation, no quotes around the title. Return ONLY a JSON array of strings, one per blurb, in the same order.',
 ].join(' ')
 
