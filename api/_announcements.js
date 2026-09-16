@@ -86,49 +86,59 @@ function isoOf(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padSta
 // in the header cell, which in this sheet is often off by a day. So a "Wednesday" announcement
 // always goes out on the real Wednesday even when the sheet's date is wrong.
 export function parseAnnouncements(rows, now = new Date()) {
-  // This sheet is organized in WEEKLY blocks: a "Week of M/D - M/D" row, a day-header row
-  // (Mon/Tue/Wed/Thu/Fri labels), then the week's announcements stacked in cells below.
-  // The header labels and dates are typed inconsistently (bare dates, wrong days, blanks),
-  // and in practice every announcement is dumped into ONE column — so we do NOT trust the
-  // per-column date. Instead: anchor on the reliable "Week of" Monday, gather every content
-  // cell in that block, and surface the whole set on that week's two reading mornings —
-  // WEDNESDAY (Mon+2) and FRIDAY (Mon+4). Announcements are read over the PA on Wed and Fri,
-  // so the same weekly set appears on both days. The client's 8:30 AM cutoff then reveals
-  // each day on its own morning. This has no per-cell date guessing, so it can't silently
-  // drop a column again.
-  const READING_OFFSETS = [2, 4] // Wednesday, Friday relative to the week's Monday
+  // WEEKLY blocks: a "Week of M/D - M/D" row, then a day-header row whose columns are the
+  // weekdays (Monday..Friday), then the week's announcements stacked under each day's column.
+  // Announcements are read over the PA on Wednesday and Friday, and the SAME item is usually
+  // typed into BOTH the Wed and the Fri column (lightly reworded for the day). So we date each
+  // cell by ITS OWN COLUMN's weekday: a Wednesday-column item shows only on Wednesday, a
+  // Friday-column item only on Friday. (Previously every cell was dumped onto both reading
+  // days, which surfaced Friday's items on Wednesday as duplicate "repeats".)
+  // Header dates are typed inconsistently, so a column's weekday comes from its header WORD
+  // when present, else its left-to-right position (Mon,Tue,Wed,Thu,Fri); the date is computed
+  // off the reliable "Week of" Monday.
+  const WEEKDAY_OFFSET = [['monday', 0], ['tuesday', 1], ['wednesday', 2], ['thursday', 3], ['friday', 4], ['saturday', 5], ['sunday', 6]]
+  const weekdayOffset = (cell) => {
+    const t = String(cell || '').trim().toLowerCase()
+    for (const [w, off] of WEEKDAY_OFFSET) if (t.startsWith(w)) return off
+    return null
+  }
   const out = []
   let weekMonday = null
+  let colOffset = null // { columnIndex: weekdayOffset } for the current week block
   for (const row of rows) {
-    // New week? Anchor on its Monday (the one thing in this sheet that's always correct).
-    let sawWeek = false
     for (const c of row) {
       const wm = (c || '').match(WEEK_RE)
-      if (wm) { weekMonday = mondayOf(makeDate(+wm[1], +wm[2], now)); sawWeek = true }
+      if (wm) { weekMonday = mondayOf(makeDate(+wm[1], +wm[2], now)) }
     }
-    // Skip a day-header row (2+ cells that are just a weekday/date label). A "Week of" row
-    // sometimes also carries header labels — that's fine, we already read its Monday above.
+    // Day-header row (2+ weekday/date cells): learn which column maps to which weekday.
     const headerCells = row.filter((c) => DAY_HEADER_RE.test((c || '').trim())).length
-    if (headerCells >= 2) continue
-    if (!weekMonday) continue // content before any "Week of" anchor — ignore, we can't date it
-    const dates = READING_OFFSETS.map((off) => {
-      const d = new Date(weekMonday); d.setDate(d.getDate() + off); return isoOf(d)
-    })
-    for (const raw of row) {
-      const cell = (raw || '').trim()
+    if (headerCells >= 2) {
+      colOffset = {}
+      let n = 0
+      for (let i = 0; i < row.length; i++) {
+        const cell = (row[i] || '').trim()
+        if (!DAY_HEADER_RE.test(cell)) continue
+        const w = weekdayOffset(cell)
+        colOffset[i] = (w == null ? n : w)
+        n++
+      }
+      continue
+    }
+    if (!weekMonday || !colOffset) continue
+    for (let i = 0; i < row.length; i++) {
+      const off = colOffset[i]
+      if (off == null) continue                 // not a dated day-column
+      const cell = (row[i] || '').trim()
       if (!cell) continue
-      if (WEEK_RE.test(cell)) continue          // stray "Week of" text
-      if (DAY_HEADER_RE.test(cell)) continue    // stray lone date/day label
-      if (sawWeek && cell.length < 3) continue  // tiny noise on the week row
+      if (WEEK_RE.test(cell) || DAY_HEADER_RE.test(cell)) continue
       // Explicit title override: start a cell with [[My Title]] to force the headline
-      // shown on the site; the marker is stripped from the body. Gives ASB direct
-      // control over any announcement's title instead of the auto keyword guess.
+      // shown on the site; the marker is stripped from the body.
       const ov = cell.match(/^\[\[\s*([^\]]{1,60}?)\s*\]\]\s*([\s\S]*)$/)
       const xtitle = ov ? ov[1].trim() : ''
       const body = ov ? ov[2].trim() : cell
       if (!body) continue
-      const text = cleanText(body)
-      for (const date of dates) out.push({ date, text, xtitle })
+      const d = new Date(weekMonday); d.setDate(d.getDate() + off)
+      out.push({ date: isoOf(d), text: cleanText(body), xtitle })
     }
   }
   const seen = new Set()
