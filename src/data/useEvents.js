@@ -94,7 +94,8 @@ function shape(data) {
 
   const upcoming = [...evItems, ...[...nextBySport.values()].map((v) => v.item)].sort((a, b) => a.when - b.when) // soonest first
   recent.sort((a, b) => b.when - a.when)                                                                        // most recent first
-  return { upcoming, recent }
+  const events = (data.events || []).map((e) => ({ name: e.name, date: e.date })).filter((e) => e.name && e.date)
+  return { upcoming, recent, events }
 }
 
 export function useEvents() {
@@ -105,7 +106,7 @@ export function useEvents() {
     // current date), then refresh from the live API in the background — so Upcoming Events never
     // waits on the slow athletics scores feed.
     if (eventsSnapshot && (Array.isArray(eventsSnapshot.events) || Array.isArray(eventsSnapshot.games))) return { ...shape(eventsSnapshot), loading: false }
-    return { upcoming: [], recent: [], loading: true }
+    return { upcoming: [], recent: [], events: [], loading: true }
   })
 
   useEffect(() => {

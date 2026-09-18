@@ -26,12 +26,12 @@ import { cleanAlbumTitle } from '../data/albumTitle'
  * not image tiles, so a card grid would flatten the hierarchy this page depends on.
  */
 export default function Home() {
-  const { upcoming, recent, loading: eventsLoading } = useEvents()
+  const { upcoming, recent, events: curatedEvents, loading: eventsLoading } = useEvents()
   return (
     <>
       <Hero />
       <SpiritPoints />
-      <LatestNews eventsRecent={recent} eventsUpcoming={upcoming} eventsLoading={eventsLoading} />
+      <LatestNews eventsRecent={recent} eventsUpcoming={upcoming} eventsAll={curatedEvents} eventsLoading={eventsLoading} />
       <MorningAnnouncements />
       <AppBanner />
     </>
@@ -190,12 +190,12 @@ const quickLinks = [
   { to: '/resources', label: 'School Store', note: 'ASB cards, dance tickets, gear' },
 ]
 
-function LatestNews({ eventsRecent = [], eventsUpcoming = [], eventsLoading = false }) {
+function LatestNews({ eventsRecent = [], eventsUpcoming = [], eventsAll = [], eventsLoading = false }) {
   const { rows, loading: newsLoading, source } = useSheetData(sheets.news, newsJson)
   const { rows: videos, loading: vLoading } = useYouTube(mediaOverlay)
   const { albums, loading: aLoading } = useFlickr(photoAlbums)
 
-  const items = buildNews(rows, source, videos, albums, eventsRecent)
+  const items = buildNews(rows, source, videos, albums, eventsRecent, eventsAll)
   const loading = (newsLoading || vLoading || aLoading) && items.length === 0
 
   return (
@@ -294,7 +294,7 @@ function TypeBadge({ type }) {
  *  - Auto items from the already-live feeds: newest Fremont TV episodes + photo albums.
  * Result: the section is always real and current, even before anyone writes an announcement.
  */
-function buildNews(newsRows, source, videos, albums, eventsRecent = []) {
+function buildNews(newsRows, source, videos, albums, eventsRecent = [], curatedEvents = []) {
   const manual = source === 'sheet'
     ? newsRows.filter((n) => n.title).map((n) => ({
         key: `a-${n.title}-${n.date || ''}`,
@@ -355,15 +355,22 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = []) {
     return { ...it, pinned: false }
   })
 
-  const albs = albumList.filter((al) => !consumed.has(al)).slice(0, 3).map((al) => ({
-    key: `f-${al.href || al.title}`,
-    type: 'Photos',
-    title: al.title,
-    blurb: al.count ? `${al.count} new photos on Flickr` : 'New album on Flickr',
-    href: al.href,
-    when: al.when,
-    pinned: false,
-  }))
+  const albs = albumList.filter((al) => !consumed.has(al)).slice(0, 3).map((al) => {
+    // A photo album for a curated EVENT (e.g. "Clubs Day") is dated by the EVENT itself, not
+    // the Flickr upload/EXIF guess (which can land a day or two late). Match title -> event.
+    const an = norm(al.title)
+    const ev = an.length >= 4 ? curatedEvents.find((e) => { const en = norm(e.name); return en && (en === an || en.includes(an) || an.includes(en)) }) : null
+    const evWhen = ev && ev.date ? parseDate(ev.date) : null
+    return {
+      key: `f-${al.href || al.title}`,
+      type: 'Photos',
+      title: al.title,
+      blurb: al.count ? `${al.count} new photos on Flickr` : 'New album on Flickr',
+      href: al.href,
+      when: evWhen || al.when,
+      pinned: false,
+    }
+  })
 
   // Only THIS school year (starts Aug 1 of the school-year start): drop last year's episodes/albums.
   const nowD = new Date()
