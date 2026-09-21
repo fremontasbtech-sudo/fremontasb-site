@@ -1,5 +1,12 @@
 [
   {
+    "title": "Fremont TV | '26-'27: Episode 3",
+    "date": "2026-09-18",
+    "youtubeId": "Valj4mgV1y4",
+    "hosts": "Shakthi & Allyson",
+    "kind": "Fremont TV"
+  },
+  {
     "title": "Fremont TV | '26-'27: Episode 2",
     "date": "2026-09-11",
     "youtubeId": "ufzypYiKvBo",
@@ -10,19 +17,19 @@
     "title": "Fremont TV | '26-'27: Episode 1",
     "date": "2026-08-28",
     "youtubeId": "vVi-gCcv79E",
-    "hosts": "Sanuga, Ava, Josh & Vid",
+    "hosts": "Sanuga, Ava, Josh, & Vid",
     "kind": "Fremont TV"
   },
   {
     "title": "Fremont TV | Episode 3: Homecoming",
-    "date": "2025-10-17",
+    "date": "2025-10-19",
     "youtubeId": "HkVm_rRrwoc",
-    "hosts": "Saisha, Ella & Yomna",
+    "hosts": "Saisha, Ella, & Yomna",
     "kind": "Fremont TV"
   },
   {
     "title": "Fremont TV | Episode 2",
-    "date": "2025-10-03",
+    "date": "2025-10-06",
     "youtubeId": "34v0SodxfhQ",
     "hosts": "Saanvi & Natalie",
     "kind": "Fremont TV"
@@ -36,21 +43,21 @@
   },
   {
     "title": "Class of 2025 Graduation Student Speeches",
-    "date": "2025-06-05",
+    "date": "2025-06-21",
     "youtubeId": "QQ8mErNy-FQ",
-    "hosts": "Jaidyn Balsara & Zaynab Mohiuddeen",
+    "hosts": "",
     "kind": "Event"
   },
   {
     "title": "Class of 2025 Senior Goodbye Rally",
-    "date": "2025-05-30",
+    "date": "2025-06-01",
     "youtubeId": "8MMU50PMpnE",
     "hosts": "",
     "kind": "Rally"
   },
   {
-    "title": "Class of 2025 Senior Goodbye Video",
-    "date": "2025-05-30",
+    "title": "Class Of 2025 Senior Goodbye Video",
+    "date": "2025-05-31",
     "youtubeId": "DWX5YeWS-JY",
     "hosts": "",
     "kind": "Event"
@@ -64,16 +71,37 @@
   },
   {
     "title": "Fremont TV | Episode 14",
-    "date": "2025-03-27",
+    "date": "2025-03-28",
     "youtubeId": "T1ga4mm9e8U",
     "hosts": "Neebir & Aryav",
     "kind": "Fremont TV"
   },
   {
-    "title": "2025 Hall of Fame Rally",
+    "title": "2025 Hall Of Fame Rally",
     "date": "2025-03-14",
     "youtubeId": "dwAu5V0muAI",
     "hosts": "",
     "kind": "Rally"
+  },
+  {
+    "title": "Fremont TV | Episode 13",
+    "date": "2025-03-07",
+    "youtubeId": "WgQPuALzVUc",
+    "hosts": "Lotem & Kendall",
+    "kind": "Fremont TV"
+  },
+  {
+    "title": "Fremont TV | Episode 12",
+    "date": "2025-03-07",
+    "youtubeId": "M6anZk-0mZ4",
+    "hosts": "Izzy & Dhruti",
+    "kind": "Fremont TV"
+  },
+  {
+    "title": "Fremont TV | Episode 11",
+    "date": "2025-03-07",
+    "youtubeId": "fV1ZfDDDe5k",
+    "hosts": "Lilly & Maya",
+    "kind": "Fremont TV"
   }
 ]

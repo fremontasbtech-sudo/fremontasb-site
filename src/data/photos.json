@@ -1,6 +1,66 @@
 [
-  { "name": "Back To School Rally 2024", "coverImageUrl": "/photos-bts-rally-2024.jpg", "flickrUrl": "https://flic.kr/s/aHBqjBFyJT" },
-  { "name": "Marching Band Family Night", "coverImageUrl": "/photos-marching-band-family-night.jpg", "flickrUrl": "https://flic.kr/s/aHBqjBFfgh" },
-  { "name": "Neon Nights: BTS Dance 2024", "coverImageUrl": "/photos-neon-nights-2024.jpg", "flickrUrl": "https://flic.kr/s/aHBqjBEBq3" },
-  { "name": "Class of 2025 Senior Sunrise", "coverImageUrl": "/photos-senior-sunrise-2025.jpg", "flickrUrl": "https://flic.kr/s/aHBqjBEcXH" }
+  {
+    "name": "Clubs Day - 9/16 '26",
+    "coverImageUrl": "https://live.staticflickr.com/65535/55536018279_3804d7b737_z.jpg",
+    "flickrUrl": "https://www.flickr.com/photos/199104771@N02/albums/72177720335676675",
+    "count": 69,
+    "date": "2026-09-18",
+    "title": "Clubs Day"
+  },
+  {
+    "name": "Football vs Oak Grove - 9/16 '26",
+    "coverImageUrl": "https://live.staticflickr.com/65535/55532948913_5a95ef2c7b_z.jpg",
+    "flickrUrl": "https://www.flickr.com/photos/199104771@N02/albums/72177720335679199",
+    "count": 424,
+    "date": "2026-09-11",
+    "title": "Football vs Oak Grove"
+  },
+  {
+    "name": "Football vs Westmont - 9/9 '26",
+    "coverImageUrl": "https://live.staticflickr.com/65535/55518282039_a593708b30_z.jpg",
+    "flickrUrl": "https://www.flickr.com/photos/199104771@N02/albums/72177720335524015",
+    "count": 122,
+    "date": "2026-09-04",
+    "title": "Football vs Westmont"
+  },
+  {
+    "name": "BTS Social (Beach Bash) Aug. 2026",
+    "coverImageUrl": "https://live.staticflickr.com/65535/55495231700_bf04dbf5ba_z.jpg",
+    "flickrUrl": "https://www.flickr.com/photos/199104771@N02/albums/72177720335352056",
+    "count": 166,
+    "date": "2026-08-28",
+    "title": "BTS Social (Beach Bash)"
+  },
+  {
+    "name": "Prom 2026",
+    "coverImageUrl": "https://live.staticflickr.com/65535/55283014984_1a933d2217_z.jpg",
+    "flickrUrl": "https://www.flickr.com/photos/199104771@N02/albums/72177720333753497",
+    "count": 188,
+    "date": "2026-05-16",
+    "title": "Prom"
+  },
+  {
+    "name": "Bell Game (FHS vs. HHS) 2025",
+    "coverImageUrl": "https://live.staticflickr.com/65535/54923814898_84b78f1fae_z.jpg",
+    "flickrUrl": "https://www.flickr.com/photos/199104771@N02/albums/72177720330346429",
+    "count": 138,
+    "date": "2025-11-14",
+    "title": "Bell Game (FHS vs HHS)"
+  },
+  {
+    "name": "Football Game - 9/19",
+    "coverImageUrl": "https://live.staticflickr.com/65535/54813690979_e4c271f09c_z.jpg",
+    "flickrUrl": "https://www.flickr.com/photos/199104771@N02/albums/72177720329300554",
+    "count": 49,
+    "date": "2025-09-19",
+    "title": "Football Game"
+  },
+  {
+    "name": "Clubs day (September)",
+    "coverImageUrl": "https://live.staticflickr.com/65535/54805559713_ecd17b8455_z.jpg",
+    "flickrUrl": "https://www.flickr.com/photos/199104771@N02/albums/72177720329189570",
+    "count": 179,
+    "date": "2025-09-17",
+    "title": "Clubs Day"
+  }
 ]
