@@ -64,6 +64,7 @@ function shape(data) {
   const prioOf = (g) => (g.push ? 2 : 0) + (/varsity/i.test(g.level || '') ? 1 : 0)
   const nextBySport = new Map()
   const recentBy = new Map()
+  const finishedBy = new Map()
   for (const g of data.games || []) {
     const d = parseIso(g.date); if (!d) continue
     const isSenior = !!g.seniorNight || /senior\s*night/i.test(g.title || '')
@@ -74,6 +75,14 @@ function shape(data) {
     const hasScore = !!(g.score && String(g.score).trim())
     const finished = g.section === 'result' || hasScore || d < start
     if (finished) {
+      // Every finished game, regardless of age, so Latest News can turn a matching photo
+      // album into a score card even for games older than PAST_DAYS (a photo album can land
+      // weeks after the game). One row per sport+date, preferring the pinned/Varsity row.
+      const fk = `${g.sport}|${g.date}`
+      const fprev = finishedBy.get(fk)
+      if (!fprev || prioOf(g) > fprev.prio) {
+        finishedBy.set(fk, { prio: prioOf(g), game: { title, date: g.date, when: d, score: hasScore ? g.score : '', level: g.level || '', seniorNight: isSenior } })
+      }
       if (d >= floor && d <= start) { // within the last PAST_DAYS, through today
         const k = `${g.sport}|${g.date}`
         const prev = recentBy.get(k)
@@ -95,7 +104,8 @@ function shape(data) {
   const upcoming = [...evItems, ...[...nextBySport.values()].map((v) => v.item)].sort((a, b) => a.when - b.when) // soonest first
   recent.sort((a, b) => b.when - a.when)                                                                        // most recent first
   const events = (data.events || []).map((e) => ({ name: e.name, date: e.date })).filter((e) => e.name && e.date)
-  return { upcoming, recent, events }
+  const finishedGames = [...finishedBy.values()].map((v) => v.game)
+  return { upcoming, recent, events, finishedGames }
 }
 
 export function useEvents() {
@@ -106,7 +116,7 @@ export function useEvents() {
     // current date), then refresh from the live API in the background — so Upcoming Events never
     // waits on the slow athletics scores feed.
     if (eventsSnapshot && (Array.isArray(eventsSnapshot.events) || Array.isArray(eventsSnapshot.games))) return { ...shape(eventsSnapshot), loading: false }
-    return { upcoming: [], recent: [], events: [], loading: true }
+    return { upcoming: [], recent: [], events: [], finishedGames: [], loading: true }
   })
 
   useEffect(() => {

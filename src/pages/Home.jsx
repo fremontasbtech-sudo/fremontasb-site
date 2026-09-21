@@ -26,12 +26,12 @@ import { cleanAlbumTitle } from '../data/albumTitle'
  * not image tiles, so a card grid would flatten the hierarchy this page depends on.
  */
 export default function Home() {
-  const { upcoming, recent, events: curatedEvents, loading: eventsLoading } = useEvents()
+  const { upcoming, recent, events: curatedEvents, finishedGames, loading: eventsLoading } = useEvents()
   return (
     <>
       <Hero />
       <SpiritPoints />
-      <LatestNews eventsRecent={recent} eventsUpcoming={upcoming} eventsAll={curatedEvents} eventsLoading={eventsLoading} />
+      <LatestNews eventsRecent={recent} eventsUpcoming={upcoming} eventsAll={curatedEvents} eventsFinished={finishedGames} eventsLoading={eventsLoading} />
       <MorningAnnouncements />
       <AppBanner />
     </>
@@ -190,12 +190,12 @@ const quickLinks = [
   { to: '/resources', label: 'School Store', note: 'ASB cards, dance tickets, gear' },
 ]
 
-function LatestNews({ eventsRecent = [], eventsUpcoming = [], eventsAll = [], eventsLoading = false }) {
+function LatestNews({ eventsRecent = [], eventsUpcoming = [], eventsAll = [], eventsFinished = [], eventsLoading = false }) {
   const { rows, loading: newsLoading, source } = useSheetData(sheets.news, newsJson)
   const { rows: videos, loading: vLoading } = useYouTube(mediaOverlay)
   const { albums, loading: aLoading } = useFlickr(photoAlbums)
 
-  const items = buildNews(rows, source, videos, albums, eventsRecent, eventsAll)
+  const items = buildNews(rows, source, videos, albums, eventsRecent, eventsAll, eventsFinished)
   const loading = (newsLoading || vLoading || aLoading) && items.length === 0
 
   return (
@@ -294,7 +294,7 @@ function TypeBadge({ type }) {
  *  - Auto items from the already-live feeds: newest Fremont TV episodes + photo albums.
  * Result: the section is always real and current, even before anyone writes an announcement.
  */
-function buildNews(newsRows, source, videos, albums, eventsRecent = [], curatedEvents = []) {
+function buildNews(newsRows, source, videos, albums, eventsRecent = [], curatedEvents = [], finishedGames = []) {
   const manual = source === 'sheet'
     ? newsRows.filter((n) => n.title).map((n) => ({
         key: `a-${n.title}-${n.date || ''}`,
@@ -355,6 +355,36 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = [], curatedE
     return { ...it, pinned: false }
   })
 
+  // A photo album that matches a FINISHED game (any age, not just the last 2 weeks) becomes a
+  // Sports score card with the final score + photos link — same shape as a recent game card —
+  // instead of a bare "N new photos" row. So an older game (e.g. the season opener) whose album
+  // shows up still leads with its score. Dated by the game, and skipped if a recent game card
+  // already covers it.
+  const gameTitles = new Set(games.map((g) => norm(g.title)))
+  const finishedCards = []
+  for (const al of albumList) {
+    if (!al.href || consumed.has(al)) continue
+    const ai = norm(al.title)
+    if (ai.length < 6) continue
+    const fg = (finishedGames || []).find((g) => {
+      const gi = norm(g.title)
+      return gi.length >= 6 && (ai === gi || ai.includes(gi) || gi.includes(ai))
+    })
+    if (!fg || gameTitles.has(norm(fg.title))) continue
+    consumed.add(al)
+    finishedCards.push({
+      key: `gm-${fg.date}-${norm(fg.title)}`,
+      type: 'Sports',
+      title: fg.title,
+      href: al.href,
+      when: fg.when,
+      seniorNight: fg.seniorNight,
+      blurb: [fg.seniorNight ? 'Senior Night' : '', fg.score ? `Final ${fg.score}` : 'Final score soon', fg.level].filter(Boolean).join(' · '),
+      viewLabel: al.count ? `View ${al.count} photos` : 'View photos',
+      pinned: false,
+    })
+  }
+
   const albs = albumList.filter((al) => !consumed.has(al)).slice(0, 3).map((al) => {
     // A photo album for a curated EVENT (e.g. "Clubs Day") is dated by the EVENT itself, not
     // the Flickr upload/EXIF guess (which can land a day or two late). Match title -> event.
@@ -379,7 +409,7 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = [], curatedE
   // Curated upcoming events + pinned games lead the feed, soonest first; the dated/recent
   // items fill the rest, freshest first. Cap the lead so real news still shows through.
   const dayKey = (d) => (d ? d.getFullYear() * 10000 + d.getMonth() * 100 + d.getDate() : 0)
-  const ranked = [...manual, ...vids, ...albs, ...games]
+  const ranked = [...manual, ...vids, ...albs, ...games, ...finishedCards]
     .filter((it) => it.title && it.when && it.when >= cutoff)
     .sort((x, y) => {
       const p = Number(y.pinned) - Number(x.pinned)
