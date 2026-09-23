@@ -38,15 +38,36 @@ export const sheets = {
   elections: null,
 }
 
-// Homecoming Court -> Nominations form (peer nomination, seasonal).
-// This is a Google Apps Script WEB APP url (ends in /exec), NOT a Sheet - so it lives
-// outside `sheets` and is used as-is (no CSV conversion). The script is bound to the
-// nominations Google Sheet; its "Config" tab (open / mode / cycle / deadline cells) is the
-// single toggle that both shows/hides this form AND picks the tab a submission is written
-// to (Test Submissions while testing, Nominations when live). Deploy: New deployment ->
-// Web app -> Execute as: Me, Who has access: Anyone -> paste the /exec url below.
-// Leave null until deployed: the form stays hidden and the page shows the court / off state.
+// ─────────────────────────────────────────────────────────────────────────────
+// HOMECOMING COURT NOMINATIONS (peer nomination, seasonal).
+//
+// ONE Apps Script project (bound to the nominations Google Sheet) is deployed TWICE as a
+// Web App. Same code, same "Config" tab (open / mode / cycle / deadline cells) - the two
+// deployments differ only in "Who has access". Both are /exec urls, NOT Sheets, so they
+// live outside `sheets` and are used as-is (no CSV conversion).
+//
+//   1. homecomingNominationsApi  - "Who has access: ANYONE".
+//      The site calls `<url>?view=config` to read { open, mode, cycle, deadline }. That is
+//      the single toggle that shows/hides the nominate card on the Homecoming Court page.
+//      Nothing can be submitted through this deployment: anonymous visitors have no
+//      Google-verified identity, so the script refuses.
+//
+//   2. homecomingNominationsPage - "Who has access: ANYONE WITHIN FUHSD".
+//      The human nomination page the "Nominate now" button opens. Google makes the student
+//      sign in with a FUHSD account before the page loads, and the script reads that
+//      verified email itself. No email is typed anywhere, so ballot-stuffing isn't possible.
+//      One submission per student; submitting again replaces that student's picks.
+//
+// Deploy each: Extensions -> Apps Script -> Deploy -> New deployment -> Web app ->
+// Execute as: Me -> Who has access (as above) -> paste the /exec url. Full steps in
+// docs/homecoming-nominations-runbook.md. Config-cell edits never need a redeploy.
+// Leave either as null until deployed: the page falls back to the court / off state.
+// ─────────────────────────────────────────────────────────────────────────────
 export const homecomingNominationsApi = 'https://script.google.com/macros/s/AKfycbyGZ8M4yXzqgyx6985ITpaS9fBkPM89ro-98zc2oTwMWg0ntWHVGu1Bn6-mSz8qxmSlpA/exec'
+
+// TODO(Abir): paste the "Anyone within FUHSD" deployment url here (docs/homecoming-nominations-runbook.md §4).
+// While null, the site shows "Nominations will open here soon." and no button, so nothing insecure is live.
+export const homecomingNominationsPage = null
 
 export const links = {
   clubAccountabilityTracker:

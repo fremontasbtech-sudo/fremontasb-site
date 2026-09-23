@@ -3,14 +3,20 @@
 // - that's intentional for dynamic feed content (video titles, album names, club
 // names, announcements, people, dates). Edit/extend here; the switch is in the navbar.
 export const ES = {
-  // -- Homecoming Court: nominations form --
+  // ── Homecoming Court: nominations window (hero + intro + hand-off card) ──
   'Nominations': 'Nominaciones',
+  'Test preview': 'Vista de prueba',
   'Peer nominations': 'Nominaciones entre estudiantes',
   'Nominate up to 4 seniors': 'Nomina hasta 4 estudiantes de último año',
-  'Nominations are open. Nominate up to 4 senior classmates for the Homecoming Court.':
-    'Las nominaciones están abiertas. Nomina hasta 4 compañeros de último año para la Corte de Homecoming.',
+  'Nominations are open. Nominate up to 4 senior classmates for the Homecoming Court using your school account.':
+    'Las nominaciones están abiertas. Nomina hasta 4 compañeros de último año para la Corte de Homecoming con tu cuenta escolar.',
+  'Test preview. This is NOT the real nomination round yet, and anything submitted will not count.':
+    'Vista de prueba. Esta todavía NO es la ronda real de nominaciones, y nada de lo que se envíe contará.',
+  'Nominations will open here soon.': 'Las nominaciones se abrirán aquí pronto.',
   'You can nominate up to 4 SENIOR Fremont students. To be inclusive of all students, Court will be made up of 12 students regardless of gender identity. 8 of the Court will be determined by student nomination, and the other 4 will be selected by teachers.':
     'Puedes nominar hasta 4 estudiantes de último año de Fremont. Para incluir a todos los estudiantes, la Corte estará formada por 12 estudiantes sin importar su identidad de género. 8 de la Corte se decidirán por nominación estudiantil y los otros 4 los elegirán los maestros.',
+  'Nominations are tied to your school Google account, so each student gets one set of picks and nobody can nominate on someone else’s behalf. Change your mind? Submit again and your new picks replace the old ones.':
+    'Las nominaciones están vinculadas a tu cuenta escolar de Google, así que cada estudiante tiene un solo conjunto de nominaciones y nadie puede nominar en nombre de otra persona. ¿Cambiaste de opinión? Envía de nuevo y tus nuevas nominaciones reemplazarán las anteriores.',
   'Two rules': 'Dos reglas',
   'Do not nominate the same senior more than once, or all your nominations will be thrown out.':
     'No nomines al mismo estudiante más de una vez, o todas tus nominaciones serán descartadas.',
@@ -18,24 +24,31 @@ export const ES = {
     'Usa nombres reales, no apodos. La ortografía debe ser lo bastante cercana para identificar al estudiante.',
   'Once the final 12 candidates are set, voting for the 2 Homecoming Royalty winners happens during Homecoming Week.':
     'Una vez definidos los 12 candidatos finales, la votación por los 2 ganadores de la Realeza de Homecoming será durante la Semana de Homecoming.',
-  'Your school email': 'Tu correo escolar',
-  'Your senior nominees': 'Tus nominados de último año',
-  'Up to 4. Leave slots blank if you have fewer.': 'Hasta 4. Deja los espacios en blanco si tienes menos.',
-  'First name': 'Nombre',
-  'Last name': 'Apellido',
-  'Submit nominations': 'Enviar nominaciones',
-  'Submitting…': 'Enviando…',
-  'Real names only. Spelling close enough to identify the student.':
-    'Solo nombres reales. Con ortografía suficiente para identificar al estudiante.',
-  'Test mode — these submissions go to the Test tab, not the real tally.':
-    'Modo de prueba — estos envíos van a la pestaña de prueba, no al conteo real.',
-  'Nominations submitted': 'Nominaciones enviadas',
-  'Thanks for nominating. Only your first submission from this email counts, so there’s no need to send it again.':
-    'Gracias por nominar. Solo cuenta tu primer envío desde este correo, así que no necesitas enviarlo de nuevo.',
-  'Please fix the following:': 'Corrige lo siguiente:',
-  'Add at least one senior to nominate.': 'Agrega al menos un estudiante de último año para nominar.',
-  'Enter your school email so your nominations can be counted.':
-    'Ingresa tu correo escolar para que tus nominaciones cuenten.',
+  'Nominations close': 'Las nominaciones cierran',
+  // Test banner above the card. The middle word is a <strong>, so it is its own text node.
+  'Test preview: not the real nominations': 'Vista de prueba: no son las nominaciones reales',
+  'This is a test run. Anything you submit on the nomination page will': 'Esta es una prueba. Lo que envíes en la página de nominaciones',
+  'not': 'no',
+  'count toward Homecoming Court.': 'contará para la Corte de Homecoming.',
+  // The "Nominate now" card
+  'Verified by your school account': 'Verificado con tu cuenta escolar',
+  'Nominate with your school account': 'Nomina con tu cuenta escolar',
+  'Sign in with your school Google account on the next page and your nominations are counted under your name. There’s no email to type.':
+    'Inicia sesión con tu cuenta escolar de Google en la siguiente página y tus nominaciones se contarán a tu nombre. No hay que escribir ningún correo.',
+  'One submission per student. Submitting again replaces your earlier picks, so only your latest set counts.':
+    'Un envío por estudiante. Si envías de nuevo, reemplazas tus nominaciones anteriores, así que solo cuenta tu último conjunto.',
+  'Nominate now': 'Nomina ahora',
+  'Opens the secure nomination page. If you’re signed in to a personal Google account, it will ask you to switch to your @student.fuhsd.org account.':
+    'Abre la página segura de nominaciones. Si tienes una sesión abierta con una cuenta personal de Google, te pedirá cambiar a tu cuenta @student.fuhsd.org.',
+  'How it works': 'Cómo funciona',
+  'Sign in': 'Inicia sesión',
+  'with your @student.fuhsd.org account': 'con tu cuenta @student.fuhsd.org',
+  'Pick up to 4 seniors': 'Elige hasta 4 estudiantes de último año',
+  'first and last names': 'nombre y apellido',
+  'Done': 'Listo',
+  'come back any time to change your picks': 'vuelve cuando quieras para cambiar tus nominaciones',
+  'Nominations aren’t connected yet. Check back soon.': 'Las nominaciones aún no están conectadas. Vuelve pronto.',
+
   // ── Navbar / chrome ──
   'Home': 'Inicio',
   'Media': 'Multimedia',

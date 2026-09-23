@@ -5,34 +5,46 @@ import { homecomingNominationsApi } from './sources'
 /**
  * useNominationConfig()
  *
- * One sheet-controlled toggle drives BOTH the page and the backend. The Apps Script
- * Web App (bound to the nominations Sheet) reads its own "Config" tab and answers a GET
- * with { open, mode, cycle, deadline }; the same cells decide which tab a POST is written
- * to (Test Submissions vs Nominations). So flipping the form on/off, or Test -> live, is a
- * single cell edit in the Sheet: no site redeploy, no Apps Script redeploy.
+ * One sheet-controlled toggle drives BOTH the site and the nomination page. The Apps
+ * Script Web App (bound to the nominations Sheet) reads its own "Config" tab and answers
+ * `GET <homecomingNominationsApi>?view=config` with { open, mode, cycle, deadline }. The
+ * same cells gate submissions on the FUHSD-only nomination page and decide which tab a
+ * submission is written to (Test Submissions vs Nominations). So flipping nominations
+ * on/off, or Test -> live, is a single cell edit in the Sheet: no site redeploy, no Apps
+ * Script redeploy.
+ *
+ * Only `?view=config` is used here. The public deployment answers that with JSON; the site
+ * never submits anything to it - students submit on the nomination page, signed in with
+ * their school account (see homecomingNominationsPage in sources.js).
  *
  * Robustness (same contract as the rest of the site): the last good status is cached in
  * localStorage (short TTL, since it can change mid-window) so a flaky request never hides
- * the form for a returning visitor, and a transient failure is retried before giving up.
+ * the nominate card for a returning visitor, and a transient failure is retried before
+ * giving up.
  *
- * If homecomingNominationsApi is null (not deployed yet), this is inert and the form
- * never renders — the page falls through to the court display / off state.
+ * If homecomingNominationsApi is null (not deployed yet), this is inert and the nominate
+ * card never renders — the page falls through to the court display / off state.
  */
 const cache = makeCache('fasb.hcnominations.v1', 5 * 60 * 1000) // 5 min
 
 const truthy = (v) => v === true || ['yes', 'true', 'y', '1', 'open'].includes(String(v).trim().toLowerCase())
 
+// `<exec url>?view=config` (or `&view=config` if the url already carries a query string).
+const configUrl = homecomingNominationsApi
+  ? `${homecomingNominationsApi}${homecomingNominationsApi.includes('?') ? '&' : '?'}view=config`
+  : null
+
 export function useNominationConfig() {
   const [state, setState] = useState(() => {
-    if (!homecomingNominationsApi) return { config: null, loading: false }
+    if (!configUrl) return { config: null, loading: false }
     const cached = cache.read()
     return cached ? { config: cached, loading: false } : { config: null, loading: true }
   })
 
   useEffect(() => {
-    if (!homecomingNominationsApi) return
+    if (!configUrl) return
     let cancelled = false
-    fetchJsonRetry(homecomingNominationsApi, {
+    fetchJsonRetry(configUrl, {
       attempts: 3,
       delayMs: 1500,
       isEmpty: (d) => !d || typeof d.open === 'undefined',

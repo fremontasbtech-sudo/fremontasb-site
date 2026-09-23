@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homecoming Court Nominations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  /* ---- Tokens (tailwind.config.js / index.css on fremontasb.org) ---- */
+  :root {
+    --brand: #9E3B1B;
+    --brand-dark: #7F2E14;
+    --brand-tint: #FBF1ED;
+    --ink: #222222;
+    --body: #595959;
+    --rule: #E6E1DD;
+    --paper: #FFFFFF;
+    --rules-card: #F6F4F2;
+    --display: "Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --r-btn: 0.375rem;
+    --r-card: 0.5rem;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--body);
+    font-family: var(--sans);
+    font-size: 1rem;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  h1, h2, h3 { font-family: var(--display); color: var(--ink); margin: 0; }
+  p { margin: 0; }
+  ol, ul { margin: 0; padding: 0; }
+  strong { font-weight: 700; color: var(--ink); }
+  a { color: inherit; }
+
+  :focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+  }
+  [hidden] { display: none !important; }
+
+  /* ---- Type ---- */
+  .eyebrow {
+    font-family: var(--display);
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--brand);
+  }
+  .page-title {
+    font-family: var(--display);
+    font-size: 2.25rem;
+    line-height: 1.1;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    text-align: center;
+  }
+  .rule-accent { margin: 1rem auto 0; height: 4px; width: 3rem; background: var(--brand); }
+  .rule-accent-left { margin-top: 0.75rem; height: 4px; width: 3rem; background: var(--brand); }
+  .subtext {
+    margin: 1.25rem auto 0;
+    max-width: 42rem;
+    min-height: 3.25rem; /* two lines, keeps the hero from jumping as copy changes */
+    font-style: italic;
+    font-size: 1rem;
+    line-height: 1.625;
+    color: var(--body);
+  }
+  .h2 {
+    font-family: var(--display);
+    font-size: 1.5rem;
+    line-height: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+  }
+  .h3 {
+    font-family: var(--display);
+    font-size: 1.5rem;
+    line-height: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+  }
+  /* The trust line's "Switch account" is the one inline link a thumb may need: give it a 44px hit area
+     without changing the line's visual height. */
+  #trust-switch { display: inline-flex; align-items: center; min-height: 44px; }
+  .link-brand {
+    color: var(--brand);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: rgba(158, 59, 27, 0.4);
+    border-radius: 2px;
+  }
+  .link-brand:hover { text-decoration-color: var(--brand); }
+
+  /* ---- Layout ---- */
+  .hero {
+    border-bottom: 1px solid var(--rule);
+    background: var(--paper);
+    padding: 3rem 1rem;
+    text-align: center;
+  }
+  .hero .eyebrow { margin-bottom: 0.75rem; }
+  .container {
+    width: 100%;
+    max-width: 36rem;
+    margin: 0 auto;
+    padding: 3.5rem 1rem;
+  }
+  .stack > * + * { margin-top: 1rem; }
+  .prose { margin-top: 1.25rem; line-height: 1.625; color: var(--body); }
+  .small { font-size: 0.875rem; line-height: 1.5; }
+  .xs { font-size: 0.75rem; line-height: 1.25; }
+  .deadline { font-size: 0.875rem; font-weight: 700; color: var(--ink); }
+
+  .card {
+    border: 1px solid var(--rule);
+    border-radius: var(--r-card);
+    background: var(--paper);
+    padding: 1.25rem;
+  }
+  .rules-card {
+    border: 1px solid var(--rule);
+    border-radius: var(--r-card);
+    background: var(--rules-card);
+    padding: 1rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  .rules-card p { font-family: var(--display); font-weight: 700; color: var(--ink); }
+  .rules-card ol { margin-top: 0.5rem; padding-left: 1.25rem; list-style: decimal; }
+  .rules-card li + li { margin-top: 0.25rem; }
+
+  .banner-test {
+    margin-bottom: 1.5rem;
+    border: 2px solid var(--brand);
+    border-radius: var(--r-card);
+    background: var(--brand-tint);
+    padding: 0.75rem 1rem;
+  }
+  .banner-test .label {
+    font-family: var(--display);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--brand);
+  }
+  .banner-test .copy { margin-top: 0.25rem; font-size: 0.875rem; line-height: 1.5; color: var(--ink); }
+
+  .notice {
+    border: 1px solid rgba(158, 59, 27, 0.4);
+    border-radius: var(--r-btn);
+    background: var(--brand-tint);
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .notice.neutral { border-color: var(--rule); background: var(--rules-card); }
+  .notice .title { font-weight: 700; }
+  .notice ul { margin-top: 0.375rem; padding-left: 1.25rem; list-style: disc; }
+  .notice li + li { margin-top: 0.25rem; }
+
+  /* ---- Buttons ---- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0.625rem 1.25rem;
+    border: 0;
+    border-radius: var(--r-btn);
+    font-family: var(--display);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: background-color 150ms ease, color 150ms ease;
+  }
+  .btn-primary { background: var(--brand); color: #fff; }
+  .btn-primary:hover { background: var(--brand-dark); }
+  .btn-secondary { background: var(--brand-tint); color: var(--brand); }
+  .btn-secondary:hover { background: var(--brand); color: #fff; }
+  .btn-disabled, .btn[disabled] { background: var(--rule); color: var(--body); cursor: not-allowed; }
+  .btn-disabled:hover, .btn[disabled]:hover { background: var(--rule); color: var(--body); }
+  .btn-link {
+    display: inline-flex; align-items: center; min-height: 44px; padding: 0 0.25rem;
+    background: none; border: 0; cursor: pointer;
+    font-family: var(--sans); font-size: 0.875rem;
+  }
+
+  /* ---- Form ---- */
+  .trust {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem;
+    padding-bottom: 1rem; margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--rule);
+    font-size: 0.875rem; line-height: 1.5; color: var(--body);
+  }
+  .trust .email { overflow-wrap: anywhere; word-break: normal; }
+  .trust .switch { white-space: nowrap; flex-basis: 100%; }
+  @media (min-width: 640px) { .trust .switch { flex-basis: auto; } }
+  .form-title { padding: 0; font-family: var(--display); font-size: 0.875rem; font-weight: 700; color: var(--ink); }
+  .form-hint { margin-top: 0.25rem; font-size: 0.875rem; color: var(--body); }
+  .slots { margin-top: 1rem; }
+  .slots > * + * { margin-top: 1rem; }
+  fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+  fieldset.slot {
+    border: 1px solid var(--rule);
+    border-radius: var(--r-card);
+    padding: 0.875rem 1rem 1rem;
+  }
+  /* A floated legend is laid out inside the box, so the fieldset border stays continuous
+     (no UA notch behind "NOMINEE 1"). .grid clears it. */
+  fieldset.slot legend {
+    float: left;
+    width: 100%;
+    padding: 0;
+    margin-bottom: 0.625rem;
+    font-family: var(--display);
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--brand);
+  }
+  .grid { clear: both; display: grid; gap: 0.75rem; grid-template-columns: 1fr; }
+  input[type="text"] {
+    display: block;
+    width: 100%;
+    min-height: 44px;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid var(--rule);
+    border-radius: var(--r-btn);
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+  }
+  input[type="text"]::placeholder { color: rgba(89, 89, 89, 0.45); opacity: 1; }
+  input[type="text"][aria-invalid="true"] {
+    border-color: var(--brand);
+    box-shadow: inset 0 0 0 1px var(--brand);
+  }
+  input[type="text"]:focus {
+    outline: none;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--brand);
+  }
+  .actions { margin-top: 1.75rem; display: flex; flex-direction: column; align-items: stretch; gap: 0.75rem; }
+  .actions .btn { width: 100%; white-space: nowrap; }
+  #view-already .btn { width: 100%; }
+  .actions .helper { font-size: 0.75rem; line-height: 1.35; color: var(--body); }
+  .actions-secondary { margin-top: 0.75rem; }
+
+  /* ---- Picks list (already / success) ---- */
+  .picks { margin-top: 1rem; list-style: none; border-top: 1px solid var(--rule); }
+  .picks li {
+    display: flex; align-items: center; gap: 0.875rem;
+    padding: 0.75rem 0.25rem;
+    border-bottom: 1px solid var(--rule);
+    color: var(--ink);
+    font-size: 1rem;
+  }
+  .picks .n {
+    flex: 0 0 auto;
+    width: 1.75rem; height: 1.75rem;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 999px;
+    background: var(--brand-tint);
+    color: var(--brand);
+    font-family: var(--display); font-size: 0.75rem; font-weight: 800;
+  }
+
+  /* ---- Loading skeleton ---- */
+  .skeleton { min-height: 32rem; }
+  .sk { border-radius: 0.25rem; background: var(--rules-card); animation: pulse 1.4s ease-in-out infinite; }
+  .sk-line { height: 0.875rem; }
+  .sk-box { border-radius: var(--r-card); border: 1px solid var(--rule); background: var(--paper); padding: 0.75rem 1rem 1rem; }
+  .sk-box .sk { height: 44px; border-radius: var(--r-btn); margin-top: 0.75rem; }
+  .sk-box .sk-tag { height: 0.75rem; width: 5rem; margin-top: 0; }
+  .sk + .sk, .sk-box + .sk-box { margin-top: 1rem; }
+  .loading-line { display: flex; align-items: center; gap: 0.75rem; font-size: 0.875rem; color: var(--body); padding-bottom: 1rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--rule); }
+  .dot { width: 0.625rem; height: 0.625rem; border-radius: 999px; background: var(--brand); animation: pulse 1.4s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+
+  .center { text-align: center; }
+  .mt-3 { margin-top: 0.75rem; }
+  .mt-4 { margin-top: 1rem; }
+  .mt-5 { margin-top: 1.25rem; }
+  .mt-6 { margin-top: 1.5rem; }
+  .mt-8 { margin-top: 2rem; }
+
+  footer {
+    border-top: 1px solid var(--rule);
+    padding: 1.5rem 1rem 2.5rem;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--body);
+  }
+  footer a { color: var(--brand); text-decoration: none; }
+  footer a:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+  @media (min-width: 640px) {
+    .hero { padding: 4rem 2rem; }
+    .page-title { font-size: 3rem; }
+    .subtext { font-size: 1.125rem; }
+    .h2 { font-size: 1.875rem; line-height: 2.25rem; }
+    .container { padding: 5rem 1rem; }
+    .card { padding: 1.5rem; }
+    .grid { grid-template-columns: 1fr 1fr; }
+    .actions { flex-direction: row; align-items: center; gap: 1rem; }
+    .actions .btn { width: auto; }
+    #view-already .btn { width: auto; }
+    .trust .switch::before { content: "\00b7 "; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <p class="eyebrow" id="hero-eyebrow">Nominations</p>
+  <h1 class="page-title">Homecoming Court</h1>
+  <div class="rule-accent" aria-hidden="true"></div>
+  <p class="subtext" id="hero-subtext">Homecoming Court peer nominations.</p>
+</header>
+
+<main class="container" id="main">
+
+  <!-- Test-mode banner (config.mode === 'test') -->
+  <div class="banner-test" id="banner-test" hidden>
+    <p class="label">Test preview: not the real nominations</p>
+    <p class="copy">This is a test of the form. Anything you submit here will <strong>not</strong> count toward Homecoming Court.</p>
+  </div>
+
+  <!-- Section intro, copied verbatim from fremontasb.org/homecoming-court -->
+  <section id="intro" aria-labelledby="intro-h">
+    <p class="eyebrow" style="margin-bottom:0.5rem">Peer nominations</p>
+    <h2 class="h2" id="intro-h">Nominate up to 4 seniors</h2>
+    <div class="rule-accent-left" aria-hidden="true"></div>
+    <div class="prose stack">
+      <p>
+        You can nominate up to 4 SENIOR Fremont students. To be inclusive of all students, Court
+        will be made up of 12 students regardless of gender identity. 8 of the Court will be
+        determined by student nomination, and the other 4 will be selected by teachers.
+      </p>
+      <div class="rules-card">
+        <p>Two rules</p>
+        <ol>
+          <li>Do not nominate the same senior more than once, or all your nominations will be thrown out.</li>
+          <li>Use real names, not nicknames. Spelling has to be close enough to identify the student.</li>
+        </ol>
+      </div>
+      <p class="small">
+        Once the final 12 candidates are set, voting for the 2 Homecoming Royalty winners happens
+        during Homecoming Week.
+      </p>
+      <p class="deadline" id="deadline" hidden></p>
+      <div class="sk sk-line" id="deadline-sk" style="width:60%;margin-top:1.25rem" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <div id="app" class="mt-8" aria-live="polite">
+
+    <!-- 1. Loading -->
+    <div id="view-loading" class="card skeleton">
+      <div class="loading-line" role="status"><span class="dot" aria-hidden="true"></span>Checking your school account…</div>
+      <div class="sk sk-line" style="width:45%" aria-hidden="true"></div>
+      <div class="sk-box" aria-hidden="true"><div class="sk sk-tag"></div><div class="sk"></div><div class="sk"></div></div>
+      <div class="sk-box" aria-hidden="true"><div class="sk sk-tag"></div><div class="sk"></div><div class="sk"></div></div>
+      <div class="sk-box" aria-hidden="true"><div class="sk sk-tag"></div><div class="sk"></div><div class="sk"></div></div>
+      <div class="sk-box" aria-hidden="true"><div class="sk sk-tag"></div><div class="sk"></div><div class="sk"></div></div>
+    </div>
+
+    <!-- 2. Not signed in / wrong domain -->
+    <div id="view-blocked" class="card" hidden>
+      <p class="eyebrow" style="margin-bottom:0.5rem">School account required</p>
+      <h2 class="h3" id="blocked-title">Sign in with your school account</h2>
+      <div class="prose stack">
+        <p id="blocked-copy">
+          Nominations are tied to your Fremont Google account so every student gets exactly one set of
+          picks. Sign in with your <strong>@student.fuhsd.org</strong> account to continue.
+        </p>
+        <p class="small">If you have a personal Gmail open, use the button below to pick your school account.</p>
+      </div>
+      <div class="mt-6">
+        <a class="btn btn-primary" id="blocked-switch" href="#">Use your school account</a>
+      </div>
+    </div>
+
+    <!-- 3. Closed -->
+    <div id="view-closed" class="card center" hidden>
+      <h2 class="h3">Nominations aren&rsquo;t open right now.</h2>
+      <p class="mt-3">
+        Check back during homecoming season. When the nomination window opens, this is where you&rsquo;ll
+        nominate your senior classmates.
+      </p>
+      <p class="mt-5 small" id="closed-existing" hidden></p>
+    </div>
+
+    <!-- 5. Already submitted -->
+    <div id="view-already" class="card" hidden>
+      <p class="eyebrow" style="margin-bottom:0.5rem">Your current picks</p>
+      <h2 class="h3">You&rsquo;ve already nominated</h2>
+      <p class="mt-3">These are the picks on file for <strong id="already-email"></strong>.</p>
+      <ol class="picks" id="already-picks"></ol>
+      <p class="mt-4 small">Only one set of picks counts per student. Replacing them overwrites this list, and only the new set counts.</p>
+      <div class="mt-6">
+        <button type="button" class="btn btn-primary" id="already-replace">Replace my picks</button>
+      </div>
+    </div>
+
+    <!-- 4 / 6 / 8. Form (+ submitting, + inline error) -->
+    <div id="view-form" class="card" hidden>
+      <p class="trust">
+        <span>Nominating as <strong class="email" id="trust-email"></strong></span>
+        <span class="switch">Not you? <a class="link-brand" id="trust-switch" href="#">Switch account</a></span>
+      </p>
+
+      <div class="notice" id="form-error" role="alert" tabindex="-1" hidden>
+        <p class="title" id="form-error-title">Please fix the following:</p>
+        <ul id="form-error-list"></ul>
+        <p class="mt-3" id="form-error-extra" hidden></p>
+      </div>
+
+      <form id="nom-form" novalidate class="mt-5">
+        <fieldset>
+          <legend class="form-title" id="form-legend">Your senior nominees</legend>
+          <p class="form-hint">Up to 4. Leave slots blank if you have fewer.</p>
+          <div class="slots" id="slots"></div>
+        </fieldset>
+        <div class="actions">
+          <button type="submit" class="btn btn-primary" id="submit-btn">Submit nominations</button>
+          <p class="helper">Real names only. Spelling close enough to identify the student.</p>
+        </div>
+        <div class="actions-secondary" id="cancel-row" hidden>
+          <button type="button" class="btn-link link-brand" id="cancel-replace">Keep my current picks instead</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- 7. Success -->
+    <div id="view-success" class="card center" role="status" hidden>
+      <p class="eyebrow" style="margin-bottom:0.5rem" id="success-eyebrow">Submitted</p>
+      <h2 class="h3" id="success-title">Nominations submitted</h2>
+      <p class="mt-3" id="success-copy"></p>
+      <ol class="picks" id="success-picks" style="text-align:left"></ol>
+      <p class="mt-4 small">Recorded for <strong id="success-email"></strong>.</p>
+      <div class="mt-6">
+        <button type="button" class="btn btn-secondary" id="success-change">Change my picks</button>
+      </div>
+    </div>
+
+    <!-- 8. Page-level error (getState failed / offline preview) -->
+    <div id="view-error" class="card" role="alert" tabindex="-1" hidden>
+      <p class="eyebrow" style="margin-bottom:0.5rem" id="error-eyebrow">Something went wrong</p>
+      <h2 class="h3" id="error-title">Couldn&rsquo;t load the nomination page</h2>
+      <p class="mt-3" id="error-copy"></p>
+      <div class="mt-6">
+        <button type="button" class="btn btn-primary" id="error-retry">Try again</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <a href="https://fremontasb.org/homecoming-court" rel="noopener">&larr; Back to fremontasb.org</a>
+  <span aria-hidden="true"> &middot; </span>
+  <span>Fremont High School ASB</span>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  var SLOTS = 4;
+  var MAX_LEN = 60;
+  var LIVE_SUBTEXT = 'Nominations are open. Nominate up to 4 senior classmates for the Homecoming Court.';
+  var TEST_SUBTEXT = 'Test preview. This is NOT the real nomination round yet, and anything submitted here will not count.';
+  var CLOSED_SUBTEXT = 'Nominations aren’t open right now. Check back during homecoming season.';
+
+  var state = { email: '', config: null, existing: null, view: 'loading', submitting: false };
+
+  var $ = function (id) { return document.getElementById(id); };
+  var views = ['loading', 'blocked', 'closed', 'already', 'form', 'success', 'error'];
+
+  function switchUrl() {
+    return 'https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent(location.href);
+  }
+
+  function show(name) {
+    state.view = name;
+    for (var i = 0; i < views.length; i++) {
+      $('view-' + views[i]).hidden = views[i] !== name;
+    }
+    // The intro only belongs with the nomination flow.
+    $('intro').hidden = !(name === 'loading' || name === 'form' || name === 'already' || name === 'success');
+  }
+
+  function text(id, value) { $(id).textContent = value; }
+
+  /* ---------- Name helpers (mirror Code.gs) ---------- */
+  function clean(s) {
+    return String(s == null ? '' : s)
+      .replace(/[\u0000-\u001F\u007F]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+  function normKey(first, last) { return (first + ' ' + last).toLowerCase().replace(/\s+/g, ' ').trim(); }
+
+  /* ---------- Build the 4 slots ---------- */
+  function buildSlots() {
+    var wrap = $('slots');
+    wrap.innerHTML = '';
+    for (var i = 0; i < SLOTS; i++) {
+      var n = i + 1;
+      var fs = document.createElement('fieldset');
+      fs.className = 'slot';
+      fs.innerHTML =
+        '<legend>Nominee ' + n + '</legend>' +
+        '<div class="grid">' +
+          '<div><label for="n' + i + '-first" class="sr-only">Nominee ' + n + ' first name</label>' +
+          '<input id="n' + i + '-first" type="text" autocomplete="off" autocapitalize="words" spellcheck="false" inputmode="text" maxlength="80" placeholder="First name"></div>' +
+          '<div><label for="n' + i + '-last" class="sr-only">Nominee ' + n + ' last name</label>' +
+          '<input id="n' + i + '-last" type="text" autocomplete="off" autocapitalize="words" spellcheck="false" inputmode="text" maxlength="80" placeholder="Last name"></div>' +
+        '</div>';
+      wrap.appendChild(fs);
+    }
+    // Editing either name in a slot clears that slot's duplicate mark.
+    wrap.addEventListener('input', function (ev) {
+      var m = /^n(\d)-(first|last)$/.exec(ev.target && ev.target.id || '');
+      if (m) setSlotInvalid(Number(m[1]), false);
+    });
+  }
+
+  function readSlots() {
+    var out = [];
+    for (var i = 0; i < SLOTS; i++) {
+      out.push({ i: i, first: clean($('n' + i + '-first').value), last: clean($('n' + i + '-last').value) });
+    }
+    return out;
+  }
+
+  function fillSlots(list) {
+    for (var i = 0; i < SLOTS; i++) {
+      var item = (list && list[i]) || { first: '', last: '' };
+      $('n' + i + '-first').value = item.first || '';
+      $('n' + i + '-last').value = item.last || '';
+    }
+  }
+
+  /* ---------- Validation (same rules + wording as the server) ---------- */
+  function validate(slots) {
+    var errs = [];
+    var filled = slots.filter(function (s) { return s.first || s.last; });
+
+    if (filled.length === 0) errs.push('Add at least one senior to nominate.');
+
+    filled.forEach(function (s) {
+      if (!s.first || !s.last) errs.push('Nominee ' + (s.i + 1) + ': enter both a first and last name.');
+      else if (s.first.length > MAX_LEN || s.last.length > MAX_LEN) errs.push('Nominee ' + (s.i + 1) + ': names must be ' + MAX_LEN + ' characters or fewer.');
+    });
+
+    var seen = {};
+    var dupes = [];
+    filled.forEach(function (s) {
+      if (!s.first || !s.last) return;
+      var key = normKey(s.first, s.last);
+      var first = seen[key];
+      if (first) {
+        // Echo the spelling the student typed first; mark both slots.
+        errs.push('You’ve listed ' + first.first + ' ' + first.last + ' more than once (nominees ' + (first.i + 1) + ' and ' + (s.i + 1) + '). Each nominee must be a different senior.');
+        if (dupes.indexOf(first.i) < 0) dupes.push(first.i);
+        dupes.push(s.i);
+      } else {
+        seen[key] = s;
+      }
+    });
+    markInvalidSlots(dupes);
+    return errs;
+  }
+
+  /* aria-invalid + brand border on the named slots; everything else cleared. */
+  function markInvalidSlots(indices) {
+    for (var i = 0; i < SLOTS; i++) {
+      var bad = indices.indexOf(i) >= 0;
+      setSlotInvalid(i, bad);
+    }
+  }
+  function setSlotInvalid(i, bad) {
+    var f = $('n' + i + '-first'), l = $('n' + i + '-last');
+    if (bad) { f.setAttribute('aria-invalid', 'true'); l.setAttribute('aria-invalid', 'true'); }
+    else { f.removeAttribute('aria-invalid'); l.removeAttribute('aria-invalid'); }
+  }
+
+  /* ---------- Error box inside the form ---------- */
+  function showFormError(title, items, extraHtml) {
+    var box = $('form-error');
+    text('form-error-title', title);
+    var ul = $('form-error-list');
+    ul.innerHTML = '';
+    (items || []).forEach(function (m) {
+      var li = document.createElement('li');
+      li.textContent = m;
+      ul.appendChild(li);
+    });
+    ul.hidden = !(items && items.length);
+    var extra = $('form-error-extra');
+    if (extraHtml) { extra.innerHTML = extraHtml; extra.hidden = false; } else { extra.innerHTML = ''; extra.hidden = true; }
+    box.hidden = false;
+    requestAnimationFrame(function () { box.focus(); });
+  }
+  function clearFormError() { $('form-error').hidden = true; markInvalidSlots([]); }
+
+  var SERVER_ERRORS = {
+    'not-signed-in': {
+      title: 'You’re not signed in to a school account.',
+      msg: 'Nothing was saved. Sign in with your @student.fuhsd.org account and try again.',
+      switchLink: true
+    },
+    'wrong-domain': {
+      title: 'That Google account isn’t a Fremont school account.',
+      msg: 'Nothing was saved. Switch to your @student.fuhsd.org account and try again.',
+      switchLink: true
+    },
+    'closed': {
+      title: 'Nominations closed while you were filling this out.',
+      msg: 'Nothing was saved. If you think this is a mistake, ask ASB.'
+    },
+    'invalid': {
+      title: 'Please fix the following:',
+      msg: 'One of the names didn’t pass the check. Make sure every nominee has a first and last name and no senior is listed twice.'
+    },
+    'busy': {
+      title: 'The nominations sheet is busy right now.',
+      msg: 'A lot of people are submitting at once. Wait a few seconds and press the button again. Your picks are still in the form.'
+    },
+    'no-tab': {
+      title: 'The nominations sheet isn’t set up yet.',
+      msg: 'Nothing was saved. Tell ASB Tech so they can fix it, then try again later.'
+    }
+  };
+
+  function showServerError(res) {
+    var code = res && res.error;
+    var known = SERVER_ERRORS[code];
+    var title = known ? known.title : 'Couldn’t submit.';
+    var msg = (res && res.message) ? String(res.message) : (known ? known.msg : 'Check your connection and try again.');
+    var extra = known && known.switchLink
+      ? 'Not you? <a class="link-brand" href="' + switchUrl() + '">Switch account</a>'
+      : '';
+    showFormError(title, [msg], extra);
+  }
+
+  /* ---------- Picks list ---------- */
+  function renderPicks(id, list) {
+    var ol = $(id);
+    ol.innerHTML = '';
+    (list || []).forEach(function (p, i) {
+      var li = document.createElement('li');
+      var n = document.createElement('span');
+      n.className = 'n';
+      n.setAttribute('aria-hidden', 'true');
+      n.textContent = String(i + 1);
+      var name = document.createElement('span');
+      name.textContent = (p.first || '') + ' ' + (p.last || '');
+      li.appendChild(n);
+      li.appendChild(name);
+      ol.appendChild(li);
+    });
+  }
+
+  /* ---------- Submitting flag ---------- */
+  function setSubmitting(on) {
+    state.submitting = on;
+    var btn = $('submit-btn');
+    btn.disabled = on;
+    btn.setAttribute('aria-disabled', on ? 'true' : 'false');
+    btn.className = 'btn ' + (on ? 'btn-disabled' : 'btn-primary');
+    btn.textContent = on ? 'Submitting…' : (state.existing ? 'Replace my picks' : 'Submit nominations');
+    var inputs = $('nom-form').querySelectorAll('input');
+    for (var i = 0; i < inputs.length; i++) inputs[i].readOnly = on;
+    $('cancel-replace').disabled = on;
+  }
+
+  /* ---------- Views ---------- */
+  function openForm(opts) {
+    opts = opts || {};
+    clearFormError();
+    text('trust-email', state.email);
+    $('trust-switch').href = switchUrl();
+    fillSlots(state.existing);
+    var replacing = !!state.existing;
+    text('form-legend', replacing ? 'Your new picks' : 'Your senior nominees');
+    $('cancel-row').hidden = !replacing;
+    setSubmitting(false);
+    show('form');
+    if (opts.focus) {
+      var first = $('n0-first');
+      first.focus();
+      try { first.setSelectionRange(first.value.length, first.value.length); } catch (e) {}
+    }
+  }
+
+  function openAlready() {
+    text('already-email', state.email);
+    renderPicks('already-picks', state.existing);
+    show('already');
+  }
+
+  function openSuccess(picks, replaced) {
+    text('success-eyebrow', replaced ? 'Updated' : 'Submitted');
+    text('success-title', replaced ? 'Picks updated' : 'Nominations submitted');
+    text('success-copy', replaced
+      ? 'Your picks were updated. Only this set counts.'
+      : 'Thanks for nominating. One set of picks counts per student, and this is yours. You can change it any time before nominations close.');
+    renderPicks('success-picks', picks);
+    text('success-email', state.email);
+    show('success');
+    $('view-success').setAttribute('tabindex', '-1');
+    $('view-success').focus();
+    window.scrollTo({ top: $('app').offsetTop - 16, behavior: 'auto' });
+  }
+
+  function openPageError(kind) {
+    if (kind === 'offline') {
+      text('error-eyebrow', 'Offline preview');
+      text('error-title', 'This page isn’t connected to the server');
+      text('error-copy', 'You’re viewing a local copy. The real nomination page runs from the Apps Script link on fremontasb.org, where it verifies your school account. Nothing here can be submitted.');
+      $('error-retry').textContent = 'Reload';
+    } else {
+      text('error-eyebrow', 'Something went wrong');
+      text('error-title', 'Couldn’t load the nomination page');
+      text('error-copy', 'Check your connection and try again. If it keeps failing, make sure you’re signed in to your @student.fuhsd.org account.');
+      $('error-retry').textContent = 'Try again';
+    }
+    show('error');
+    $('view-error').focus();
+  }
+
+  function applyHero(config) {
+    var mode = config && config.mode;
+    var cycle = config && config.cycle ? String(config.cycle).trim() : '';
+    text('hero-eyebrow', mode === 'test' ? 'Test preview' : (cycle && cycle !== 'Homecoming Court' ? cycle : 'Nominations'));
+    var open = !!(config && config.open);
+    text('hero-subtext', !open ? CLOSED_SUBTEXT : (mode === 'test' ? TEST_SUBTEXT : LIVE_SUBTEXT));
+    $('banner-test').hidden = !(open && mode === 'test');
+    var dl = config && config.deadline ? String(config.deadline).trim() : '';
+    $('deadline').hidden = !dl;
+    $('deadline-sk').hidden = true;
+    text('deadline', dl ? 'Nominations close ' + dl + '.' : '');
+  }
+
+  /* ---------- Server ---------- */
+  function hasServer() {
+    return typeof window.google !== 'undefined' && window.google && window.google.script && window.google.script.run;
+  }
+
+  function loadState() {
+    show('loading');
+    if (!hasServer()) {
+      // Local preview: never a blank page, always say why.
+      setTimeout(function () { openPageError('offline'); }, 300);
+      return;
+    }
+    try {
+      google.script.run
+        .withSuccessHandler(onState)
+        .withFailureHandler(function () { openPageError('load'); })
+        .getState();
+    } catch (e) {
+      openPageError('load');
+    }
+  }
+
+  function onState(res) {
+    if (!res || typeof res !== 'object') { openPageError('load'); return; }
+    state.email = res.email || '';
+    state.config = res.config || {};
+    state.existing = Array.isArray(res.existing) && res.existing.length ? res.existing.map(function (p) {
+      return { first: clean(p && p.first), last: clean(p && p.last) };
+    }) : null;
+    applyHero(state.config);
+
+    if (!state.config.open) {
+      var ce = $('closed-existing');
+      if (state.existing) { ce.textContent = 'Your picks were recorded before the window closed, so you’re all set.'; ce.hidden = false; }
+      else ce.hidden = true;
+      show('closed');
+      return;
+    }
+    if (!res.signedIn || !state.email) {
+      $('blocked-switch').href = switchUrl();
+      show('blocked');
+      return;
+    }
+    if (state.existing) openAlready();
+    else openForm();
+  }
+
+  function onSubmit(ev) {
+    ev.preventDefault();
+    if (state.submitting) return;
+    var slots = readSlots();
+    var errs = validate(slots);
+    if (errs.length) { showFormError('Please fix the following:', errs); return; }
+    clearFormError();
+
+    var nominees = slots
+      .filter(function (s) { return s.first && s.last; })
+      .map(function (s) { return { first: s.first, last: s.last }; });
+
+    if (!hasServer()) {
+      showFormError('Couldn’t submit.', ['This is an offline preview, so nothing can be sent. Open the page from fremontasb.org to nominate for real.']);
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      google.script.run
+        .withSuccessHandler(function (res) {
+          setSubmitting(false);
+          if (res && res.ok) {
+            state.existing = nominees;
+            openSuccess(nominees, !!res.replaced);
+          } else {
+            showServerError(res);
+          }
+        })
+        .withFailureHandler(function (err) {
+          setSubmitting(false);
+          showFormError('Couldn’t submit.', ['Check your connection and try again. Your picks are still in the form.' + (err && err.message ? ' (' + err.message + ')' : '')]);
+        })
+        .submitNominations(nominees);
+    } catch (e) {
+      setSubmitting(false);
+      showFormError('Couldn’t submit.', ['Check your connection and try again. Your picks are still in the form.']);
+    }
+  }
+
+  /* ---------- Wire up ---------- */
+  buildSlots();
+  $('nom-form').addEventListener('submit', onSubmit);
+  $('already-replace').addEventListener('click', function () { openForm({ focus: true }); });
+  $('success-change').addEventListener('click', function () { openForm({ focus: true }); });
+  $('cancel-replace').addEventListener('click', function () { openAlready(); $('already-replace').focus(); });
+  $('error-retry').addEventListener('click', function () {
+    if (!hasServer()) { location.reload(); return; }
+    loadState();
+  });
+  $('trust-switch').href = switchUrl();
+  $('blocked-switch').href = switchUrl();
+
+  loadState();
+})();
+</script>
+</body>
+</html>

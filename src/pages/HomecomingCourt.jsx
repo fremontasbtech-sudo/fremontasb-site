@@ -1,6 +1,6 @@
 import PageHero from '../components/PageHero'
 import { Loading, DevNote } from '../components/DataState'
-import { sheets } from '../data/sources'
+import { sheets, homecomingNominationsPage } from '../data/sources'
 import { useSheetData, isHidden } from '../data/useSheetData'
 import localCourt from '../data/homecomingCourt.json'
 import NominationForm from '../components/NominationForm'
@@ -41,17 +41,25 @@ export default function HomecomingCourt() {
   }
 
   // Phase 1 - nominations window. A single Config cell in the Sheet (read via the Apps
-  // Script Web App) opens this; the court display below only appears after nominations close
-  // and the final 12 are entered. See useNominationConfig + NominationForm.
+  // Script Web App's ?view=config) opens this; the court display below only appears after
+  // nominations close and the final 12 are entered. Nominating itself happens on a separate
+  // FUHSD-only page (students sign in with their school Google account there, so no email is
+  // ever typed on this site). See useNominationConfig + NominationForm (the hand-off card).
   if (nom?.open) {
     return (
       <>
         <PageHero
           title="Homecoming Court"
           eyebrow={nom.mode === 'test' ? 'Test preview' : (cycle !== 'Homecoming Court' ? cycle : 'Nominations')}
-          subtext={nom.mode === 'test'
-            ? 'Test preview. This is NOT the real nomination round yet, and anything submitted here will not count.'
-            : 'Nominations are open. Nominate up to 4 senior classmates for the Homecoming Court.'}
+          subtext={
+            // Until the FUHSD-only page URL is wired in sources.js, the card below says "not
+            // connected yet", so the hero must not claim the round is open.
+            !homecomingNominationsPage
+              ? 'Nominations will open here soon.'
+              : nom.mode === 'test'
+                ? 'Test preview. This is NOT the real nomination round yet, and anything submitted will not count.'
+                : 'Nominations are open. Nominate up to 4 senior classmates for the Homecoming Court using your school account.'
+          }
         />
         <section className="container-site section-space">
           <div className="mx-auto max-w-xl">
@@ -66,6 +74,11 @@ export default function HomecomingCourt() {
                 will be made up of 12 students regardless of gender identity. 8 of the Court will be
                 determined by student nomination, and the other 4 will be selected by teachers.
               </p>
+              <p>
+                Nominations are tied to your school Google account, so each student gets one set of
+                picks and nobody can nominate on someone else&rsquo;s behalf. Change your mind? Submit
+                again and your new picks replace the old ones.
+              </p>
               <div className="rounded-lg border border-rule bg-[#F6F4F2] p-4 text-sm">
                 <p className="font-display font-bold text-ink">Two rules</p>
                 <ol className="mt-2 list-decimal space-y-1 pl-5">
@@ -77,11 +90,12 @@ export default function HomecomingCourt() {
                 Once the final 12 candidates are set, voting for the 2 Homecoming Royalty winners happens
                 during Homecoming Week.
               </p>
-              {nom?.deadline ? (
+              {nom?.deadline && homecomingNominationsPage ? (
                 <p className="text-sm font-bold text-ink">Nominations close {nom.deadline}.</p>
               ) : null}
             </div>
           </div>
+          {/* The "Nominate now" hand-off card renders where the in-page form used to be. */}
           <div className="mt-8">
             <NominationForm mode={nom.mode} />
           </div>
