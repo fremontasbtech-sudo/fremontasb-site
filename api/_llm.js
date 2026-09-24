@@ -6,6 +6,12 @@
 // their heuristic fallback, so the feed always renders.
 
 let lastError = ''
+
+async function fetchWithTimeout(url, opts, ms) {
+  const ctrl = new AbortController()
+  const t = setTimeout(() => ctrl.abort(), ms)
+  try { return await fetch(url, { ...opts, signal: ctrl.signal }) } finally { clearTimeout(t) }
+}
 export function llmError() { return lastError }
 
 export async function llmTitles(texts, instruction) {
@@ -33,20 +39,33 @@ export async function llmTitles(texts, instruction) {
       if (!r.ok) throw new Error('openai ' + r.status)
       content = (await r.json()).choices?.[0]?.message?.content
     } else {
-      // Stable aliases so this survives Google retiring specific versions.
-      const models = ['gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-2.0-flash']
+      // Stable aliases first so this survives Google retiring specific versions. A busy model
+      // (429 rate limit / 5xx overload) is retried once after a short pause, then the next
+      // model is tried, so one hiccup no longer drops the whole batch to the heuristic.
+      const models = ['gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-2.5-flash-lite', 'gemini-2.0-flash']
+      const body = JSON.stringify({
+        contents: [{ parts: [{ text: instruction + '\n\nItems:\n' + payload }] }],
+        generationConfig: { temperature: 0.2, responseMimeType: 'application/json' },
+      })
       let ok = null, diag = []
-      for (const model of models) {
-        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(GK)}`, {
-          method: 'POST',
-          headers: { 'content-type': 'application/json', 'x-goog-api-key': GK },
-          body: JSON.stringify({ contents: [{ parts: [{ text: instruction + '\n\nItems:\n' + payload }] }] }),
-        })
-        if (r.ok) { ok = r; break }
-        diag.push(model + ':' + r.status + ' ' + (await r.text()).slice(0, 120))
+      outer: for (const model of models) {
+        for (let attempt = 0; attempt < 2; attempt++) {
+          let r
+          try {
+            r = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(GK)}`, {
+              method: 'POST',
+              headers: { 'content-type': 'application/json', 'x-goog-api-key': GK },
+              body,
+            }, 12000)
+          } catch (e) { diag.push(model + ':timeout'); break }
+          if (r.ok) { ok = r; break outer }
+          diag.push(model + ':' + r.status + ' ' + (await r.text()).slice(0, 100))
+          if (!(r.status === 429 || r.status >= 500) || attempt === 1) break
+          await new Promise((res) => setTimeout(res, 900))
+        }
       }
       if (!ok) throw new Error('gemini ' + diag.join(' | '))
-      content = (await ok.json()).candidates?.[0]?.content?.parts?.[0]?.text
+      content = (await ok.json()).candidates?.[0]?.content?.parts?.map((p) => p.text || '').join('')
     }
     if (!content) return null
     const arr = JSON.parse((content.match(/\[[\s\S]*\]/) || [content])[0])

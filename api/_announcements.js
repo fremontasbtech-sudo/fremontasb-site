@@ -57,9 +57,10 @@ export function titleOf(text) {
     [/\bbeam\b|rideshare/i, 'Sunnyvale Beam Rideshare'], [/\bbikes?\b/i, 'Bike Policy'], [/parking/i, 'Parking Permits'],
     [/litter|trash/i, 'Campus Cleanliness'], [/blood drive/i, 'Blood Drive'], [/color guard/i, 'Color Guard'],
     [/marching band/i, 'Marching Band'], [/\bchoir/i, 'Choir'], [/summer (home)?work|hw packet/i, 'Summer Homework'],
-    [/spirit week/i, 'Spirit Week'], [/fundraiser/i, 'Fundraiser'], [/\brally\b/i, 'Rally'], [/\bdance\b/i, 'Dance'],
-    [/audition/i, 'Auditions'],
+    [/spirit week/i, 'Spirit Week'],
   ]
+  // Generic event words: used only if nothing more specific (a named club / "X tournament") is found.
+  const generic = [[/fundraiser/i, 'Fundraiser'], [/deadline/i, 'Deadline Reminder'], [/permission slip/i, 'Permission Slips'], [/\brally\b/i, 'Rally'], [/\bdance\b/i, 'Dance'], [/audition/i, 'Auditions']]
   for (const [re, label] of map) if (re.test(text)) return label
   const tc = (x) => x.replace(/\s+/g, ' ').trim().replace(/\b([a-z])/g, (c) => c.toUpperCase())
   // "Come join Friday Night Live! …" / "Join the Chess Club at lunch" → the club/thing name
@@ -73,6 +74,27 @@ export function titleOf(text) {
   if (mm && mm[1]) return tc(mm[1])
   const m = text.match(/join (?:the |our )?([A-Z][A-Za-z&'\u2019 ]+?(?:Club|Team|Society|Program|Council|Committee|Choir|Band))/)
   if (m) return m[1].replace(/\s+/g, ' ').trim()
+  // "…come out to the Ceramics Club Tuesday…" → "Ceramics Club" (a named group anywhere in the text)
+  const CAP = "[A-Z][\\w&'\u2019-]*"
+  const SKIP = /^(The|This|That|Our|Your|A|An|Come|Join|If|Do|Don't|Don\u2019t|Want|Have|Are|Is|We|You|It|FHS|Fremont)$/
+  const trimLead = (phrase) => { const w = phrase.split(/\s+/); while (w.length > 1 && SKIP.test(w[0])) w.shift(); return SKIP.test(w[0]) ? '' : w.join(' ') }
+  mm = text.match(new RegExp(`((?:${CAP}\\s+){0,3}${CAP})\\s+(Club|Team|Society|Council|Committee|Choir|Orchestra|Ensemble|League)\\b`))
+  if (mm) { const lead = trimLead(mm[1]); if (lead) return `${lead} ${mm[2]}` }
+  // "…the conclusion of the Pickleball tournament!" → "Pickleball Tournament"
+  const NOUNS = ['tournament', 'fundraiser', 'sale', 'drive', 'night', 'game', 'meeting', 'competition', 'show', 'showcase',
+    'concert', 'workshop', 'fair', 'festival', 'trip', 'audition', 'auditions', 'tryout', 'tryouts', 'assembly', 'rally',
+    'dance', 'challenge', 'contest', 'party', 'drive', 'walk', 'run', 'screening', 'performance', 'recital', 'banquet', 'social']
+  const nounAlt = NOUNS.map((n) => `[${n[0]}${n[0].toUpperCase()}]${n.slice(1)}`).join('|')
+  mm = text.match(new RegExp(`((?:${CAP}\\s+){0,2}${CAP})\\s+(${nounAlt})\\b`))
+  if (mm) { const lead = trimLead(mm[1]); if (lead) return tc(`${lead} ${mm[2]}`) }
+  for (const [re, label] of generic) if (re.test(text)) return label
+  // Last resort: a proper-noun phrase ("Girls Who Code"), skipping greetings, days and months.
+  const DAYMON = /^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|January|February|March|April|May|June|July|August|September|October|November|December|Ms|Mr|Mrs|Dr|See|Reminder|Stop|Tickets|Hey|Hi|Please|Remember|Don|Make|Sign|Bring|Check|Grab|Get)\.?$/
+  const runs = [...text.matchAll(new RegExp(`${CAP}(?:\\s+${CAP})*`, 'g'))]
+    .map((r) => r[0].split(/\s+/).filter((w) => !SKIP.test(w) && !DAYMON.test(w)).join(' '))
+    .filter((r) => r.length >= 4)
+  const multi = runs.find((r) => r.includes(' '))
+  if (multi) return multi
   const words = t.split(' ').slice(0, 6).join(' ').replace(/[.,;:!?]+$/, '')
   return (words.length > 48 ? words.slice(0, 46).trim() + '\u2026' : words) || 'Announcement'
 }
@@ -214,17 +236,34 @@ function mergeSameDayTitle(items) {
   return order.map((k) => { const g = groups.get(k); return { ...g.item, text: g.texts.join('\n\n') } })
 }
 
+// Titles are generated in small parallel batches (a 15-blurb batch is far less likely to come
+// back malformed than one 80-blurb request, and one bad batch no longer throws away the rest).
+// Anything the LLM didn't title falls back to titleOf(); `titleFallbacks` counts those so the
+// endpoint can keep that response only briefly and try the LLM again soon.
+const BATCH = 15
 async function applyTitles(items) {
-  const need = [...new Set(items.filter((it) => !it.xtitle).map((it) => it.text).filter((t) => !titleCache.has(t)))].slice(0, 80)
+  const need = [...new Set(items.filter((it) => !it.xtitle).map((it) => it.text).filter((t) => !titleCache.has(t)))].slice(0, 90)
   let usedLLM = false
   if (need.length) {
-    const titles = await llmTitles(need, TITLE_INSTRUCTION)
-    if (titles) { usedLLM = true; need.forEach((t, i) => { if (titles[i]) titleCache.set(t, titles[i]) }) }
+    const chunks = []
+    for (let i = 0; i < need.length; i += BATCH) chunks.push(need.slice(i, i + BATCH))
+    const results = await Promise.all(chunks.map((c) => llmTitles(c, TITLE_INSTRUCTION)))
+    results.forEach((titles, ci) => {
+      if (!titles) return
+      usedLLM = true
+      chunks[ci].forEach((t, i) => { if (titles[i] && titles[i].length <= 60) titleCache.set(t, titles[i]) })
+    })
   }
-  let out = items.map((it) => ({ ...it, title: it.xtitle || titleCache.get(it.text) || it.title }))
+  let fallbacks = 0
+  let out = items.map((it) => {
+    const title = it.xtitle || titleCache.get(it.text)
+    if (!title) fallbacks++
+    return { ...it, title: title || it.title }
+  })
   out = mergeSameDayTitle(out)
-  out.titleSource = usedLLM ? 'llm' : 'heuristic'
-  out.titleError = usedLLM ? '' : llmError()
+  out.titleSource = fallbacks === 0 ? 'llm' : usedLLM ? 'mixed' : 'heuristic'
+  out.titleFallbacks = fallbacks
+  out.titleError = fallbacks ? llmError() : ''
   return out
 }
 

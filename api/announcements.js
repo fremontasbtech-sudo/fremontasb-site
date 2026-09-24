@@ -8,13 +8,17 @@ export default async function handler(req, res) {
   try {
     res.setHeader('Access-Control-Allow-Origin', '*')  // let the Firebird Hub app read this feed
     const announcements = await fetchAnnouncements(announcementsSheet)
-    if (announcements && announcements.length) {
+    if (announcements && announcements.length && announcements.titleFallbacks) {
+      // Some titles are heuristic stand-ins because the LLM hiccuped: keep this copy for only
+      // 30 s so the next request tries the LLM again, instead of pinning weak titles for 30 min.
+      res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=60')
+    } else if (announcements && announcements.length) {
       // Short CDN cache so sheet edits show within a few minutes; SWR keeps it instant.
       res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=1800')
     } else {
       res.setHeader('Cache-Control', 'no-store') // don't cache an empty parse
     }
-    res.status(200).json({ announcements, titleSource: announcements.titleSource || 'heuristic', titleError: announcements.titleError || '' })
+    res.status(200).json({ announcements, titleSource: announcements.titleSource || 'heuristic', titleFallbacks: announcements.titleFallbacks || 0, titleError: announcements.titleError || '' })
   } catch (err) {
     res.status(200).json({ announcements: [], error: String(err && err.message || err) })
   }
