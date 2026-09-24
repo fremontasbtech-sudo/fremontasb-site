@@ -3,22 +3,21 @@ import { googleClientId } from '../data/sources'
 import { Loading, Notice } from './DataState'
 
 /**
- * NominationForm - Homecoming Court peer nominations, right on the page.
+ * NominationForm - Homecoming Court peer nominations, right on the page. ONE submission per
+ * student, final once submitted.
  *
  *   1. Student clicks "Sign in with Google" (Google Identity Services). Google hands the page
  *      a signed ID token for their account. No email is ever typed.
- *   2. The page sends that token + picks to /api/nominate. The SERVER checks the token with
- *      Google (our client ID, not expired, verified @student.fuhsd.org) and only then writes
- *      one row for that email through the nominations Apps Script. Resubmitting replaces it.
+ *   2. The page asks /api/nominate whether this student has ALREADY nominated. If so it shows
+ *      "You've already nominated" with their picks and no form. Only otherwise does the form show.
+ *   3. Form → "Review my nominations" (final check, clearly marked as final) → Submit. The
+ *      server checks the token with Google, and the Apps Script refuses a second row for the
+ *      same email (under a lock), answering 'already' with the picks that count, which the page
+ *      then shows. "Your nominations are in" appears only after the row is written.
  *
- * The token lives in memory + sessionStorage (this tab only) until it expires (~1 hour).
+ * The token lives in memory + sessionStorage (this tab only) until it expires (~1 hour); the
+ * confirmed picks are remembered for the tab so a reload shows them instantly.
  * mode === 'test' shows the test banner; the server writes test runs to "Test Submissions".
- *
- * Speed: nothing on screen waits on the (slow) Apps Script. After sign-in the form opens at
- * once (the email comes from the Google token itself) while the student's saved picks load in
- * the background. Submitting shows the confirmation immediately with a "Saving…" status that
- * flips to "Saved" when the server confirms; if the save fails, the form comes back with the
- * picks still filled in and the error, so nothing is ever silently lost.
  */
 const SLOTS = 4
 const TOKEN_KEY = 'fasb.hcnom.token'
@@ -94,7 +93,8 @@ async function api(credential, action, nominees) {
 }
 
 export default function NominationForm({ mode = 'test' }) {
-  // Everything below starts from what this tab already knows, so a reload renders instantly.
+  // Start from what this tab already knows so a reload renders instantly; the server is still
+  // asked in the background and always has the final word.
   const [boot] = useState(() => {
     const tok = loadToken()
     const em = tok ? tokenEmail(tok) : ''
@@ -102,18 +102,18 @@ export default function NominationForm({ mode = 'test' }) {
     return { tok, em, cached }
   })
   const [token, setToken] = useState(boot.tok)
-  const [phase, setPhase] = useState(boot.tok ? (boot.cached ? 'done' : 'form') : 'signin') // signin | form | done
+  // signin | checking | form | review | submitting | done
+  const [phase, setPhase] = useState(boot.tok ? (boot.cached ? 'done' : 'checking') : 'signin')
   const [email, setEmail] = useState(boot.em)
   const [slots, setSlots] = useState(() => toSlots(boot.cached))
-  const [hadPicks, setHadPicks] = useState(!!boot.cached)
+  const [doneKind, setDoneKind] = useState('already') // 'just' = submitted now | 'already' = submitted before
   const [errors, setErrors] = useState([])
+  const [notice, setNotice] = useState('')
   const [signinMsg, setSigninMsg] = useState('')
-  const [save, setSave] = useState(boot.cached ? 'saved' : '') // '' | 'saving' | 'saved'
-  const [checking, setChecking] = useState(!!boot.tok)
-  const dirty = useRef(false)
   const errRef = useRef(null)
   const cardRef = useRef(null)
-  const submitting = save === 'saving'
+  const phaseRef = useRef(phase)
+  phaseRef.current = phase
 
   const signOut = useCallback((msg = '') => {
     saveToken('')
@@ -121,79 +121,87 @@ export default function NominationForm({ mode = 'test' }) {
     setToken('')
     setEmail('')
     setErrors([])
+    setNotice('')
     setSigninMsg(msg)
-    setSave('')
-    setChecking(false)
-    setHadPicks(false)
     setSlots(emptySlots())
-    dirty.current = false
     setPhase('signin')
     try { window.google?.accounts?.id?.disableAutoSelect() } catch { /* ignore */ }
   }, [])
 
   // Handle the server's auth-related answers in one place. Returns true if handled.
-  const authProblem = useCallback((d) => {
-    if (d.error === 'signin') { signOut('Your sign-in expired. Please sign in again.'); return true }
+  const authProblem = useCallback((d, extra = '') => {
+    if (d.error === 'signin') { signOut(`Your sign-in expired. Please sign in again.${extra}`); return true }
     if (d.error === 'wrong-domain') {
-      signOut(`${d.email ? `${d.email} isn’t a school account. ` : ''}Sign in with your @student.fuhsd.org account.`)
+      signOut(`${d.email ? `${d.email} isn’t a school account. ` : ''}Sign in with your @student.fuhsd.org account.${extra}`)
       return true
     }
     return false
   }, [signOut])
 
-  // In the BACKGROUND after sign-in: load this student's saved picks (the form is already open).
-  // If they haven't started typing, a saved set switches the card to "Your nominations are in";
-  // if they have, we keep their typing and just mark that submitting will replace the old set.
+  const showDone = useCallback((picks, kind, msg = '') => {
+    setSlots(toSlots(picks))
+    setDoneKind(kind)
+    setNotice(msg)
+    setErrors([])
+    setPhase('done')
+  }, [])
+
+  // After sign-in (and on reload with a valid token): ask the server whether this student has
+  // ALREADY nominated. The form is only shown once we know they haven't, so nobody is ever
+  // invited to fill in a second set that can't count.
   useEffect(() => {
     if (!token) return
     let cancelled = false
-    setChecking(true)
     api(token, 'state').then((d) => {
       if (cancelled) return
-      setChecking(false)
       if (!d.ok) {
         if (authProblem(d)) return
-        return // saved picks just couldn't be loaded; the form still works
+        // Couldn't check (network). Showing the form is still safe: the server refuses a second
+        // submission and the page then shows the picks that count.
+        if (phaseRef.current === 'checking') setPhase('form')
+        return
       }
       if (d.email) setEmail(d.email)
       const saved = Array.isArray(d.existing) ? d.existing : []
-      savePicks(d.email || tokenEmail(token), saved.length ? saved : null)
-      setHadPicks(saved.length > 0)
-      if (dirty.current) return
-      setSlots(toSlots(saved))
-      setSave(saved.length ? 'saved' : '')
-      setPhase(saved.length ? 'done' : 'form')
+      const em = d.email || tokenEmail(token)
+      if (saved.length) {
+        savePicks(em, saved)
+        if (phaseRef.current !== 'submitting') showDone(saved, 'already')
+      } else {
+        savePicks(em, null)
+        // e.g. ASB cleared a test row: the cached "done" view is stale, so open the form.
+        if (phaseRef.current === 'checking' || phaseRef.current === 'done') { setSlots(emptySlots()); setPhase('form') }
+      }
     })
     return () => { cancelled = true }
-  }, [token, authProblem])
+  }, [token, authProblem, showDone])
 
-  // While a save is in flight, warn before the tab is closed (the picks aren't confirmed yet).
+  // While a submission is in flight, warn before the tab is closed.
   useEffect(() => {
-    if (save !== 'saving') return
+    if (phase !== 'submitting') return
     const warn = (e) => { e.preventDefault(); e.returnValue = '' }
     window.addEventListener('beforeunload', warn)
     return () => window.removeEventListener('beforeunload', warn)
-  }, [save])
+  }, [phase])
 
   const onCredential = useCallback((resp) => {
     if (!resp?.credential) { setSigninMsg('Sign-in didn’t finish. Please try again.'); return }
     saveToken(resp.credential)
     const em = tokenEmail(resp.credential)
     const cached = loadPicks(em)
-    dirty.current = false
     setSigninMsg('')
+    setErrors([])
+    setNotice('')
     setEmail(em)
     setSlots(toSlots(cached))
-    setHadPicks(!!cached)
-    setSave(cached ? 'saved' : '')
-    setPhase(cached ? 'done' : 'form') // open the form right away, no waiting on the server
+    setDoneKind('already')
+    setPhase(cached ? 'done' : 'checking')
     setToken(resp.credential)
   }, [])
 
-  const setSlot = (i, key, val) => {
-    dirty.current = true
-    setSlots((s) => s.map((slot, j) => (j === i ? { ...slot, [key]: val } : slot)))
-  }
+  const setSlot = (i, key, val) => setSlots((s) => s.map((slot, j) => (j === i ? { ...slot, [key]: val } : slot)))
+  const focusErrors = () => requestAnimationFrame(() => errRef.current?.focus())
+  const toTop = () => requestAnimationFrame(() => cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
 
   function validate() {
     const errs = []
@@ -210,46 +218,64 @@ export default function NominationForm({ mode = 'test' }) {
     return { errs, filled }
   }
 
-  async function onSubmit(e) {
+  // Step 1: check the form, then show the picks for a final look (nominating is one-time).
+  function onReview(e) {
     e.preventDefault()
-    if (submitting) return
     const { errs, filled } = validate()
     setErrors(errs)
-    if (errs.length) { requestAnimationFrame(() => errRef.current?.focus()); return }
-    // Token about to expire? Ask for a fresh sign-in rather than failing on the server.
+    if (errs.length) { focusErrors(); return }
+    setSlots(toSlots(filled))
+    setPhase('review')
+    toTop()
+  }
+
+  // Step 2: submit. The confirmation only says "in" once the server has written the row.
+  async function onSubmit() {
+    if (phase === 'submitting') return
     if (tokenExp(token) < Date.now() + 30_000) {
-      signOut('Your sign-in expired. Please sign in again. Your picks were not sent yet.')
+      signOut('Your sign-in expired. Please sign in again. Your nominations were not sent yet.')
       return
     }
-    const picksNow = filled.map(({ first, last }) => ({ first, last }))
-    const before = slots
-    // Optimistic: show the confirmation now; the status line says "Saving…" until the server
-    // confirms the row is written.
-    setSlots(toSlots(picksNow))
-    setSave('saving')
-    setPhase('done')
-    requestAnimationFrame(() => cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+    const picksNow = slots.filter((s) => s.first.trim() && s.last.trim()).map((s) => ({ first: s.first.trim(), last: s.last.trim() }))
+    setErrors([])
+    setPhase('submitting')
     const d = await api(token, 'submit', picksNow)
     if (d.ok) {
-      dirty.current = false
       savePicks(email || tokenEmail(token), picksNow)
-      setHadPicks(true)
-      setSave('saved')
+      showDone(picksNow, 'just')
       return
     }
-    // Not saved: bring the form back exactly as they left it, with the reason.
-    setSave(hadPicks ? 'saved' : '')
-    if (authProblem(d)) {
-      setSigninMsg((m) => `${m} Your picks were not saved yet.`.trim())
+    if (d.error === 'already') {
+      const prior = Array.isArray(d.existing) && d.existing.length ? d.existing : null
+      if (prior) savePicks(email || tokenEmail(token), prior)
+      showDone(prior || picksNow, 'already', 'You had already nominated, so this new set was not saved. The picks below are the ones that count.')
       return
     }
-    setSlots(before)
-    setPhase('form')
-    setErrors([d.message || 'Couldn’t save right now. Please try again in a moment.'])
-    requestAnimationFrame(() => errRef.current?.focus())
+    if (authProblem(d, ' Your nominations were not sent.')) return
+    setPhase('review')
+    setErrors([d.message || 'Couldn’t submit right now. Please try again in a moment.'])
+    focusErrors()
   }
 
   const picks = slots.filter((s) => s.first.trim() && s.last.trim())
+
+  const errorBox = (
+    <div
+      ref={errRef}
+      tabIndex={-1}
+      role="alert"
+      className={errors.length ? 'mt-5 rounded-btn border border-brand/40 bg-brand-tint px-4 py-3 text-sm text-ink' : 'sr-only'}
+    >
+      {errors.length > 0 && (
+        <>
+          <p className="font-bold">{errors.length > 1 ? 'Please fix the following:' : 'Please fix this:'}</p>
+          <ul className="mt-1.5 list-disc space-y-1 pl-5">
+            {errors.map((er, i) => <li key={i}>{er}</li>)}
+          </ul>
+        </>
+      )}
+    </div>
+  )
 
   return (
     <div className="mx-auto max-w-xl">
@@ -267,79 +293,28 @@ export default function NominationForm({ mode = 'test' }) {
       <section ref={cardRef} className="card-surface scroll-mt-24 p-6 sm:p-8" aria-labelledby="nominate-heading">
         {phase === 'signin' && <SignIn onCredential={onCredential} message={signinMsg} />}
 
-        {phase === 'done' && (
-          <div>
-            <p className="eyebrow flex items-center gap-2" role="status" aria-live="polite">
-              {save === 'saving' ? (
-                <><span className="h-2 w-2 animate-pulse rounded-full bg-brand" aria-hidden="true" />Saving…</>
-              ) : (
-                <><CheckIcon />Saved</>
-              )}
-            </p>
+        {phase === 'checking' && (
+          <>
+            <p className="eyebrow">Verified by your school account</p>
             <h3 id="nominate-heading" className="mt-2 font-display text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">
-              Your nominations are in
+              Checking your nominations…
             </h3>
-            <Account email={email} onSwitch={() => signOut()} />
-            <ol className="mt-5 space-y-2">
-              {picks.map((p, i) => (
-                <li key={i} className="flex items-center gap-3 rounded-lg border border-rule px-4 py-3">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-tint font-display text-sm font-bold text-brand">
-                    {i + 1}
-                  </span>
-                  <span className="min-w-0 break-words font-display font-bold text-ink">{p.first} {p.last}</span>
-                </li>
-              ))}
-            </ol>
-            <p className="mt-4 text-sm leading-relaxed text-body">
-              Only your latest set counts. You can change it any time until nominations close.
-            </p>
-            <div className="mt-6 flex flex-col sm:flex-row">
-              <button
-                type="button"
-                className={save === 'saving' ? 'btn-disabled' : 'btn-primary'}
-                aria-disabled={save === 'saving'}
-                onClick={() => { if (save === 'saving') return; setErrors([]); setPhase('form') }}
-              >
-                Change my picks
-              </button>
-            </div>
-          </div>
+            {email && <Account email={email} onSwitch={() => signOut()} />}
+            <Loading label="Looking up whether you’ve already nominated…" />
+          </>
         )}
 
         {phase === 'form' && (
-          <form onSubmit={onSubmit} noValidate>
+          <form onSubmit={onReview} noValidate>
             <p className="eyebrow">Verified by your school account</p>
             <h3 id="nominate-heading" className="mt-2 font-display text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">
-              {hadPicks ? 'Change your nominations' : 'Your senior nominees'}
+              Your senior nominees
             </h3>
             {email && <Account email={email} onSwitch={() => signOut()} />}
-
-            <div
-              ref={errRef}
-              tabIndex={-1}
-              role="alert"
-              className={errors.length ? 'mt-5 rounded-btn border border-brand/40 bg-brand-tint px-4 py-3 text-sm text-ink' : 'sr-only'}
-            >
-              {errors.length > 0 && (
-                <>
-                  <p className="font-bold">Please fix the following:</p>
-                  <ul className="mt-1.5 list-disc space-y-1 pl-5">
-                    {errors.map((er, i) => <li key={i}>{er}</li>)}
-                  </ul>
-                </>
-              )}
-            </div>
-
-            <p className="mt-5 text-sm text-body">Up to 4 seniors. Leave slots blank if you have fewer.</p>
-            {checking && !hadPicks && (
-              <p className="mt-1 flex items-center gap-2 text-xs text-body/80" role="status">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand" aria-hidden="true" />
-                Checking for picks you already saved…
-              </p>
-            )}
-            {hadPicks && dirty.current && (
-              <p className="mt-1 text-xs text-body/80">You already have picks saved. Submitting replaces them.</p>
-            )}
+            {errorBox}
+            <p className="mt-5 text-sm text-body">
+              Up to 4 seniors. Leave slots blank if you have fewer. <strong className="text-ink">You can only nominate once.</strong>
+            </p>
             <div className="mt-4 space-y-4">
               {slots.map((slot, i) => (
                 <fieldset key={i} className="rounded-lg border border-rule p-4">
@@ -367,22 +342,81 @@ export default function NominationForm({ mode = 'test' }) {
                 </fieldset>
               ))}
             </div>
-
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
-              <button type="submit" className={submitting ? 'btn-disabled' : 'btn-primary'} aria-disabled={submitting}>
-                {submitting ? 'Submitting…' : hadPicks ? 'Save new picks' : 'Submit nominations'}
-              </button>
-              {hadPicks && !submitting && (
-                <button type="button" className={`text-sm ${linkCls}`} onClick={() => { setErrors([]); setPhase('done') }}>
-                  Keep my current picks
-                </button>
-              )}
+            <div className="mt-7 flex flex-col sm:flex-row">
+              <button type="submit" className="btn-primary">Review my nominations</button>
             </div>
             <p className="mt-3 text-xs text-body">Real names only. Spelling close enough to identify the student.</p>
           </form>
         )}
+
+        {(phase === 'review' || phase === 'submitting') && (
+          <div>
+            <p className="eyebrow flex items-center gap-2" role="status" aria-live="polite">
+              {phase === 'submitting'
+                ? <><span className="h-2 w-2 animate-pulse rounded-full bg-brand" aria-hidden="true" />Submitting…</>
+                : 'Final check'}
+            </p>
+            <h3 id="nominate-heading" className="mt-2 font-display text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">
+              {phase === 'submitting' ? 'Submitting your nominations' : 'Are these right?'}
+            </h3>
+            {email && <Account email={email} onSwitch={phase === 'submitting' ? null : () => signOut()} />}
+            {errorBox}
+            <PickList picks={picks} />
+            <div className="mt-5 rounded-lg border border-rule bg-[#F6F4F2] p-4 text-sm text-ink">
+              <strong>This is final.</strong> Each student can nominate once, and you can&rsquo;t change your picks after you submit.
+            </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
+              <button
+                type="button"
+                onClick={onSubmit}
+                className={phase === 'submitting' ? 'btn-disabled' : 'btn-primary'}
+                aria-disabled={phase === 'submitting'}
+              >
+                {phase === 'submitting' ? 'Submitting…' : 'Submit nominations'}
+              </button>
+              {phase === 'review' && (
+                <button type="button" className={`text-sm ${linkCls}`} onClick={() => { setErrors([]); setSlots(toSlots(picks)); setPhase('form') }}>
+                  Go back and edit
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {phase === 'done' && (
+          <div>
+            <p className="eyebrow flex items-center gap-2" role="status" aria-live="polite"><CheckIcon />
+              {doneKind === 'just' ? 'Submitted' : 'Already submitted'}
+            </p>
+            <h3 id="nominate-heading" className="mt-2 font-display text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">
+              {doneKind === 'just' ? 'Your nominations are in' : 'You’ve already nominated'}
+            </h3>
+            <Account email={email} onSwitch={() => signOut()} />
+            {notice && <div className="mt-5"><Notice>{notice}</Notice></div>}
+            <p className="mt-5 font-display text-xs font-bold uppercase tracking-[0.14em] text-ink">Your nominations</p>
+            <PickList picks={picks} />
+            <p className="mt-4 text-sm leading-relaxed text-body">
+              Each student can nominate once, so these are final. Thanks for nominating!
+            </p>
+          </div>
+        )}
       </section>
     </div>
+  )
+}
+
+function PickList({ picks }) {
+  return (
+    <ol className="mt-3 space-y-2">
+      {picks.map((p, i) => (
+        <li key={i} className="flex items-center gap-3 rounded-lg border border-rule px-4 py-3">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-tint font-display text-sm font-bold text-brand">
+            {i + 1}
+          </span>
+          <span className="min-w-0 break-words font-display font-bold text-ink">{p.first} {p.last}</span>
+        </li>
+      ))}
+    </ol>
   )
 }
 
@@ -390,7 +424,7 @@ function Account({ email, onSwitch }) {
   return (
     <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-body">
       <span>Signed in as <strong className="break-all text-ink">{email}</strong></span>
-      <button type="button" onClick={onSwitch} className={linkCls}>Switch account</button>
+      {onSwitch && <button type="button" onClick={onSwitch} className={linkCls}>Switch account</button>}
     </p>
   )
 }

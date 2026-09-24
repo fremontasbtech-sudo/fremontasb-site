@@ -36,9 +36,9 @@
  *   Timestamp | Nominator Email | N1 First | N1 Last | N2 First | N2 Last
  *             | N3 First | N3 Last | N4 First | N4 Last
  *
- * One row per student. Resubmitting UPSERTS: the student's existing row
- * (matched on column B, case-insensitive) is overwritten in place, so the
- * tab is already deduped when it is time to tally.
+ * One row per student, FINAL: a second submission from the same email (matched
+ * on column B, case-insensitive) is refused, so the tab is already one-row-per-
+ * student when it is time to tally. To let someone redo a TEST run, delete their row.
  */
 
 // The shared (PUBLIC, "anyone with the link") Events spreadsheet. Only its Config tab is used here:
@@ -379,7 +379,7 @@ function stateFor_(id) {
   };
 }
 
-// Upsert the caller's nominations. Identity comes from Session only.
+// Record the caller's nominations once (a second attempt is refused).
 function submitNominations(nominees) {
   return submitFor_(getIdentity_(), nominees);
 }
@@ -437,13 +437,16 @@ function submitFor_(id, nominees) {
       }
     }
 
-    var existingRow = findRowByEmail_(sh, id.email);
-    if (existingRow > 0) {
-      sh.getRange(existingRow, 1, 1, row.length).setValues([row]);
-      return { ok: true, replaced: true };
+    // ONE submission per student, final. Checked under the script lock, so two submissions from
+    // the same account at the same moment can't both get in. A second attempt changes nothing
+    // and gets back the picks that count, which the site then shows.
+    if (findRowByEmail_(sh, id.email) > 0) {
+      return { ok: false, error: 'already', message: 'You already nominated. Each student can nominate once.',
+        existing: readOwnPicks_(sh, id.email) };
     }
     sh.appendRow(row);
-    return { ok: true, replaced: false };
+    SpreadsheetApp.flush();
+    return { ok: true };
   } catch (err) {
     // Sheet exception (not the lock). Same contract code, distinct message for triage.
     return { ok: false, error: 'busy',

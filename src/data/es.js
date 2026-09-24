@@ -15,8 +15,8 @@ export const ES = {
   'Nominations will open here soon.': 'Las nominaciones se abrirán aquí pronto.',
   'You can nominate up to 4 SENIOR Fremont students. To be inclusive of all students, Court will be made up of 12 students regardless of gender identity. 8 of the Court will be determined by student nomination, and the other 4 will be selected by teachers.':
     'Puedes nominar hasta 4 estudiantes de último año de Fremont. Para incluir a todos los estudiantes, la Corte estará formada por 12 estudiantes sin importar su identidad de género. 8 de la Corte se decidirán por nominación estudiantil y los otros 4 los elegirán los maestros.',
-  'Nominations are tied to your school Google account, so each student gets one set of picks and nobody can nominate on someone else’s behalf. Change your mind? Submit again and your new picks replace the old ones.':
-    'Las nominaciones están vinculadas a tu cuenta escolar de Google, así que cada estudiante tiene un solo conjunto de nominaciones y nadie puede nominar en nombre de otra persona. ¿Cambiaste de opinión? Envía de nuevo y tus nuevas nominaciones reemplazarán las anteriores.',
+  'Nominations are tied to your school Google account, so each student nominates once and nobody can nominate on someone else’s behalf. Once you submit, your picks are final.':
+    'Las nominaciones están vinculadas a tu cuenta escolar de Google, así que cada estudiante nomina una sola vez y nadie puede nominar en nombre de otra persona. Una vez que envías, tus nominaciones son definitivas.',
   'Two rules': 'Dos reglas',
   'Do not nominate the same senior more than once, or all your nominations will be thrown out.':
     'No nomines al mismo estudiante más de una vez, o todas tus nominaciones serán descartadas.',
@@ -80,6 +80,22 @@ export const ES = {
   'Only your latest set counts. You can change it any time until nominations close.':
     'Solo cuenta tu último conjunto. Puedes cambiarlo cuando quieras hasta que cierren las nominaciones.',
   'Change my picks': 'Cambiar mis nominaciones',
+  'Checking your nominations…': 'Revisando tus nominaciones…',
+  'Looking up whether you’ve already nominated…': 'Buscando si ya nominaste…',
+  'You can only nominate once.': 'Solo puedes nominar una vez.',
+  'Review my nominations': 'Revisar mis nominaciones',
+  'Final check': 'Revisión final',
+  'Are these right?': '¿Están bien?',
+  'Submitting your nominations': 'Enviando tus nominaciones',
+  'This is final.': 'Esto es definitivo.',
+  'Each student can nominate once, and you can’t change your picks after you submit.': 'Cada estudiante puede nominar una vez, y no puedes cambiar tus nominaciones después de enviarlas.',
+  'Go back and edit': 'Volver y editar',
+  'Submitted': 'Enviado',
+  'Already submitted': 'Ya enviado',
+  'You’ve already nominated': 'Ya nominaste',
+  'Your nominations': 'Tus nominaciones',
+  'Each student can nominate once, so these are final. Thanks for nominating!': 'Cada estudiante puede nominar una vez, así que estas son definitivas. ¡Gracias por nominar!',
+  'You had already nominated, so this new set was not saved. The picks below are the ones that count.': 'Ya habías nominado, así que este nuevo conjunto no se guardó. Las nominaciones de abajo son las que cuentan.',
   'Saving…': 'Guardando…',
   'Checking for picks you already saved…': 'Buscando nominaciones que ya guardaste…',
   'You already have picks saved. Submitting replaces them.': 'Ya tienes nominaciones guardadas. Si envías, las reemplazas.',
