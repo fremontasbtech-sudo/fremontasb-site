@@ -65,6 +65,16 @@
  * tab is already deduped when it is time to tally.
  */
 
+// The spreadsheet holding the Config / Nominations / Test Submissions tabs. Set so this can run as a
+// STANDALONE project owned by the school account (Google won't transfer ownership of a personal-Gmail
+// Sheet to a school account, and it doesn't need to: the script only needs EDIT access to the Sheet).
+// Leave '' only if this code is bound to the Sheet itself (Extensions -> Apps Script).
+var SHEET_ID_ = '11Pm2zUc_O40E0oTZekYvsD_D8FenH9s7PiJ43m7JCH0';
+
+function book_() {
+  return SHEET_ID_ ? SpreadsheetApp.openById(SHEET_ID_) : SpreadsheetApp.getActive();
+}
+
 var ALLOWED_DOMAINS_ = ['student.fuhsd.org', 'fuhsd.org'];
 var MAX_NOMINEES_ = 4;
 var MAX_NAME_LEN_ = 60;
@@ -75,7 +85,7 @@ var MAX_NAME_LEN_ = 60;
 
 function readConfig_() {
   var cfg = { open: false, mode: 'test', cycle: '', deadline: '' };
-  var sh = SpreadsheetApp.getActive().getSheetByName('Config');
+  var sh = book_().getSheetByName('Config');
   if (!sh) return cfg;
   var values = sh.getDataRange().getValues();
   for (var i = 0; i < values.length; i++) {
@@ -277,7 +287,7 @@ function getState() {
   var existing = null;
   if (id.signedIn) {
     try {
-      var sh = SpreadsheetApp.getActive().getSheetByName(tabNameForMode_(config.mode));
+      var sh = book_().getSheetByName(tabNameForMode_(config.mode));
       if (sh) existing = readOwnPicks_(sh, id.email);
     } catch (err) {
       existing = null;
@@ -324,7 +334,7 @@ function submitNominations(nominees) {
 
   try {
     var tabName = tabNameForMode_(config.mode);
-    var sh = SpreadsheetApp.getActive().getSheetByName(tabName);
+    var sh = book_().getSheetByName(tabName);
     if (!sh) {
       return { ok: false, error: 'no-tab',
         message: 'The "' + tabName + '" tab is missing from the spreadsheet. Please tell ASB.' };
