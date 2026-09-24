@@ -236,28 +236,27 @@ function mergeSameDayTitle(items) {
   return order.map((k) => { const g = groups.get(k); return { ...g.item, text: g.texts.join('\n\n') } })
 }
 
-// Titles are generated in small parallel batches (a 15-blurb batch is far less likely to come
-// back malformed than one 80-blurb request, and one bad batch no longer throws away the rest).
-// Anything the LLM didn't title falls back to titleOf(); `titleFallbacks` counts those so the
-// endpoint can keep that response only briefly and try the LLM again soon.
-const BATCH = 15
+// Only the NEWEST announcements get LLM titles, in ONE request: that is what visitors actually
+// read, and it keeps us far inside the free Gemini quota (Sept 2026: several parallel batches
+// per refresh used the quota up by evening, which is what dropped titles to the heuristic).
+// Older ones use titleOf(), which is decent on its own. `titleFallbacks` counts only the newest
+// items that missed an LLM title, so the endpoint caches that response briefly and retries.
+const LLM_NEWEST = 30
 async function applyTitles(items) {
-  const need = [...new Set(items.filter((it) => !it.xtitle).map((it) => it.text).filter((t) => !titleCache.has(t)))].slice(0, 90)
+  const newest = new Set(items.slice(0, LLM_NEWEST).map((it) => it.text)) // items are newest-first
+  const need = [...new Set(items.filter((it) => !it.xtitle && newest.has(it.text)).map((it) => it.text).filter((t) => !titleCache.has(t)))]
   let usedLLM = false
   if (need.length) {
-    const chunks = []
-    for (let i = 0; i < need.length; i += BATCH) chunks.push(need.slice(i, i + BATCH))
-    const results = await Promise.all(chunks.map((c) => llmTitles(c, TITLE_INSTRUCTION)))
-    results.forEach((titles, ci) => {
-      if (!titles) return
+    const titles = await llmTitles(need, TITLE_INSTRUCTION)
+    if (titles) {
       usedLLM = true
-      chunks[ci].forEach((t, i) => { if (titles[i] && titles[i].length <= 60) titleCache.set(t, titles[i]) })
-    })
+      need.forEach((t, i) => { if (titles[i] && titles[i].length <= 60) titleCache.set(t, titles[i]) })
+    }
   }
   let fallbacks = 0
   let out = items.map((it) => {
     const title = it.xtitle || titleCache.get(it.text)
-    if (!title) fallbacks++
+    if (!title && newest.has(it.text)) fallbacks++
     return { ...it, title: title || it.title }
   })
   out = mergeSameDayTitle(out)

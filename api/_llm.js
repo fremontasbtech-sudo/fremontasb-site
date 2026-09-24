@@ -39,9 +39,9 @@ export async function llmTitles(texts, instruction) {
       if (!r.ok) throw new Error('openai ' + r.status)
       content = (await r.json()).choices?.[0]?.message?.content
     } else {
-      // Stable aliases first so this survives Google retiring specific versions. A busy model
-      // (429 rate limit / 5xx overload) is retried once after a short pause, then the next
-      // model is tried, so one hiccup no longer drops the whole batch to the heuristic.
+      // Stable aliases first so this survives Google retiring specific versions. An overloaded
+      // model (5xx) is retried once after a short pause; a model out of quota (429) is skipped;
+      // either way the next model is tried, so one hiccup no longer drops the batch to the heuristic.
       const models = ['gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-2.5-flash-lite', 'gemini-2.0-flash']
       const body = JSON.stringify({
         contents: [{ parts: [{ text: instruction + '\n\nItems:\n' + payload }] }],
@@ -60,7 +60,9 @@ export async function llmTitles(texts, instruction) {
           } catch (e) { diag.push(model + ':timeout'); break }
           if (r.ok) { ok = r; break outer }
           diag.push(model + ':' + r.status + ' ' + (await r.text()).slice(0, 100))
-          if (!(r.status === 429 || r.status >= 500) || attempt === 1) break
+          // 429 = this model's quota is used up: retrying it is pointless, move to the next model
+          // (each model has its own free-tier quota). 5xx = overloaded: one retry after a pause.
+          if (r.status < 500 || attempt === 1) break
           await new Promise((res) => setTimeout(res, 900))
         }
       }
