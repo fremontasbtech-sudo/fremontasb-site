@@ -5,9 +5,9 @@ import { homecomingNominationsApi } from './sources'
 /**
  * useNominationConfig()
  *
- * One sheet-controlled toggle drives BOTH the site and the nomination page. The Apps
- * Script Web App (bound to the nominations Sheet) reads its own "Config" tab and answers
- * `GET <homecomingNominationsApi>?view=config` with { open, mode, cycle, deadline }. The
+ * One sheet-controlled toggle drives BOTH the site and the nomination backend. The Apps
+ * Script Web App reads the "Config" tab and answers `GET <homecomingNominationsApi>?view=config`
+ * with { open, mode, cycle, deadline }; the site reads it via /api/nominations-config (edge-cached). The
  * same cells gate submissions on the FUHSD-only nomination page and decide which tab a
  * submission is written to (Test Submissions vs Nominations). So flipping nominations
  * on/off, or Test -> live, is a single cell edit in the Sheet: no site redeploy, no Apps
@@ -29,10 +29,9 @@ const cache = makeCache('fasb.hcnominations.v1', 5 * 60 * 1000) // 5 min
 
 const truthy = (v) => v === true || ['yes', 'true', 'y', '1', 'open'].includes(String(v).trim().toLowerCase())
 
-// `<exec url>?view=config` (or `&view=config` if the url already carries a query string).
-const configUrl = homecomingNominationsApi
-  ? `${homecomingNominationsApi}${homecomingNominationsApi.includes('?') ? '&' : '?'}view=config`
-  : null
+// Read through our own edge-cached endpoint (api/nominations-config.js), not Apps Script directly:
+// Apps Script cold starts take 10-30 s, the edge copy answers instantly.
+const configUrl = homecomingNominationsApi ? '/api/nominations-config' : null
 
 export function useNominationConfig() {
   const [state, setState] = useState(() => {

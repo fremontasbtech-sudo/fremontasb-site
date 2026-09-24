@@ -53,7 +53,7 @@ function validate(raw) {
 
 async function callScript(payload) {
   const ctrl = new AbortController()
-  const timer = setTimeout(() => ctrl.abort(), 25000)
+  const timer = setTimeout(() => ctrl.abort(), 45000)
   try {
     const r = await fetch(homecomingNominationsApi, {
       method: 'POST',

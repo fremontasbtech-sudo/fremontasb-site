@@ -5,8 +5,11 @@ import { LangToggle } from '../i18n'
 
 // Primary links show in the bar; "More" holds seasonal + secondary pages.
 // Homecoming Court and Elections are separate pages on separate schedules, never merge them.
+// Homecoming Court is promoted to the bar during homecoming season (nominations QR codes point
+// at /homecoming-court). After homecoming, move it back to `more`; the URL never changes.
 const primary = [
   { to: '/', label: 'Home', end: true },
+  { to: '/homecoming-court', label: 'Homecoming' },
   { to: '/media', label: 'Media' },
   { to: '/photos', label: 'Photos' },
   { to: '/clubs', label: 'Clubs' },
@@ -15,15 +18,14 @@ const primary = [
   { to: '/contact', label: 'Contact' },
 ]
 const more = [
-  { to: '/homecoming-court', label: 'Homecoming Court' },
   { to: '/elections', label: 'Elections' },
   { to: '/download-app', label: 'Download the App' },
 ]
 
 // Desktop link: rust text + 2px rust rule underneath when active; hover is color only.
 const desktopLink = ({ isActive }) =>
-  `relative inline-flex h-16 items-center px-3 font-display text-[15px] font-bold transition-colors
-   after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:bg-brand after:transition-opacity
+  `relative inline-flex h-16 items-center px-1.5 xl:px-3 font-display text-[14px] xl:text-[15px] font-bold transition-colors
+   after:absolute after:inset-x-1.5 xl:after:inset-x-3 after:bottom-0 after:h-0.5 after:bg-brand after:transition-opacity
    ${isActive ? 'text-brand after:opacity-100' : 'text-ink hover:text-brand after:opacity-0'}`
 
 const mobileLink = ({ isActive }) =>
@@ -73,8 +75,8 @@ export default function Navbar() {
               onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setMoreOpen(false) }}>
             <button type="button" aria-haspopup="true" aria-expanded={moreOpen}
               onClick={() => setMoreOpen((v) => !v)}
-              className={`relative inline-flex h-16 items-center gap-1 px-3 font-display text-[15px] font-bold transition-colors
-                after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:bg-brand
+              className={`relative inline-flex h-16 items-center gap-1 px-1.5 xl:px-3 font-display text-[14px] xl:text-[15px] font-bold transition-colors
+                after:absolute after:inset-x-1.5 xl:after:inset-x-3 after:bottom-0 after:h-0.5 after:bg-brand
                 ${moreActive ? 'text-brand after:opacity-100' : 'text-ink hover:text-brand after:opacity-0'}`}>
               More <Chevron open={moreOpen} />
             </button>
