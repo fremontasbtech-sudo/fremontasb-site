@@ -63,9 +63,14 @@ export const sheets = {
 // docs/homecoming-nominations-runbook.md. Config-cell edits never need a redeploy.
 // Leave either as null until deployed: the page falls back to the court / off state.
 // ─────────────────────────────────────────────────────────────────────────────
+// Public OAuth Web client ID for "Sign in with Google" on the Homecoming Court page (GCP project
+// "Fremont ASB Website", ASB Gmail). Public by design; the client SECRET is never used anywhere.
+export const googleClientId = '276898272987-f2qepltpkfs8um36rh6qpeesfk1u5i57.apps.googleusercontent.com'
+
 export const homecomingNominationsApi = 'https://script.google.com/macros/s/AKfycbyGZ8M4yXzqgyx6985ITpaS9fBkPM89ro-98zc2oTwMWg0ntWHVGu1Bn6-mSz8qxmSlpA/exec'
 
-// The nomination page the "Nominate now" button opens: a Google Form owned by the school account
+// BACKUP only. Students nominate on the site itself (Sign in with Google -> api/nominate.js -> the
+// Apps Script above). This Google Form is the "Trouble signing in?" fallback link: a Google Form owned by the school account
 // (amehta251@student.fuhsd.org), restricted to "Anyone in Fremont Union High School District", collecting
 // VERIFIED emails, limited to 1 response per account, with response editing on (resubmit = edit, so only one
 // set counts). FUHSD blocks student accounts from authorizing Apps Script / OAuth apps, so a first-party Google

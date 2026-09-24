@@ -12,6 +12,7 @@ import Contact from './pages/Contact'
 import DownloadApp from './pages/DownloadApp'
 import NotFound from './pages/NotFound'
 import SigninTest from './pages/SigninTest'
+import Privacy from './pages/Privacy'
 
 // Route table. Add a page: create src/pages/X.jsx, import it, add a row here, add a nav link in Navbar.jsx.
 const router = createBrowserRouter([
@@ -29,6 +30,7 @@ const router = createBrowserRouter([
       { path: '/contact', element: <Contact /> },
       { path: '/download-app', element: <DownloadApp /> },
       { path: '/signin-test', element: <SigninTest /> },
+      { path: '/privacy', element: <Privacy /> },
       // old Wix URLs
       { path: '/fremonttv', element: <Navigate to="/media" replace /> },
       { path: '/videos', element: <Navigate to="/media" replace /> },

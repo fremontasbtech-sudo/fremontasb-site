@@ -44,7 +44,7 @@ export default function Footer() {
         <div className="container-site py-3 flex flex-col sm:flex-row items-center justify-between gap-1 text-xs text-body">
           <p className="inline-flex min-h-[44px] items-center">{school.credit}</p>
           <p className="inline-flex min-h-[44px] items-center gap-1">
-            <Link to="/download-app" className="inline-flex min-h-[44px] items-center hover:text-brand">Download the App</Link> · © {new Date().getFullYear()} Fremont High School ASB
+            <Link to="/download-app" className="inline-flex min-h-[44px] items-center hover:text-brand">Download the App</Link> · <Link to="/privacy" className="inline-flex min-h-[44px] items-center hover:text-brand">Privacy</Link> · © {new Date().getFullYear()} Fremont High School ASB
           </p>
         </div>
       </div>

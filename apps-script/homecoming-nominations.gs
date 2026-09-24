@@ -1,49 +1,23 @@
 /**
  * Homecoming Court Nominations — Apps Script backend (Code.gs).
- * Bound to the nominations Google Sheet (Extensions → Apps Script).
- * Companion file: Index.html (the FUHSD-only nomination page).
+ * Opens the nominations Google Sheet by ID (SHEET_ID_ below).
  *
  * =====================================================================
  * HOW IDENTITY WORKS (the whole point — do not weaken this)
  * =====================================================================
- * The nominator is identified by Google Workspace itself, not by anything
- * typed into a form. There is NO email input anywhere.
+ * FUHSD blocks student accounts from authorizing Apps Script, so students never
+ * touch this script. They sign in on fremontasb.org/homecoming-court with
+ * "Sign in with Google"; the site's server (api/nominate.js) checks the ID token and
+ * forwards it here, and doPost checks it AGAIN with Google (UrlFetchApp → tokeninfo):
+ * signature, audience = our OAuth client ID, not expired, email_verified, and a
+ * @student.fuhsd.org / @fuhsd.org address. The email is taken only from that token.
+ * There is NO email input anywhere and no shared secret to leak.
  *
- *   - This project is owned by a FUHSD account and deployed as a Web App
- *     with  Execute as: Me (owner)  and  Who has access: Anyone within FUHSD.
- *   - Google forces the visitor to sign in to a FUHSD account before the
- *     page even loads.
- *   - Inside server functions, Session.getActiveUser().getEmail() returns
- *     the visitor's Google-verified email (same-Workspace exception: the
- *     owner and the visitor share the FUHSD Workspace, so the email is
- *     populated even though "Execute as: Me").
- *   - The server NEVER reads an email / name / identity claim from the
- *     client. Not from e.parameter, not from the nominees payload, not
- *     from anywhere. Defense in depth: the server also rejects an empty
- *     email or one that is not on an allowed domain
- *     (student.fuhsd.org, fuhsd.org).
- *
- * =====================================================================
- * TWO DEPLOYMENTS OF THIS ONE SCRIPT (same code, same Config tab)
- * =====================================================================
- *   1. PUBLIC CONFIG deployment  — Who has access: Anyone.
- *      The website (fremontasb.org) calls  <execUrl>?view=config  and gets
- *      JSON {open, mode, cycle, deadline}. That is all this deployment is
- *      for. If someone opens it without ?view=config it still renders the
- *      page, but Session.getActiveUser() is EMPTY for anonymous /
- *      out-of-domain visitors, so getState() reports signedIn:false and
- *      submitNominations() refuses with 'not-signed-in'. Nothing can be
- *      written through it.
- *      → paste its /exec URL into src/data/sources.js as homecomingNominationsApi
- *
- *   2. FUHSD-ONLY PAGE deployment — Who has access: Anyone within FUHSD.
- *      This /exec URL is the human nomination page the site links to.
- *      Submissions go through google.script.run from Index.html.
- *      → paste its /exec URL into src/data/sources.js as homecomingNominationsPage
- *
- *   Both: Deploy → New deployment → Web app → Execute as: Me.
- *   Redeploy a NEW VERSION only when Code.gs / Index.html change.
- *   Editing the Config tab (open, mode, cycle, deadline) needs NO redeploy.
+ * Deployment: ONE Web App, owned by the ASB Gmail, Execute as: Me, Who has
+ * access: Anyone. GET ?view=config is the public open/mode JSON the site reads.
+ * Redeploy a NEW VERSION of the same deployment (Manage deployments → Edit) when
+ * this file changes, so the /exec URL stays the same. Config-tab edits need no redeploy.
+ * (Index.html / google.script.run is the old in-script page; it stays harmless.)
  *
  * =====================================================================
  * SPREADSHEET LAYOUT (already exists — do not restructure)
@@ -138,16 +112,50 @@ function doGet(e) {
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT);
 }
 
-// POST is intentionally NOT a submission path. The old no-cors POST accepted
-// an email from the request body; that would be an identity bypass. All
-// submissions must go through google.script.run → submitNominations()
-// from the FUHSD-only page, where identity comes from Session.
-function doPost() {
-  return json_({
-    ok: false,
-    error: 'use-page',
-    message: 'Submissions are only accepted from the nomination page.'
-  });
+// POST — the ONLY submission path. fremontasb.org/api/nominate forwards the student's Google
+// ID token (from "Sign in with Google" on the site) and this script checks it WITH GOOGLE
+// itself (tokeninfo): signed by Google, audience = our OAuth client ID, not expired, verified
+// @student.fuhsd.org / @fuhsd.org email. The email comes ONLY from that verified token, never
+// from the request body, so nobody can nominate as someone else. No shared secret exists.
+//
+// Body (JSON): { credential: <Google ID token>, action: 'state' | 'submit', nominees?: [{first,last}] }
+var GOOGLE_CLIENT_ID_ = '276898272987-f2qepltpkfs8um36rh6qpeesfk1u5i57.apps.googleusercontent.com';
+
+function doPost(e) {
+  var body = {};
+  try { body = JSON.parse((e && e.postData && e.postData.contents) || '{}') || {}; } catch (err) { body = {}; }
+
+  var email = verifiedEmail_(body.credential);
+  if (email === null) {
+    return json_({ ok: false, error: 'signin', message: 'Your sign-in expired. Please sign in again.' });
+  }
+  var id = identityFrom_(email);
+  if (!id.signedIn) {
+    return json_({ ok: false, error: 'wrong-domain', email: email,
+      message: 'Please sign in with your @student.fuhsd.org account to nominate.' });
+  }
+
+  if (body.action === 'state') return json_(stateFor_(id));
+  if (body.action === 'submit') return json_(submitFor_(id, body.nominees));
+  return json_({ ok: false, error: 'bad-action', message: 'Unknown action.' });
+}
+
+// Returns the lowercased verified email from a Google ID token, or null if Google doesn't vouch for it.
+function verifiedEmail_(credential) {
+  if (typeof credential !== 'string' || credential.length < 100 || credential.length > 4096) return null;
+  var r;
+  try {
+    r = UrlFetchApp.fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(credential),
+      { muteHttpExceptions: true });
+  } catch (err) { return null; }
+  if (r.getResponseCode() !== 200) return null;
+  var t;
+  try { t = JSON.parse(r.getContentText()); } catch (err2) { return null; }
+  var issOk = t.iss === 'accounts.google.com' || t.iss === 'https://accounts.google.com';
+  var verified = t.email_verified === true || t.email_verified === 'true';
+  var fresh = Number(t.exp) * 1000 > Date.now();
+  if (t.aud !== GOOGLE_CLIENT_ID_ || !issOk || !verified || !fresh) return null;
+  return String(t.email || '').trim().toLowerCase();
 }
 
 // ---------------------------------------------------------------------
@@ -161,7 +169,12 @@ function getIdentity_() {
   } catch (err) {
     email = '';
   }
-  email = email.trim().toLowerCase();
+  return identityFrom_(email);
+}
+
+// Domain check shared by both paths. doPost passes the email the site's server verified.
+function identityFrom_(raw) {
+  var email = (typeof raw === 'string' ? raw : '').trim().toLowerCase();
   var at = email.indexOf('@');
   var domain = at >= 0 ? email.substring(at + 1) : '';
   var allowed = false;
@@ -282,7 +295,10 @@ function validateNominees_(raw) {
 // Everything the page needs to render its initial state. `existing` is
 // ONLY the caller's own row; other students' rows are never returned.
 function getState() {
-  var id = getIdentity_();
+  return stateFor_(getIdentity_());
+}
+
+function stateFor_(id) {
   var config = readConfig_();
   var existing = null;
   if (id.signedIn) {
@@ -303,7 +319,10 @@ function getState() {
 
 // Upsert the caller's nominations. Identity comes from Session only.
 function submitNominations(nominees) {
-  var id = getIdentity_();
+  return submitFor_(getIdentity_(), nominees);
+}
+
+function submitFor_(id, nominees) {
   if (!id.email) {
     return { ok: false, error: 'not-signed-in',
       message: 'You need to be signed in to your school Google account to nominate.' };

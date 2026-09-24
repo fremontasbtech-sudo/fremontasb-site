@@ -1,6 +1,6 @@
 import PageHero from '../components/PageHero'
 import { Loading, DevNote } from '../components/DataState'
-import { sheets, homecomingNominationsPage } from '../data/sources'
+import { sheets, googleClientId } from '../data/sources'
 import { useSheetData, isHidden } from '../data/useSheetData'
 import localCourt from '../data/homecomingCourt.json'
 import NominationForm from '../components/NominationForm'
@@ -42,9 +42,9 @@ export default function HomecomingCourt() {
 
   // Phase 1 - nominations window. A single Config cell in the Sheet (read via the Apps
   // Script Web App's ?view=config) opens this; the court display below only appears after
-  // nominations close and the final 12 are entered. Nominating itself happens on a separate
-  // FUHSD-only page (students sign in with their school Google account there, so no email is
-  // ever typed on this site). See useNominationConfig + NominationForm (the hand-off card).
+  // nominations close and the final 12 are entered. Students nominate right here: Sign in
+  // with Google, then /api/nominate verifies the token server-side before anything is saved
+  // (no email is ever typed). See useNominationConfig + NominationForm.
   if (nom?.open) {
     return (
       <>
@@ -52,9 +52,7 @@ export default function HomecomingCourt() {
           title="Homecoming Court"
           eyebrow={nom.mode === 'test' ? 'Test preview' : (cycle !== 'Homecoming Court' ? cycle : 'Nominations')}
           subtext={
-            // Until the FUHSD-only page URL is wired in sources.js, the card below says "not
-            // connected yet", so the hero must not claim the round is open.
-            !homecomingNominationsPage
+            !googleClientId
               ? 'Nominations will open here soon.'
               : nom.mode === 'test'
                 ? 'Test preview. This is NOT the real nomination round yet, and anything submitted will not count.'
@@ -90,12 +88,11 @@ export default function HomecomingCourt() {
                 Once the final 12 candidates are set, voting for the 2 Homecoming Royalty winners happens
                 during Homecoming Week.
               </p>
-              {nom?.deadline && homecomingNominationsPage ? (
+              {nom?.deadline && googleClientId ? (
                 <p className="text-sm font-bold text-ink">Nominations close {nom.deadline}.</p>
               ) : null}
             </div>
           </div>
-          {/* The "Nominate now" hand-off card renders where the in-page form used to be. */}
           <div className="mt-8">
             <NominationForm mode={nom.mode} />
           </div>
