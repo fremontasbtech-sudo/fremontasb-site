@@ -22,9 +22,7 @@
  * =====================================================================
  * SPREADSHEET LAYOUT (already exists — do not restructure)
  * =====================================================================
- * Config tab: in the shared Events spreadsheet (SHEET_ID_). Nominations + Test Submissions tabs:
- * in the PRIVATE nominations spreadsheet (Script Properties NOM_SHEET_ID, see
- * setupPrivateNominationsSheet), so student emails are never in a publicly shared file.
+ * All in the Events spreadsheet (SHEET_ID_): Config, Nominations, Test Submissions.
  *
  * Config tab (column A = key, column B = value; any row order):
  *   open       yes | no          → whether submissions are accepted
@@ -42,51 +40,48 @@
  * one-row-per-student with their latest picks when it is time to tally.
  */
 
-// The shared (PUBLIC, "anyone with the link") Events spreadsheet. Only its Config tab is used here:
-// open / mode / cycle / deadline, which ASB edits. No student data is ever written to it.
+// The Events spreadsheet: its Config tab (open / mode / cycle / deadline) drives nominations, and
+// its Nominations / Test Submissions tabs receive them.
 var SHEET_ID_ = '11Pm2zUc_O40E0oTZekYvsD_D8FenH9s7PiJ43m7JCH0';
 
 function book_() {
   return SHEET_ID_ ? SpreadsheetApp.openById(SHEET_ID_) : SpreadsheetApp.getActive();
 }
 
-// Nominations (student emails + picks) live in a SEPARATE, PRIVATE spreadsheet owned by this
-// script's account, never in the public Events sheet: anyone with the Events link could read
-// those tabs. It is also small, so writes are fast. Its id is stored in Script Properties
-// (NOM_SHEET_ID) by setupPrivateNominationsSheet(), run once from the editor.
-var NOM_SHEET_PROP_ = 'NOM_SHEET_ID';
+// Nominations are written to the Nominations / Test Submissions tabs of the same Events
+// spreadsheet (ASB's own sheet: ASB Tech, ASB Cabinet and the advisor).
+var NOM_SHEET_PROP_ = 'NOM_SHEET_ID'; // only used by moveNominationsBack() below
 var NOM_HEADERS_ = ['Timestamp', 'Nominator Email', 'N1 First', 'N1 Last', 'N2 First', 'N2 Last',
   'N3 First', 'N3 Last', 'N4 First', 'N4 Last'];
 
 function nomBook_() {
-  var id = PropertiesService.getScriptProperties().getProperty(NOM_SHEET_PROP_);
-  return id ? SpreadsheetApp.openById(id) : null;
+  return book_();
 }
 
-// ONE-TIME SETUP (Run from the editor). Creates the private "Homecoming Nominations" spreadsheet
-// with Nominations + Test Submissions tabs, copies over any rows already in the Events sheet's
-// tabs of the same names, and saves its id. Safe to re-run: it does nothing once set up.
-function setupPrivateNominationsSheet() {
+// ONE-TIME (Run from the editor, Sept 24 2026): copies any rows saved in the temporary separate
+// spreadsheet back into the Events sheet tabs (newer row per email wins), then forgets that
+// spreadsheet's id. Safe to re-run; does nothing once the id is gone.
+function moveNominationsBack() {
   var props = PropertiesService.getScriptProperties();
-  var existing = props.getProperty(NOM_SHEET_PROP_);
-  if (existing) { Logger.log('Already set up: https://docs.google.com/spreadsheets/d/' + existing + '/edit'); return; }
-  var ss = SpreadsheetApp.create('Homecoming Court Nominations 2026 (private)');
-  var old = book_();
+  var id = props.getProperty(NOM_SHEET_PROP_);
+  if (!id) { Logger.log('Nothing to move back.'); return; }
+  var src = SpreadsheetApp.openById(id);
+  var dst = book_();
   ['Nominations', 'Test Submissions'].forEach(function (name) {
-    var sh = ss.insertSheet(name);
-    sh.getRange(1, 1, 1, NOM_HEADERS_.length).setValues([NOM_HEADERS_]).setFontWeight('bold');
-    sh.setFrozenRows(1);
-    var src = old.getSheetByName(name);
-    if (src && src.getLastRow() > 1) {
-      var rows = src.getRange(2, 1, src.getLastRow() - 1, NOM_HEADERS_.length).getValues()
-        .filter(function (r) { return String(r[1] || '').trim() !== ''; });
-      if (rows.length) sh.getRange(2, 1, rows.length, NOM_HEADERS_.length).setValues(rows);
-    }
+    var from = src.getSheetByName(name), to = dst.getSheetByName(name);
+    if (!from || !to || from.getLastRow() < 2) return;
+    var rows = from.getRange(2, 1, from.getLastRow() - 1, NOM_HEADERS_.length).getValues();
+    rows.forEach(function (r) {
+      var email = String(r[1] || '').trim();
+      if (!email) return;
+      var at = findRowByEmail_(to, email);
+      if (at > 0) to.getRange(at, 1, 1, NOM_HEADERS_.length).setValues([r]);
+      else to.appendRow(r);
+    });
+    Logger.log(name + ': moved ' + rows.length + ' row(s) back');
   });
-  var first = ss.getSheets()[0];
-  if (first.getName() !== 'Nominations' && first.getName() !== 'Test Submissions') ss.deleteSheet(first);
-  props.setProperty(NOM_SHEET_PROP_, ss.getId());
-  Logger.log('Private nominations sheet: ' + ss.getUrl());
+  props.deleteProperty(NOM_SHEET_PROP_);
+  Logger.log('Done. The separate spreadsheet can now be deleted: ' + src.getUrl());
 }
 
 var ALLOWED_DOMAINS_ = ['student.fuhsd.org', 'fuhsd.org'];
