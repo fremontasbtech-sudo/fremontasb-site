@@ -30,15 +30,16 @@
  *   open       yes | no          → whether submissions are accepted
  *   mode       test | live       → which tab a submission is written to
  *   cycle      Homecoming 2026    → label shown on the page (optional)
- *   deadline   Fri, Oct 3         → shown on the page if set (optional)
+ *   deadline   Fri, Oct 3         → shown on the page; if the cell is a real DATE, nominations
+ *                                  also close automatically at 11:59 PM that day (optional)
  *
  * Header row (row 1) for BOTH Nominations and Test Submissions, exact order:
  *   Timestamp | Nominator Email | N1 First | N1 Last | N2 First | N2 Last
  *             | N3 First | N3 Last | N4 First | N4 Last
  *
- * One row per student, FINAL: a second submission from the same email (matched
- * on column B, case-insensitive) is refused, so the tab is already one-row-per-
- * student when it is time to tally. To let someone redo a TEST run, delete their row.
+ * One row per student. Resubmitting (before the deadline) OVERWRITES that
+ * student's row (matched on column B, case-insensitive), so the tab is already
+ * one-row-per-student with their latest picks when it is time to tally.
  */
 
 // The shared (PUBLIC, "anyone with the link") Events spreadsheet. Only its Config tab is used here:
@@ -100,10 +101,16 @@ var MAX_NAME_LEN_ = 60;
 // to read four cells. A Config-tab edit therefore takes effect within about a minute.
 function readConfig_() {
   var cache = CacheService.getScriptCache();
-  var hit = cache.get('cfg_v1');
-  if (hit) { try { return JSON.parse(hit); } catch (e) { /* fall through */ } }
-  var cfg = readConfigFromSheet_();
-  try { cache.put('cfg_v1', JSON.stringify(cfg), 60); } catch (e2) { /* best-effort */ }
+  var cfg = null;
+  var hit = cache.get('cfg_v2');
+  if (hit) { try { cfg = JSON.parse(hit); } catch (e) { cfg = null; } }
+  if (!cfg) {
+    cfg = readConfigFromSheet_();
+    try { cache.put('cfg_v2', JSON.stringify(cfg), 60); } catch (e2) { /* best-effort */ }
+  }
+  // Automatic close: if the deadline cell is a real DATE, nominations close at the end of that
+  // day even if nobody flips "open" to no. (A plain-text deadline is display-only.)
+  if (cfg.deadlineEnd && Date.now() > cfg.deadlineEnd) cfg.open = false;
   return cfg;
 }
 
@@ -118,7 +125,13 @@ function readConfigFromSheet_() {
     if (key === 'open') cfg.open = /^(yes|true|y|1|open)$/i.test(val);
     else if (key === 'mode') cfg.mode = /^live$/i.test(val) ? 'live' : 'test';
     else if (key === 'cycle') cfg.cycle = val;
-    else if (key === 'deadline') cfg.deadline = val;
+    else if (key === 'deadline') {
+      cfg.deadline = val;
+      var raw = values[i][1];
+      if (Object.prototype.toString.call(raw) === '[object Date]' && !isNaN(raw.getTime())) {
+        cfg.deadlineEnd = raw.getTime() + 24 * 60 * 60 * 1000 - 1; // 11:59:59 PM that day
+      }
+    }
   }
   return cfg;
 }
@@ -379,7 +392,7 @@ function stateFor_(id) {
   };
 }
 
-// Record the caller's nominations once (a second attempt is refused).
+// Save the caller's nominations (one row per student; a change overwrites it).
 function submitNominations(nominees) {
   return submitFor_(getIdentity_(), nominees);
 }
@@ -437,16 +450,18 @@ function submitFor_(id, nominees) {
       }
     }
 
-    // ONE submission per student, final. Checked under the script lock, so two submissions from
-    // the same account at the same moment can't both get in. A second attempt changes nothing
-    // and gets back the picks that count, which the site then shows.
-    if (findRowByEmail_(sh, id.email) > 0) {
-      return { ok: false, error: 'already', message: 'You already nominated. Each student can nominate once.',
-        existing: readOwnPicks_(sh, id.email) };
+    // ONE row per student. A student may change their picks until nominations close: the new set
+    // OVERWRITES their row (under the script lock, so two saves can't create two rows), and only
+    // the latest set counts. After the deadline config.open is false and we never get here.
+    var existingRow = findRowByEmail_(sh, id.email);
+    if (existingRow > 0) {
+      sh.getRange(existingRow, 1, 1, row.length).setValues([row]);
+      SpreadsheetApp.flush();
+      return { ok: true, replaced: true };
     }
     sh.appendRow(row);
     SpreadsheetApp.flush();
-    return { ok: true };
+    return { ok: true, replaced: false };
   } catch (err) {
     // Sheet exception (not the lock). Same contract code, distinct message for triage.
     return { ok: false, error: 'busy',

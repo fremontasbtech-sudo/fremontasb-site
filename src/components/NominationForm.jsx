@@ -3,17 +3,18 @@ import { googleClientId } from '../data/sources'
 import { Loading, Notice } from './DataState'
 
 /**
- * NominationForm - Homecoming Court peer nominations, right on the page. ONE submission per
- * student, final once submitted.
+ * NominationForm - Homecoming Court peer nominations, right on the page. ONE set of picks per
+ * student, which they can change until nominations close (only the latest set counts).
  *
  *   1. Student clicks "Sign in with Google" (Google Identity Services). Google hands the page
  *      a signed ID token for their account. No email is ever typed.
  *   2. The page asks /api/nominate whether this student has ALREADY nominated. If so it shows
- *      "You've already nominated" with their picks and no form. Only otherwise does the form show.
- *   3. Form → "Review my nominations" (final check, clearly marked as final) → Submit. The
- *      server checks the token with Google, and the Apps Script refuses a second row for the
- *      same email (under a lock), answering 'already' with the picks that count, which the page
- *      then shows. "Your nominations are in" appears only after the row is written.
+ *      "You've already nominated" with the picks that count (never an empty form), plus
+ *      "Change my nominations", which opens the form PRE-FILLED with those picks.
+ *   3. Form → "Review my nominations" → Submit / Save changes. The server checks the token with
+ *      Google; the Apps Script keeps ONE row per email (a change overwrites it) and refuses
+ *      anything after nominations close (Config open=no, or past a date-typed deadline). The
+ *      confirmation appears only after the row is written.
  *
  * The token lives in memory + sessionStorage (this tab only) until it expires (~1 hour); the
  * confirmed picks are remembered for the tab so a reload shows them instantly.
@@ -92,7 +93,7 @@ async function api(credential, action, nominees) {
   return { ok: false, error: 'busy', message: 'Couldn’t reach the server. Check your connection and try again.' }
 }
 
-export default function NominationForm({ mode = 'test' }) {
+export default function NominationForm({ mode = 'test', deadline = '' }) {
   // Start from what this tab already knows so a reload renders instantly; the server is still
   // asked in the background and always has the final word.
   const [boot] = useState(() => {
@@ -106,7 +107,10 @@ export default function NominationForm({ mode = 'test' }) {
   const [phase, setPhase] = useState(boot.tok ? (boot.cached ? 'done' : 'checking') : 'signin')
   const [email, setEmail] = useState(boot.em)
   const [slots, setSlots] = useState(() => toSlots(boot.cached))
-  const [doneKind, setDoneKind] = useState('already') // 'just' = submitted now | 'already' = submitted before
+  const [doneKind, setDoneKind] = useState('already') // 'just' | 'updated' | 'already' (from before)
+  const [saved, setSaved] = useState(boot.cached) // the picks the SERVER has for this student (or null)
+  const [editing, setEditing] = useState(false) // changing an existing set
+  const [closed, setClosed] = useState(false) // server said nominations are closed
   const [errors, setErrors] = useState([])
   const [notice, setNotice] = useState('')
   const [signinMsg, setSigninMsg] = useState('')
@@ -124,6 +128,8 @@ export default function NominationForm({ mode = 'test' }) {
     setNotice('')
     setSigninMsg(msg)
     setSlots(emptySlots())
+    setSaved(null)
+    setEditing(false)
     setPhase('signin')
     try { window.google?.accounts?.id?.disableAutoSelect() } catch { /* ignore */ }
   }, [])
@@ -139,6 +145,8 @@ export default function NominationForm({ mode = 'test' }) {
   }, [signOut])
 
   const showDone = useCallback((picks, kind, msg = '') => {
+    setSaved(picks)
+    setEditing(false)
     setSlots(toSlots(picks))
     setDoneKind(kind)
     setNotice(msg)
@@ -166,11 +174,15 @@ export default function NominationForm({ mode = 'test' }) {
       const em = d.email || tokenEmail(token)
       if (saved.length) {
         savePicks(em, saved)
-        if (phaseRef.current !== 'submitting') showDone(saved, 'already')
+        // Returning voter: show what counts right now (never an empty form). They can still
+        // change it from there until nominations close. Don't yank them out of an edit.
+        if (phaseRef.current === 'checking' || phaseRef.current === 'done') showDone(saved, 'already')
+        else setSaved(saved)
       } else {
         savePicks(em, null)
+        setSaved(null)
         // e.g. ASB cleared a test row: the cached "done" view is stale, so open the form.
-        if (phaseRef.current === 'checking' || phaseRef.current === 'done') { setSlots(emptySlots()); setPhase('form') }
+        if (phaseRef.current === 'checking' || phaseRef.current === 'done') { setSlots(emptySlots()); setEditing(false); setPhase('form') }
       }
     })
     return () => { cancelled = true }
@@ -195,6 +207,8 @@ export default function NominationForm({ mode = 'test' }) {
     setEmail(em)
     setSlots(toSlots(cached))
     setDoneKind('already')
+    setSaved(cached)
+    setEditing(false)
     setPhase(cached ? 'done' : 'checking')
     setToken(resp.credential)
   }, [])
@@ -242,13 +256,16 @@ export default function NominationForm({ mode = 'test' }) {
     const d = await api(token, 'submit', picksNow)
     if (d.ok) {
       savePicks(email || tokenEmail(token), picksNow)
-      showDone(picksNow, 'just')
+      showDone(picksNow, editing || d.replaced ? 'updated' : 'just')
       return
     }
-    if (d.error === 'already') {
-      const prior = Array.isArray(d.existing) && d.existing.length ? d.existing : null
-      if (prior) savePicks(email || tokenEmail(token), prior)
-      showDone(prior || picksNow, 'already', 'You had already nominated, so this new set was not saved. The picks below are the ones that count.')
+    if (d.error === 'closed') {
+      setClosed(true)
+      // Past the deadline: nothing was saved. Show what counts (if anything) and say so plainly.
+      if (saved) { showDone(saved, 'already', 'Nominations have closed, so your changes were not saved. The picks below are the ones that count.'); return }
+      setPhase('review')
+      setErrors(['Nominations have closed, so this couldn’t be saved.'])
+      focusErrors()
       return
     }
     if (authProblem(d, ' Your nominations were not sent.')) return
@@ -258,6 +275,9 @@ export default function NominationForm({ mode = 'test' }) {
   }
 
   const picks = slots.filter((s) => s.first.trim() && s.last.trim())
+  const until = deadline ? `until nominations close (${deadline})` : 'until nominations close'
+  const startEdit = () => { setErrors([]); setNotice(''); setSlots(toSlots(saved)); setEditing(true); setPhase('form'); toTop() }
+  const cancelEdit = () => { setErrors([]); showDone(saved, doneKind === 'just' || doneKind === 'updated' ? doneKind : 'already') }
 
   const errorBox = (
     <div
@@ -308,12 +328,14 @@ export default function NominationForm({ mode = 'test' }) {
           <form onSubmit={onReview} noValidate>
             <p className="eyebrow">Verified by your school account</p>
             <h3 id="nominate-heading" className="mt-2 font-display text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">
-              Your senior nominees
+              {editing ? 'Change your nominations' : 'Your senior nominees'}
             </h3>
             {email && <Account email={email} onSwitch={() => signOut()} />}
             {errorBox}
             <p className="mt-5 text-sm text-body">
-              Up to 4 seniors. Leave slots blank if you have fewer. <strong className="text-ink">You can only nominate once.</strong>
+              {editing
+                ? <>Your current picks are filled in. Saving <strong className="text-ink">replaces</strong> them; only your latest set counts.</>
+                : <>Up to 4 seniors. Leave slots blank if you have fewer. You can change your picks {until}.</>}
             </p>
             <div className="mt-4 space-y-4">
               {slots.map((slot, i) => (
@@ -342,8 +364,11 @@ export default function NominationForm({ mode = 'test' }) {
                 </fieldset>
               ))}
             </div>
-            <div className="mt-7 flex flex-col sm:flex-row">
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
               <button type="submit" className="btn-primary">Review my nominations</button>
+              {editing && (
+                <button type="button" className={`text-sm ${linkCls}`} onClick={cancelEdit}>Cancel, keep my current picks</button>
+              )}
             </div>
             <p className="mt-3 text-xs text-body">Real names only. Spelling close enough to identify the student.</p>
           </form>
@@ -354,16 +379,18 @@ export default function NominationForm({ mode = 'test' }) {
             <p className="eyebrow flex items-center gap-2" role="status" aria-live="polite">
               {phase === 'submitting'
                 ? <><span className="h-2 w-2 animate-pulse rounded-full bg-brand" aria-hidden="true" />Submitting…</>
-                : 'Final check'}
+                : 'Check your picks'}
             </p>
             <h3 id="nominate-heading" className="mt-2 font-display text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">
-              {phase === 'submitting' ? 'Submitting your nominations' : 'Are these right?'}
+              {phase === 'submitting' ? (editing ? 'Saving your changes' : 'Submitting your nominations') : 'Are these right?'}
             </h3>
             {email && <Account email={email} onSwitch={phase === 'submitting' ? null : () => signOut()} />}
             {errorBox}
             <PickList picks={picks} />
             <div className="mt-5 rounded-lg border border-rule bg-[#F6F4F2] p-4 text-sm text-ink">
-              <strong>This is final.</strong> Each student can nominate once, and you can&rsquo;t change your picks after you submit.
+              {editing
+                ? <><strong>This replaces your earlier nominations.</strong> Only your latest set counts.</>
+                : <>One set per student. You can come back and change it {until}.</>}
             </div>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
               <button
@@ -372,7 +399,7 @@ export default function NominationForm({ mode = 'test' }) {
                 className={phase === 'submitting' ? 'btn-disabled' : 'btn-primary'}
                 aria-disabled={phase === 'submitting'}
               >
-                {phase === 'submitting' ? 'Submitting…' : 'Submit nominations'}
+                {phase === 'submitting' ? (editing ? 'Saving…' : 'Submitting…') : editing ? 'Save changes' : 'Submit nominations'}
               </button>
               {phase === 'review' && (
                 <button type="button" className={`text-sm ${linkCls}`} onClick={() => { setErrors([]); setSlots(toSlots(picks)); setPhase('form') }}>
@@ -386,18 +413,27 @@ export default function NominationForm({ mode = 'test' }) {
         {phase === 'done' && (
           <div>
             <p className="eyebrow flex items-center gap-2" role="status" aria-live="polite"><CheckIcon />
-              {doneKind === 'just' ? 'Submitted' : 'Already submitted'}
+              {doneKind === 'just' ? 'Submitted' : doneKind === 'updated' ? 'Updated' : 'Already submitted'}
             </p>
             <h3 id="nominate-heading" className="mt-2 font-display text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">
-              {doneKind === 'just' ? 'Your nominations are in' : 'You’ve already nominated'}
+              {doneKind === 'just' ? 'Your nominations are in' : doneKind === 'updated' ? 'Your nominations are updated' : 'You’ve already nominated'}
             </h3>
             <Account email={email} onSwitch={() => signOut()} />
             {notice && <div className="mt-5"><Notice>{notice}</Notice></div>}
             <p className="mt-5 font-display text-xs font-bold uppercase tracking-[0.14em] text-ink">Your nominations</p>
             <PickList picks={picks} />
-            <p className="mt-4 text-sm leading-relaxed text-body">
-              Each student can nominate once, so these are final. Thanks for nominating!
-            </p>
+            {closed ? (
+              <p className="mt-4 text-sm leading-relaxed text-body">Nominations have closed. These are the picks that count.</p>
+            ) : (
+              <>
+                <p className="mt-4 text-sm leading-relaxed text-body">
+                  These are the picks that count. You can change them {until}; only your latest set counts.
+                </p>
+                <div className="mt-6 flex flex-col sm:flex-row">
+                  <button type="button" className="btn-primary" onClick={startEdit}>Change my nominations</button>
+                </div>
+              </>
+            )}
           </div>
         )}
       </section>

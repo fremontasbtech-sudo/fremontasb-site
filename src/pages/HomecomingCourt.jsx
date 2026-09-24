@@ -73,8 +73,9 @@ export default function HomecomingCourt() {
                 determined by student nomination, and the other 4 will be selected by teachers.
               </p>
               <p>
-                Nominations are tied to your school Google account, so each student nominates once and
-                nobody can nominate on someone else&rsquo;s behalf. Once you submit, your picks are final.
+                Nominations are tied to your school Google account, so each student gets one set of
+                picks and nobody can nominate on someone else&rsquo;s behalf. Change your mind? You can
+                update your picks until nominations close; only your latest set counts.
               </p>
               <div className="rounded-lg border border-rule bg-[#F6F4F2] p-4 text-sm">
                 <p className="font-display font-bold text-ink">Two rules</p>
@@ -93,7 +94,7 @@ export default function HomecomingCourt() {
             </div>
           </div>
           <div className="mt-8">
-            <NominationForm mode={nom.mode} />
+            <NominationForm mode={nom.mode} deadline={nom.deadline} />
           </div>
         </section>
       </>
