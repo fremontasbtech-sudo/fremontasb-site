@@ -65,9 +65,13 @@ export const sheets = {
 // ─────────────────────────────────────────────────────────────────────────────
 export const homecomingNominationsApi = 'https://script.google.com/macros/s/AKfycbyGZ8M4yXzqgyx6985ITpaS9fBkPM89ro-98zc2oTwMWg0ntWHVGu1Bn6-mSz8qxmSlpA/exec'
 
-// TODO(Abir): paste the "Anyone within FUHSD" deployment url here (docs/homecoming-nominations-runbook.md §4).
-// While null, the site shows "Nominations will open here soon." and no button, so nothing insecure is live.
-export const homecomingNominationsPage = null
+// The nomination page the "Nominate now" button opens: a Google Form owned by the school account
+// (amehta251@student.fuhsd.org), restricted to "Anyone in Fremont Union High School District", collecting
+// VERIFIED emails, limited to 1 response per account, with response editing on (resubmit = edit, so only one
+// set counts). FUHSD blocks student accounts from authorizing Apps Script / OAuth apps, so a first-party Google
+// Form is the only way to get Google-verified identity; tally from the Form's responses, not the Sheet tabs.
+// Set to null to hide the button (the page then says "Nominations will open here soon.").
+export const homecomingNominationsPage = 'https://docs.google.com/forms/d/e/1FAIpQLScO27Cbqjq_cR-PHI2EhdRBevPcLoPWeJ9dU6LIlC1QtW5srg/viewform'
 
 export const links = {
   clubAccountabilityTracker:
