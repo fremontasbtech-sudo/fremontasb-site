@@ -79,14 +79,6 @@ export default async function handler(req, res) {
   if (typeof body === 'string') { try { body = JSON.parse(body) } catch { body = {} } }
   body = body || {}
 
-  let who
-  try { who = await verify(body.credential) } catch { who = undefined }
-  if (who === undefined) return res.status(502).json({ ok: false, error: 'busy', message: 'Couldn’t reach Google to check your sign-in. Please try again.' })
-  if (!who) return res.status(401).json({ ok: false, error: 'signin', message: 'Your sign-in expired. Please sign in again.' })
-  if (!who.allowed) {
-    return res.status(403).json({ ok: false, error: 'wrong-domain', email: who.email, message: 'That’s not a school account. Sign in with your @student.fuhsd.org account.' })
-  }
-
   const action = body.action === 'submit' ? 'submit' : 'state'
   let nominees
   if (action === 'submit') {
@@ -95,17 +87,31 @@ export default async function handler(req, res) {
     nominees = v.nominees
   }
 
-  try {
-    const out = await callScript({ action, credential: body.credential, nominees })
-    if (!out || typeof out !== 'object') throw new Error('bad reply')
-    // Old script version (no token check yet) answers POSTs with 'use-page'.
-    if (out.error === 'use-page') {
-      return res.status(503).json({ ok: false, error: 'not-configured', message: 'Nominations aren’t connected yet. Please tell ASB.' })
-    }
-    if (out.error === 'signin' || out.error === 'wrong-domain') return res.status(401).json(out)
-    if (action === 'state') return res.status(200).json({ ok: true, email: who.email, config: out.config, existing: out.existing || null })
-    return res.status(200).json({ ...out, email: who.email })
-  } catch {
+  // Speed: start the Apps Script call and our own Google check AT THE SAME TIME. The script
+  // re-verifies the token itself before writing anything, so running them in parallel is safe;
+  // our check only exists to give clear sign-in errors without waiting on the script.
+  const scriptP = callScript({ action, credential: body.credential, nominees }).then((v) => ({ v }), (e) => ({ e }))
+  let who
+  try { who = await verify(body.credential) } catch { who = undefined }
+  if (who === null) return res.status(401).json({ ok: false, error: 'signin', message: 'Your sign-in expired. Please sign in again.' })
+  if (who && !who.allowed) {
+    return res.status(403).json({ ok: false, error: 'wrong-domain', email: who.email, message: 'That’s not a school account. Sign in with your @student.fuhsd.org account.' })
+  }
+
+  const s = await scriptP
+  const out = s.v
+  if (!out || typeof out !== 'object' || s.e) {
     return res.status(502).json({ ok: false, error: 'busy', message: 'Couldn’t save right now. Please try again in a moment.' })
   }
+  // Old script version (no token check yet) answers POSTs with 'use-page'.
+  if (out.error === 'use-page') {
+    return res.status(503).json({ ok: false, error: 'not-configured', message: 'Nominations aren’t connected yet. Please tell ASB.' })
+  }
+  if (out.error === 'signin' || out.error === 'wrong-domain') return res.status(401).json(out)
+  const email = (who && who.email) || out.email || ''
+  if (action === 'state') {
+    if (out.ok === false) return res.status(200).json(out)
+    return res.status(200).json({ ok: true, email, config: out.config, existing: out.existing || null })
+  }
+  return res.status(200).json({ ...out, email })
 }

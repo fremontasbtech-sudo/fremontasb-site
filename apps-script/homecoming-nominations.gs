@@ -57,7 +57,18 @@ var MAX_NAME_LEN_ = 60;
 // Config
 // ---------------------------------------------------------------------
 
+// Config is cached for 60 s so most requests don't have to open the (large) spreadsheet just
+// to read four cells. A Config-tab edit therefore takes effect within about a minute.
 function readConfig_() {
+  var cache = CacheService.getScriptCache();
+  var hit = cache.get('cfg_v1');
+  if (hit) { try { return JSON.parse(hit); } catch (e) { /* fall through */ } }
+  var cfg = readConfigFromSheet_();
+  try { cache.put('cfg_v1', JSON.stringify(cfg), 60); } catch (e2) { /* best-effort */ }
+  return cfg;
+}
+
+function readConfigFromSheet_() {
   var cfg = { open: false, mode: 'test', cycle: '', deadline: '' };
   var sh = book_().getSheetByName('Config');
   if (!sh) return cfg;
@@ -141,8 +152,15 @@ function doPost(e) {
 }
 
 // Returns the lowercased verified email from a Google ID token, or null if Google doesn't vouch for it.
+// Speed: a verified token is remembered in CacheService until it expires, so the student's
+// "load my picks" call pays for the Google check once and their submit skips it (~1 s saved).
 function verifiedEmail_(credential) {
   if (typeof credential !== 'string' || credential.length < 100 || credential.length > 4096) return null;
+  var cache = CacheService.getScriptCache();
+  var key = 'tok_' + Utilities.base64EncodeWebSafe(
+    Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, credential));
+  var hit = cache.get(key);
+  if (hit) return hit;
   var r;
   try {
     r = UrlFetchApp.fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(credential),
@@ -153,9 +171,13 @@ function verifiedEmail_(credential) {
   try { t = JSON.parse(r.getContentText()); } catch (err2) { return null; }
   var issOk = t.iss === 'accounts.google.com' || t.iss === 'https://accounts.google.com';
   var verified = t.email_verified === true || t.email_verified === 'true';
-  var fresh = Number(t.exp) * 1000 > Date.now();
-  if (t.aud !== GOOGLE_CLIENT_ID_ || !issOk || !verified || !fresh) return null;
-  return String(t.email || '').trim().toLowerCase();
+  var secsLeft = Math.floor(Number(t.exp) - Date.now() / 1000);
+  if (t.aud !== GOOGLE_CLIENT_ID_ || !issOk || !verified || !(secsLeft > 0)) return null;
+  var email = String(t.email || '').trim().toLowerCase();
+  if (email && secsLeft > 30) {
+    try { cache.put(key, email, Math.min(secsLeft - 10, 21600)); } catch (err3) { /* cache is best-effort */ }
+  }
+  return email;
 }
 
 // ---------------------------------------------------------------------

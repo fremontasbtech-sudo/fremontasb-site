@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { googleClientId, homecomingNominationsPage } from '../data/sources'
+import { googleClientId } from '../data/sources'
 import { Loading, Notice } from './DataState'
 
 /**
@@ -13,9 +13,16 @@ import { Loading, Notice } from './DataState'
  *
  * The token lives in memory + sessionStorage (this tab only) until it expires (~1 hour).
  * mode === 'test' shows the test banner; the server writes test runs to "Test Submissions".
+ *
+ * Speed: nothing on screen waits on the (slow) Apps Script. After sign-in the form opens at
+ * once (the email comes from the Google token itself) while the student's saved picks load in
+ * the background. Submitting shows the confirmation immediately with a "Saving…" status that
+ * flips to "Saved" when the server confirms; if the save fails, the form comes back with the
+ * picks still filled in and the error, so nothing is ever silently lost.
  */
 const SLOTS = 4
 const TOKEN_KEY = 'fasb.hcnom.token'
+const PICKS_KEY = 'fasb.hcnom.picks' // { email, picks } last confirmed save, this tab only
 const emptySlots = () => Array.from({ length: SLOTS }, () => ({ first: '', last: '' }))
 const normName = (f, l) => `${f} ${l}`.toLowerCase().replace(/\s+/g, ' ').trim()
 const inputCls =
@@ -36,6 +43,22 @@ function loadToken() {
     return t && tokenExp(t) > Date.now() + 60_000 ? t : ''
   } catch { return '' }
 }
+function tokenEmail(tok) {
+  try {
+    const b = tok.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+    return String(JSON.parse(atob(b)).email || '').toLowerCase()
+  } catch { return '' }
+}
+function loadPicks(email) {
+  try {
+    const d = JSON.parse(sessionStorage.getItem(PICKS_KEY) || 'null')
+    return d && d.email === email && Array.isArray(d.picks) && d.picks.length ? d.picks : null
+  } catch { return null }
+}
+function savePicks(email, picks) {
+  try { picks ? sessionStorage.setItem(PICKS_KEY, JSON.stringify({ email, picks })) : sessionStorage.removeItem(PICKS_KEY) } catch { /* private mode */ }
+}
+const toSlots = (picks) => emptySlots().map((s, i) => (picks && picks[i] ? { first: picks[i].first || '', last: picks[i].last || '' } : s))
 function saveToken(t) {
   try { t ? sessionStorage.setItem(TOKEN_KEY, t) : sessionStorage.removeItem(TOKEN_KEY) } catch { /* private mode */ }
 }
@@ -71,23 +94,39 @@ async function api(credential, action, nominees) {
 }
 
 export default function NominationForm({ mode = 'test' }) {
-  const [token, setToken] = useState(loadToken)
-  const [phase, setPhase] = useState(() => (loadToken() ? 'loading' : 'signin')) // signin | loading | form | done
-  const [email, setEmail] = useState('')
-  const [slots, setSlots] = useState(emptySlots)
-  const [hadPicks, setHadPicks] = useState(false)
+  // Everything below starts from what this tab already knows, so a reload renders instantly.
+  const [boot] = useState(() => {
+    const tok = loadToken()
+    const em = tok ? tokenEmail(tok) : ''
+    const cached = em ? loadPicks(em) : null
+    return { tok, em, cached }
+  })
+  const [token, setToken] = useState(boot.tok)
+  const [phase, setPhase] = useState(boot.tok ? (boot.cached ? 'done' : 'form') : 'signin') // signin | form | done
+  const [email, setEmail] = useState(boot.em)
+  const [slots, setSlots] = useState(() => toSlots(boot.cached))
+  const [hadPicks, setHadPicks] = useState(!!boot.cached)
   const [errors, setErrors] = useState([])
   const [signinMsg, setSigninMsg] = useState('')
-  const [submitting, setSubmitting] = useState(false)
+  const [save, setSave] = useState(boot.cached ? 'saved' : '') // '' | 'saving' | 'saved'
+  const [checking, setChecking] = useState(!!boot.tok)
+  const dirty = useRef(false)
   const errRef = useRef(null)
   const cardRef = useRef(null)
+  const submitting = save === 'saving'
 
   const signOut = useCallback((msg = '') => {
     saveToken('')
+    savePicks('', null)
     setToken('')
     setEmail('')
     setErrors([])
     setSigninMsg(msg)
+    setSave('')
+    setChecking(false)
+    setHadPicks(false)
+    setSlots(emptySlots())
+    dirty.current = false
     setPhase('signin')
     try { window.google?.accounts?.id?.disableAutoSelect() } catch { /* ignore */ }
   }, [])
@@ -102,24 +141,27 @@ export default function NominationForm({ mode = 'test' }) {
     return false
   }, [signOut])
 
-  // After sign-in (or on return with a still-valid token): load this student's own saved picks.
+  // In the BACKGROUND after sign-in: load this student's saved picks (the form is already open).
+  // If they haven't started typing, a saved set switches the card to "Your nominations are in";
+  // if they have, we keep their typing and just mark that submitting will replace the old set.
   useEffect(() => {
     if (!token) return
     let cancelled = false
-    setPhase('loading')
+    setChecking(true)
     api(token, 'state').then((d) => {
       if (cancelled) return
+      setChecking(false)
       if (!d.ok) {
         if (authProblem(d)) return
-        setErrors([d.message || 'Something went wrong. Please try again.'])
-        setPhase('form')
-        return
+        return // saved picks just couldn't be loaded; the form still works
       }
-      setEmail(d.email || '')
+      if (d.email) setEmail(d.email)
       const saved = Array.isArray(d.existing) ? d.existing : []
+      savePicks(d.email || tokenEmail(token), saved.length ? saved : null)
       setHadPicks(saved.length > 0)
-      setSlots(emptySlots().map((s, i) => (saved[i] ? { first: saved[i].first || '', last: saved[i].last || '' } : s)))
-      setErrors([])
+      if (dirty.current) return
+      setSlots(toSlots(saved))
+      setSave(saved.length ? 'saved' : '')
       setPhase(saved.length ? 'done' : 'form')
     })
     return () => { cancelled = true }
@@ -128,11 +170,22 @@ export default function NominationForm({ mode = 'test' }) {
   const onCredential = useCallback((resp) => {
     if (!resp?.credential) { setSigninMsg('Sign-in didn’t finish. Please try again.'); return }
     saveToken(resp.credential)
+    const em = tokenEmail(resp.credential)
+    const cached = loadPicks(em)
+    dirty.current = false
     setSigninMsg('')
+    setEmail(em)
+    setSlots(toSlots(cached))
+    setHadPicks(!!cached)
+    setSave(cached ? 'saved' : '')
+    setPhase(cached ? 'done' : 'form') // open the form right away, no waiting on the server
     setToken(resp.credential)
   }, [])
 
-  const setSlot = (i, key, val) => setSlots((s) => s.map((slot, j) => (j === i ? { ...slot, [key]: val } : slot)))
+  const setSlot = (i, key, val) => {
+    dirty.current = true
+    setSlots((s) => s.map((slot, j) => (j === i ? { ...slot, [key]: val } : slot)))
+  }
 
   function validate() {
     const errs = []
@@ -160,17 +213,30 @@ export default function NominationForm({ mode = 'test' }) {
       signOut('Your sign-in expired. Please sign in again. Your picks were not sent yet.')
       return
     }
-    setSubmitting(true)
-    const d = await api(token, 'submit', filled.map(({ first, last }) => ({ first, last })))
-    setSubmitting(false)
+    const picksNow = filled.map(({ first, last }) => ({ first, last }))
+    const before = slots
+    // Optimistic: show the confirmation now; the status line says "Saving…" until the server
+    // confirms the row is written.
+    setSlots(toSlots(picksNow))
+    setSave('saving')
+    setPhase('done')
+    requestAnimationFrame(() => cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+    const d = await api(token, 'submit', picksNow)
     if (d.ok) {
-      setSlots(emptySlots().map((s, i) => (filled[i] ? { first: filled[i].first, last: filled[i].last } : s)))
+      dirty.current = false
+      savePicks(email || tokenEmail(token), picksNow)
       setHadPicks(true)
-      setPhase('done')
-      requestAnimationFrame(() => cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+      setSave('saved')
       return
     }
-    if (authProblem(d)) return
+    // Not saved: bring the form back exactly as they left it, with the reason.
+    setSave(hadPicks ? 'saved' : '')
+    if (authProblem(d)) {
+      setSigninMsg((m) => `${m} Your picks were not saved yet.`.trim())
+      return
+    }
+    setSlots(before)
+    setPhase('form')
     setErrors([d.message || 'Couldn’t save right now. Please try again in a moment.'])
     requestAnimationFrame(() => errRef.current?.focus())
   }
@@ -193,19 +259,15 @@ export default function NominationForm({ mode = 'test' }) {
       <section ref={cardRef} className="card-surface scroll-mt-24 p-6 sm:p-8" aria-labelledby="nominate-heading">
         {phase === 'signin' && <SignIn onCredential={onCredential} message={signinMsg} />}
 
-        {phase === 'loading' && (
-          <>
-            <p className="eyebrow">Verified by your school account</p>
-            <h3 id="nominate-heading" className="mt-2 font-display text-2xl font-extrabold tracking-tight text-ink">
-              Checking your sign-in…
-            </h3>
-            <Loading label="Loading your nominations…" />
-          </>
-        )}
-
         {phase === 'done' && (
-          <div role="status">
-            <p className="eyebrow">Saved</p>
+          <div>
+            <p className="eyebrow flex items-center gap-2" role="status" aria-live="polite">
+              {save === 'saving' ? (
+                <><span className="h-2 w-2 animate-pulse rounded-full bg-brand" aria-hidden="true" />Saving…</>
+              ) : (
+                <><CheckIcon />Saved</>
+              )}
+            </p>
             <h3 id="nominate-heading" className="mt-2 font-display text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">
               Your nominations are in
             </h3>
@@ -224,7 +286,12 @@ export default function NominationForm({ mode = 'test' }) {
               Only your latest set counts. You can change it any time until nominations close.
             </p>
             <div className="mt-6 flex flex-col sm:flex-row">
-              <button type="button" className="btn-primary" onClick={() => { setErrors([]); setPhase('form') }}>
+              <button
+                type="button"
+                className={save === 'saving' ? 'btn-disabled' : 'btn-primary'}
+                aria-disabled={save === 'saving'}
+                onClick={() => { if (save === 'saving') return; setErrors([]); setPhase('form') }}
+              >
                 Change my picks
               </button>
             </div>
@@ -256,6 +323,15 @@ export default function NominationForm({ mode = 'test' }) {
             </div>
 
             <p className="mt-5 text-sm text-body">Up to 4 seniors. Leave slots blank if you have fewer.</p>
+            {checking && !hadPicks && (
+              <p className="mt-1 flex items-center gap-2 text-xs text-body/80" role="status">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand" aria-hidden="true" />
+                Checking for picks you already saved…
+              </p>
+            )}
+            {hadPicks && dirty.current && (
+              <p className="mt-1 text-xs text-body/80">You already have picks saved. Submitting replaces them.</p>
+            )}
             <div className="mt-4 space-y-4">
               {slots.map((slot, i) => (
                 <fieldset key={i} className="rounded-lg border border-rule p-4">
@@ -357,7 +433,7 @@ function SignIn({ onCredential, message }) {
         {state === 'loading' && <Loading label="Loading Google sign-in…" />}
         {state === 'failed' && (
           <Notice tone="neutral">
-            Google sign-in didn&rsquo;t load. Turn off any content blocker or try another browser, or use the backup form below.
+            Google sign-in didn&rsquo;t load. Turn off any content blocker or ad blocker, or try another browser, then reload this page.
           </Notice>
         )}
       </div>
@@ -367,13 +443,15 @@ function SignIn({ onCredential, message }) {
           We only get your name and school email from Google, and use them only to count one set of picks per student.{' '}
           <a href="/privacy" className={linkCls}>Privacy</a>
         </p>
-        {homecomingNominationsPage && (
-          <p>
-            Trouble signing in?{' '}
-            <a href={homecomingNominationsPage} rel="noopener" className={linkCls}>Use the backup form</a>
-          </p>
-        )}
       </div>
     </>
+  )
+}
+
+function CheckIcon() {
+  return (
+    <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3 8.5l3.2 3L13 4.5" />
+    </svg>
   )
 }

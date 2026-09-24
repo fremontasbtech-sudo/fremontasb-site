@@ -80,6 +80,11 @@ export const ES = {
   'Only your latest set counts. You can change it any time until nominations close.':
     'Solo cuenta tu último conjunto. Puedes cambiarlo cuando quieras hasta que cierren las nominaciones.',
   'Change my picks': 'Cambiar mis nominaciones',
+  'Saving…': 'Guardando…',
+  'Checking for picks you already saved…': 'Buscando nominaciones que ya guardaste…',
+  'You already have picks saved. Submitting replaces them.': 'Ya tienes nominaciones guardadas. Si envías, las reemplazas.',
+  'Google sign-in didn’t load. Turn off any content blocker or ad blocker, or try another browser, then reload this page.':
+    'El inicio de sesión de Google no cargó. Desactiva cualquier bloqueador de contenido o de anuncios, o prueba otro navegador, y vuelve a cargar esta página.',
   'Nominations aren’t connected yet. Check back soon.': 'Las nominaciones aún no están conectadas. Vuelve pronto.',
 
   // ── Navbar / chrome ──

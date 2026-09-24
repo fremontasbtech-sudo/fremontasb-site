@@ -41,9 +41,12 @@ export default function Home() {
 /* ───────────────────────── 1. Hero video ───────────────────────── */
 
 function Hero() {
-  // Poster is the base layer; the video fades in ONLY once it's actually playing.
-  // If a phone blocks autoplay (e.g. iOS Low Power Mode), the video stays invisible
-  // (opacity-0 hides its play-button overlay too) and the poster simply shows.
+  // The poster IS the video's first frame (public/hero-poster.jpg is extracted from hero.mp4), so
+  // the instant the video starts playing it continues seamlessly from the still: no cross-fade, no
+  // jump from a different photo. The video is only hidden until it actually plays so a phone that
+  // blocks autoplay (e.g. iOS Low Power Mode) shows the still frame, not a play-button overlay.
+  // If hero.mp4 is ever replaced, regenerate the poster from its first frame:
+  //   ffmpeg -i public/hero.mp4 -frames:v 1 -q:v 7 public/hero-poster.jpg
   const videoRef = useRef(null)
   const [playing, setPlaying] = useState(false)
   useEffect(() => {
@@ -51,29 +54,32 @@ function Hero() {
     if (!v) return
     const onPlaying = () => setPlaying(true)
     v.addEventListener('playing', onPlaying)
+    if (!v.paused && v.readyState > 2) setPlaying(true) // already playing (fast cache hit)
     const p = v.play && v.play()
     if (p && typeof p.catch === 'function') p.catch(() => {}) // autoplay blocked → poster stays
     return () => v.removeEventListener('playing', onPlaying)
   }, [])
   return (
     <section className="relative isolate overflow-hidden bg-ink text-white" aria-label="Fremont High School ASB">
-      {/* Poster paints the frame always; the video (below) fades in over it when it plays. */}
+      {/* First frame of the drone shot, painted immediately; the video takes over from it. */}
       <img
         src={embeds.heroPoster}
         alt=""
         aria-hidden="true"
+        fetchpriority="high"
+        decoding="async"
         className="absolute inset-0 h-full w-full object-cover"
       />
       <video
         ref={videoRef}
-        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${playing ? 'opacity-100' : 'opacity-0'}`}
+        className={`absolute inset-0 h-full w-full object-cover ${playing ? 'opacity-100' : 'opacity-0'}`}
         src={embeds.heroVideo}
         poster={embeds.heroPoster}
         autoPlay
         muted
         loop
         playsInline
-        preload="metadata"
+        preload="auto"
         aria-hidden="true"
         tabIndex={-1}
       />
