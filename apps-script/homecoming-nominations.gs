@@ -22,7 +22,9 @@
  * =====================================================================
  * SPREADSHEET LAYOUT (already exists — do not restructure)
  * =====================================================================
- * Tabs: Config, Nominations, Test Submissions.
+ * Config tab: in the shared Events spreadsheet (SHEET_ID_). Nominations + Test Submissions tabs:
+ * in the PRIVATE nominations spreadsheet (Script Properties NOM_SHEET_ID, see
+ * setupPrivateNominationsSheet), so student emails are never in a publicly shared file.
  *
  * Config tab (column A = key, column B = value; any row order):
  *   open       yes | no          → whether submissions are accepted
@@ -39,14 +41,51 @@
  * tab is already deduped when it is time to tally.
  */
 
-// The spreadsheet holding the Config / Nominations / Test Submissions tabs. Set so this can run as a
-// STANDALONE project owned by the school account (Google won't transfer ownership of a personal-Gmail
-// Sheet to a school account, and it doesn't need to: the script only needs EDIT access to the Sheet).
-// Leave '' only if this code is bound to the Sheet itself (Extensions -> Apps Script).
+// The shared (PUBLIC, "anyone with the link") Events spreadsheet. Only its Config tab is used here:
+// open / mode / cycle / deadline, which ASB edits. No student data is ever written to it.
 var SHEET_ID_ = '11Pm2zUc_O40E0oTZekYvsD_D8FenH9s7PiJ43m7JCH0';
 
 function book_() {
   return SHEET_ID_ ? SpreadsheetApp.openById(SHEET_ID_) : SpreadsheetApp.getActive();
+}
+
+// Nominations (student emails + picks) live in a SEPARATE, PRIVATE spreadsheet owned by this
+// script's account, never in the public Events sheet: anyone with the Events link could read
+// those tabs. It is also small, so writes are fast. Its id is stored in Script Properties
+// (NOM_SHEET_ID) by setupPrivateNominationsSheet(), run once from the editor.
+var NOM_SHEET_PROP_ = 'NOM_SHEET_ID';
+var NOM_HEADERS_ = ['Timestamp', 'Nominator Email', 'N1 First', 'N1 Last', 'N2 First', 'N2 Last',
+  'N3 First', 'N3 Last', 'N4 First', 'N4 Last'];
+
+function nomBook_() {
+  var id = PropertiesService.getScriptProperties().getProperty(NOM_SHEET_PROP_);
+  return id ? SpreadsheetApp.openById(id) : null;
+}
+
+// ONE-TIME SETUP (Run from the editor). Creates the private "Homecoming Nominations" spreadsheet
+// with Nominations + Test Submissions tabs, copies over any rows already in the Events sheet's
+// tabs of the same names, and saves its id. Safe to re-run: it does nothing once set up.
+function setupPrivateNominationsSheet() {
+  var props = PropertiesService.getScriptProperties();
+  var existing = props.getProperty(NOM_SHEET_PROP_);
+  if (existing) { Logger.log('Already set up: https://docs.google.com/spreadsheets/d/' + existing + '/edit'); return; }
+  var ss = SpreadsheetApp.create('Homecoming Court Nominations 2026 (private)');
+  var old = book_();
+  ['Nominations', 'Test Submissions'].forEach(function (name) {
+    var sh = ss.insertSheet(name);
+    sh.getRange(1, 1, 1, NOM_HEADERS_.length).setValues([NOM_HEADERS_]).setFontWeight('bold');
+    sh.setFrozenRows(1);
+    var src = old.getSheetByName(name);
+    if (src && src.getLastRow() > 1) {
+      var rows = src.getRange(2, 1, src.getLastRow() - 1, NOM_HEADERS_.length).getValues()
+        .filter(function (r) { return String(r[1] || '').trim() !== ''; });
+      if (rows.length) sh.getRange(2, 1, rows.length, NOM_HEADERS_.length).setValues(rows);
+    }
+  });
+  var first = ss.getSheets()[0];
+  if (first.getName() !== 'Nominations' && first.getName() !== 'Test Submissions') ss.deleteSheet(first);
+  props.setProperty(NOM_SHEET_PROP_, ss.getId());
+  Logger.log('Private nominations sheet: ' + ss.getUrl());
 }
 
 var ALLOWED_DOMAINS_ = ['student.fuhsd.org', 'fuhsd.org'];
@@ -325,7 +364,8 @@ function stateFor_(id) {
   var existing = null;
   if (id.signedIn) {
     try {
-      var sh = book_().getSheetByName(tabNameForMode_(config.mode));
+      var nb = nomBook_();
+      var sh = nb && nb.getSheetByName(tabNameForMode_(config.mode));
       if (sh) existing = readOwnPicks_(sh, id.email);
     } catch (err) {
       existing = null;
@@ -375,7 +415,12 @@ function submitFor_(id, nominees) {
 
   try {
     var tabName = tabNameForMode_(config.mode);
-    var sh = book_().getSheetByName(tabName);
+    var nb = nomBook_();
+    if (!nb) {
+      return { ok: false, error: 'no-tab',
+        message: 'Nominations storage isn\'t set up yet. Please tell ASB.' };
+    }
+    var sh = nb.getSheetByName(tabName);
     if (!sh) {
       return { ok: false, error: 'no-tab',
         message: 'The "' + tabName + '" tab is missing from the spreadsheet. Please tell ASB.' };

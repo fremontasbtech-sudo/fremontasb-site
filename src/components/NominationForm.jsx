@@ -167,6 +167,14 @@ export default function NominationForm({ mode = 'test' }) {
     return () => { cancelled = true }
   }, [token, authProblem])
 
+  // While a save is in flight, warn before the tab is closed (the picks aren't confirmed yet).
+  useEffect(() => {
+    if (save !== 'saving') return
+    const warn = (e) => { e.preventDefault(); e.returnValue = '' }
+    window.addEventListener('beforeunload', warn)
+    return () => window.removeEventListener('beforeunload', warn)
+  }, [save])
+
   const onCredential = useCallback((resp) => {
     if (!resp?.credential) { setSigninMsg('Sign-in didn’t finish. Please try again.'); return }
     saveToken(resp.credential)
