@@ -50,13 +50,11 @@ export default function HomecomingCourt() {
       <>
         <PageHero
           title="Homecoming Court"
-          eyebrow={nom.mode === 'test' ? 'Test preview' : (cycle !== 'Homecoming Court' ? cycle : 'Nominations')}
+          eyebrow={cycle !== 'Homecoming Court' ? cycle : 'Nominations'}
           subtext={
             !googleClientId
               ? 'Nominations will open here soon.'
-              : nom.mode === 'test'
-                ? 'Test preview. This is NOT the real nomination round yet, and anything submitted will not count.'
-                : 'Nominations are open. Nominate up to 4 senior classmates for the Homecoming Court using your school account.'
+              : 'Nominations are open. Nominate up to 4 senior classmates for the Homecoming Court using your school account.'
           }
         />
         <section className="container-site section-space">
@@ -68,25 +66,24 @@ export default function HomecomingCourt() {
             <div className="rule-accent-left" />
             <div className="mt-5 space-y-4 leading-relaxed text-body">
               <p>
-                You can nominate up to 4 SENIOR Fremont students. To be inclusive of all students, Court
-                will be made up of 12 students regardless of gender identity. 8 of the Court will be
-                determined by student nomination, and the other 4 will be selected by teachers.
+                You can nominate up to 4 seniors. To be inclusive of all students, Hoco Court will be made
+                up of 12 students regardless of gender identity. 8 members will be chosen via student
+                nomination, and the other 4 will be selected by teachers.
               </p>
               <p>
-                Nominations are tied to your school Google account, so each student gets one set of
-                picks and nobody can nominate on someone else&rsquo;s behalf. Change your mind? You can
-                update your picks until nominations close; only your latest set counts.
+                Nominations are tied to your school Google account, so that everyone can only submit once.
+                If you submit multiple times, only your most recent nominations will count.
               </p>
               <div className="rounded-lg border border-rule bg-[#F6F4F2] p-4 text-sm">
-                <p className="font-display font-bold text-ink">Two rules</p>
+                <p className="font-display font-bold text-ink">Rules</p>
                 <ol className="mt-2 list-decimal space-y-1 pl-5">
                   <li>Do not nominate the same senior more than once, or all your nominations will be thrown out.</li>
                   <li>Use real names, not nicknames. Spelling has to be close enough to identify the student.</li>
                 </ol>
               </div>
               <p className="text-sm">
-                Once the final 12 candidates are set, voting for the 2 Homecoming Royalty winners happens
-                during Homecoming Week.
+                Once the court is chosen, voting for the 2 Homecoming Royalty winners will happen during
+                Homecoming Week.
               </p>
               {nom?.deadline && googleClientId ? (
                 <p className="text-sm font-bold text-ink">Nominations close {nom.deadline}.</p>

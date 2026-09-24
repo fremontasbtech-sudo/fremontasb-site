@@ -18,7 +18,8 @@ import { Loading, Notice } from './DataState'
  *
  * The token lives in memory + sessionStorage (this tab only) until it expires (~1 hour); the
  * confirmed picks are remembered for the tab so a reload shows them instantly.
- * mode === 'test' shows the test banner; the server writes test runs to "Test Submissions".
+ * mode (Config tab) only decides which tab the server writes to: test → "Test Submissions",
+ * live → "Nominations". The page looks the same in both (no test wording, per ASB).
  */
 const SLOTS = 4
 const TOKEN_KEY = 'fasb.hcnom.token'
@@ -299,16 +300,6 @@ export default function NominationForm({ mode = 'test', deadline = '' }) {
 
   return (
     <div className="mx-auto max-w-xl">
-      {mode === 'test' && (
-        <div className="mb-6 rounded-lg border-2 border-brand bg-brand-tint px-4 py-3">
-          <p className="font-display text-sm font-extrabold uppercase tracking-[0.12em] text-brand">
-            Test preview: not the real nominations
-          </p>
-          <p className="mt-1 text-sm text-ink">
-            This is a test run. Anything you submit here will <strong>not</strong> count toward Homecoming Court.
-          </p>
-        </div>
-      )}
 
       <section ref={cardRef} className="card-surface scroll-mt-24 p-6 sm:p-8" aria-labelledby="nominate-heading">
         {phase === 'signin' && <SignIn onCredential={onCredential} message={signinMsg} />}
@@ -426,9 +417,6 @@ export default function NominationForm({ mode = 'test', deadline = '' }) {
               <p className="mt-4 text-sm leading-relaxed text-body">Nominations have closed. These are the picks that count.</p>
             ) : (
               <>
-                <p className="mt-4 text-sm leading-relaxed text-body">
-                  These are the picks that count. You can change them {until}; only your latest set counts.
-                </p>
                 <div className="mt-6 flex flex-col sm:flex-row">
                   <button type="button" className="btn-primary" onClick={startEdit}>Change my nominations</button>
                 </div>
@@ -500,8 +488,8 @@ function SignIn({ onCredential, message }) {
         Sign in to nominate
       </h3>
       <p className="mt-4 leading-relaxed text-body">
-        Sign in with your <strong className="text-ink">@student.fuhsd.org</strong> Google account. That&rsquo;s how we
-        know each set of picks is really yours. There&rsquo;s no email to type.
+        Sign in with your <strong className="text-ink">@student.fuhsd.org</strong> Google account. We use this to
+        verify your identity.
       </p>
 
       {message && <div className="mt-5"><Notice>{message}</Notice></div>}
@@ -518,8 +506,7 @@ function SignIn({ onCredential, message }) {
 
       <div className="mt-6 space-y-2 border-t border-rule pt-5 text-sm leading-relaxed text-body">
         <p>
-          We only get your name and school email from Google, and use them only to count one set of picks per student.{' '}
-          <a href="/privacy" className={linkCls}>Privacy</a>
+          View our Privacy policies <a href="/privacy" className={linkCls}>here</a>.
         </p>
       </div>
     </>

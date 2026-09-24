@@ -13,17 +13,17 @@ export const ES = {
   'Test preview. This is NOT the real nomination round yet, and anything submitted will not count.':
     'Vista de prueba. Esta todavía NO es la ronda real de nominaciones, y nada de lo que se envíe contará.',
   'Nominations will open here soon.': 'Las nominaciones se abrirán aquí pronto.',
-  'You can nominate up to 4 SENIOR Fremont students. To be inclusive of all students, Court will be made up of 12 students regardless of gender identity. 8 of the Court will be determined by student nomination, and the other 4 will be selected by teachers.':
-    'Puedes nominar hasta 4 estudiantes de último año de Fremont. Para incluir a todos los estudiantes, la Corte estará formada por 12 estudiantes sin importar su identidad de género. 8 de la Corte se decidirán por nominación estudiantil y los otros 4 los elegirán los maestros.',
-  'Nominations are tied to your school Google account, so each student gets one set of picks and nobody can nominate on someone else’s behalf. Change your mind? You can update your picks until nominations close; only your latest set counts.':
-    'Las nominaciones están vinculadas a tu cuenta escolar de Google, así que cada estudiante tiene un solo conjunto de nominaciones y nadie puede nominar en nombre de otra persona. ¿Cambiaste de opinión? Puedes actualizar tus nominaciones hasta que cierren; solo cuenta tu último conjunto.',
-  'Two rules': 'Dos reglas',
+  'You can nominate up to 4 seniors. To be inclusive of all students, Hoco Court will be made up of 12 students regardless of gender identity. 8 members will be chosen via student nomination, and the other 4 will be selected by teachers.':
+    'Puedes nominar hasta 4 estudiantes de último año. Para incluir a todos, la Corte de Hoco tendrá 12 estudiantes sin importar su identidad de género. 8 miembros se eligen por nominación estudiantil y los otros 4 los seleccionan los maestros.',
+  'Nominations are tied to your school Google account, so that everyone can only submit once. If you submit multiple times, only your most recent nominations will count.':
+    'Las nominaciones están vinculadas a tu cuenta escolar de Google, así que cada persona solo puede enviar una vez. Si envías varias veces, solo cuentan tus nominaciones más recientes.',
+  'Rules': 'Reglas',
   'Do not nominate the same senior more than once, or all your nominations will be thrown out.':
     'No nomines al mismo estudiante más de una vez, o todas tus nominaciones serán descartadas.',
   'Use real names, not nicknames. Spelling has to be close enough to identify the student.':
     'Usa nombres reales, no apodos. La ortografía debe ser lo bastante cercana para identificar al estudiante.',
-  'Once the final 12 candidates are set, voting for the 2 Homecoming Royalty winners happens during Homecoming Week.':
-    'Una vez definidos los 12 candidatos finales, la votación por los 2 ganadores de la Realeza de Homecoming será durante la Semana de Homecoming.',
+  'Once the court is chosen, voting for the 2 Homecoming Royalty winners will happen during Homecoming Week.':
+    'Una vez elegida la corte, la votación para los 2 ganadores de la Realeza de Homecoming será durante la Semana de Homecoming.',
   'Nominations close': 'Las nominaciones cierran',
   // Test banner above the card. The middle word is a <strong>, so it is its own text node.
   'Test preview: not the real nominations': 'Vista de prueba: no son las nominaciones reales',
@@ -51,6 +51,9 @@ export const ES = {
   'This is a test run. Anything you submit here will': 'Esta es una prueba. Lo que envíes aquí',
   'Sign in to nominate': 'Inicia sesión para nominar',
   'Sign in with your': 'Inicia sesión con tu cuenta de Google',
+  'Google account. We use this to verify your identity.': '. La usamos para verificar tu identidad.',
+  'View our Privacy policies': 'Consulta nuestras políticas de privacidad',
+  'here': 'aquí',
   'Google account. That’s how we know each set of picks is really yours. There’s no email to type.':
     '. Así sabemos que cada conjunto de nominaciones es realmente tuyo. No hay que escribir ningún correo.',
   'Trouble signing in?': '¿Problemas para iniciar sesión?',
