@@ -89,6 +89,8 @@ export const ES = {
   'Every rally, dress-up day, and class competition adds points to your class total. ASB updates the numbers after each event. Seniors, juniors, sophomores, freshmen. One class wins the year.':
     'Cada rally, día temático y competencia entre clases suma puntos al total de tu grado. ASB actualiza los números después de cada evento. Seniors, juniors, sophomores, freshmen: un solo grado gana el año.',
   'Leading': 'Va ganando',
+  'Tied': 'Empate',
+  'Tied for first:': 'Empate en primer lugar:',
   'lead by': 'lidera por',
   'point': 'punto',
   'points': 'puntos',

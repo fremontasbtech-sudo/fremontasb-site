@@ -124,6 +124,8 @@ function SpiritPoints() {
     .sort((a, b) => b.points - a.points)
   const max = classes[0]?.points || 1
   const lead = classes.length > 1 ? classes[0].points - classes[1].points : 0
+  const top = classes.length ? classes[0].points : 0
+  const tiedTop = classes.filter((c) => c.points === top) // more than one = a tie for first
 
   return (
     <section id="spirit-points" className="section-space scroll-mt-16">
@@ -135,9 +137,18 @@ function SpiritPoints() {
             Every rally, dress-up day, and class competition adds points to your class total. ASB updates the numbers
             after each event. Seniors, juniors, sophomores, freshmen. One class wins the year.
           </p>
-          {classes.length > 1 && !loading && (
+          {classes.length > 1 && !loading && top > 0 && (
             <p className="mt-6 font-display text-lg font-bold text-ink">
-              {classes[0].grade} lead by <span className="text-brand">{lead}</span> {lead === 1 ? 'point' : 'points'}.
+              {tiedTop.length > 1 ? (
+                <>
+                  <span>Tied for first:</span>{' '}
+                  {tiedTop.map((c, i) => (
+                    <span key={c.grade}>{i > 0 && <span aria-hidden="true"> &amp; </span>}<span className="text-brand">{c.grade}</span></span>
+                  ))}
+                </>
+              ) : (
+                <>{classes[0].grade} lead by <span className="text-brand">{lead}</span> {lead === 1 ? 'point' : 'points'}.</>
+              )}
             </p>
           )}
           {source !== 'sheet' && (
@@ -151,17 +162,18 @@ function SpiritPoints() {
           {!loading && classes.length > 0 && (
             <ol className="mt-4 divide-y divide-rule border-y border-rule lg:mt-0">
               {classes.map((c, i) => {
-                const leader = i === 0
+                const leader = top > 0 && c.points === top
+                const rank = 1 + classes.filter((o) => o.points > c.points).length
                 return (
                   <li key={c.grade} className={`grid grid-cols-[2.5rem_1fr_auto] items-center gap-x-4 ${leader ? 'py-6' : 'py-4'}`}>
                     <span className={`font-display text-2xl font-extrabold tabular-nums ${leader ? 'text-brand' : 'text-body/50'}`}>
-                      {i + 1}
+                      {rank}
                     </span>
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-baseline gap-x-2">
                         <span className={`font-display font-bold text-ink ${leader ? 'text-2xl sm:text-3xl' : 'text-lg'}`}>{c.grade}</span>
                         {c.classOf && <span className="whitespace-nowrap text-sm text-body">Class of {c.classOf}</span>}
-                        {leader && <span className="eyebrow ml-auto">Leading</span>}
+                        {leader && <span className="eyebrow ml-auto">{tiedTop.length > 1 ? 'Tied' : 'Leading'}</span>}
                       </div>
                       <div className="mt-2 h-2 w-full bg-rule" role="presentation">
                         <div
