@@ -78,5 +78,24 @@ async function refreshMedia() {
   } catch (e) { console.warn(`[snapshot] media.json: kept (${e.message})`) }
 }
 
-await Promise.all([refreshEvents(), refreshPhotos(), refreshMedia()])
+// Spirit Points: the standings at deploy time become the instant first paint (and the fallback).
+async function refreshSpirit() {
+  const ctrl = new AbortController()
+  const t = setTimeout(() => ctrl.abort(), TIMEOUT_MS)
+  try {
+    const r = await fetch(`${BASE}/api/sheet?tab=Spirit%20Points`, { signal: ctrl.signal })
+    if (!r.ok) throw new Error(`http ${r.status}`)
+    const rows = (await r.text()).split(/\r?\n/).map((l) => (l.match(/("([^"]|"")*"|[^,]*)(,|$)/g) || []).map((c) => c.replace(/,$/, '').replace(/^"|"$/g, '').replace(/""/g, '"')))
+    const prev = readLocal('spiritPoints.json') || []
+    const next = prev.map((p) => {
+      const row = rows.find((r) => (r[0] || '').trim().toLowerCase() === p.grade.toLowerCase())
+      if (!row) return null
+      const points = row.slice(1).reduce((sum, c) => { const n = Number(String(c).replace(/[^\d.-]/g, '')); return sum + (Number.isFinite(n) ? n : 0) }, 0)
+      return { ...p, points }
+    })
+    commit('spiritPoints.json', next, (v) => v.length === 4 && v.every(Boolean))
+  } catch (e) { console.warn(`[snapshot] spiritPoints.json: kept (${e.message})`) } finally { clearTimeout(t) }
+}
+
+await Promise.all([refreshEvents(), refreshPhotos(), refreshMedia(), refreshSpirit()])
 console.log('[snapshot] done')
