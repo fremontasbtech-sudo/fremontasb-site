@@ -74,7 +74,7 @@ export default function Media() {
                   <Meta label="Type">{latest.kind}</Meta>
                 </dl>
                 <p className="mt-6 text-sm leading-relaxed text-body">
-                  New episodes play in 4th block every other week. Missed one? Everything we've published is in the archive below.
+                  New episodes play during 4th block every other week. If you missed one, you can find every episode in the archive below.
                 </p>
                 <a href={watchUrl(latest.youtubeId)} target="_blank" rel="noopener noreferrer"
                    className="link-brand mt-4 inline-flex min-h-[44px] items-center gap-1.5 text-sm font-bold">
@@ -108,7 +108,7 @@ export default function Media() {
           )}
 
           <div className="mt-10 flex flex-wrap items-center gap-4 border-t border-rule pt-8">
-            <p className="text-sm text-body">Older videos and full rally recordings live on the channel.</p>
+            <p className="text-sm text-body">Older videos and full rally recordings are on our YouTube channel.</p>
             <Button variant="secondary" href={links.youtube} external>All videos on YouTube</Button>
           </div>
         </div>

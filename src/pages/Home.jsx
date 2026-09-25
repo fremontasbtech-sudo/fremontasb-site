@@ -94,8 +94,7 @@ function Hero() {
           </h1>
           <div className="mt-5 h-1 w-14 bg-brand" aria-hidden="true" />
           <p className="mt-5 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">
-            We're the students behind the rallies, the clubs, and Fremont TV, plus the spirit points race that keeps
-            all four grades going. Glad you're here, Firebird.
+            We’re the student leaders who plan rallies, run clubs, make Fremont TV, and keep track of spirit points for all four grades. This site has everything you need to stay updated on what’s happening at Fremont.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
             <Button to="/media" text="Watch Fremont TV" />
@@ -134,8 +133,7 @@ function SpiritPoints() {
         <div className="lg:col-span-5">
           <SectionHeader eyebrow="Class competition" title="Spirit Points Tracker" className="!mb-4 sm:!mb-4" />
           <p className="text-base leading-relaxed text-body">
-            Every rally, dress-up day, and class competition adds points to your class total. ASB updates the numbers
-            after each event. Seniors, juniors, sophomores, freshmen. One class wins the year.
+            Every rally, dress-up day, and class competition adds points to your class’s total. ASB updates the numbers after each event, and the class with the most points at the end of the year wins.
           </p>
           {classes.length > 1 && !loading && top > 0 && (
             <p className="mt-6 font-display text-lg font-bold text-ink">
@@ -191,7 +189,7 @@ function SpiritPoints() {
               })}
             </ol>
           )}
-          {!loading && classes.length === 0 && <Notice>No spirit points posted yet. Check back after the first rally.</Notice>}
+          {!loading && classes.length === 0 && <Notice>No spirit points have been posted yet. Check back after the first rally.</Notice>}
         </div>
       </div>
     </section>
@@ -203,8 +201,8 @@ function SpiritPoints() {
 const quickLinks = [
   { to: '/media', label: 'Media', note: 'Fremont TV episodes and rally videos' },
   { to: '/photos', label: 'Photos', note: 'Event albums on Flickr' },
-  { to: '/clubs', label: 'Clubs', note: 'Official list, handbook, renewal forms' },
-  { to: '/resources', label: 'School Store', note: 'ASB cards, dance tickets, gear' },
+  { to: '/clubs', label: 'Clubs', note: 'The official club list, handbook, and renewal forms' },
+  { to: '/resources', label: 'School Store', note: 'ASB cards, dance tickets, and spirit wear' },
 ]
 
 function LatestNews({ eventsRecent = [], eventsUpcoming = [], eventsAll = [], eventsFinished = [], eventsLoading = false }) {
@@ -236,7 +234,7 @@ function LatestNews({ eventsRecent = [], eventsUpcoming = [], eventsAll = [], ev
                 ))}
               </ol>
             )}
-            {!loading && items.length === 0 && <Notice>Nothing posted yet. Check back once school events get going.</Notice>}
+            {!loading && items.length === 0 && <Notice>Nothing has been posted yet. Check back once school events start.</Notice>}
           </div>
 
           <div>
@@ -251,7 +249,7 @@ function LatestNews({ eventsRecent = [], eventsUpcoming = [], eventsAll = [], ev
                 ))}
               </ol>
             )}
-            {!eventsLoading && eventsUpcoming.length === 0 && <Notice>Nothing coming up in the next three weeks. Check back soon.</Notice>}
+            {!eventsLoading && eventsUpcoming.length === 0 && <Notice>There are no events in the next three weeks. Check back soon for updates.</Notice>}
           </div>
         </div>
 
@@ -584,7 +582,7 @@ function MorningAnnouncements() {
       <div className="container-site">
         <SectionHeader eyebrow="Read on the PA" title="Morning Announcements" />
         <p className="-mt-3 mb-8 max-w-2xl leading-relaxed text-body">
-          Read over the PA on Wednesday and Friday mornings. Pick a marked day on the calendar to catch that morning&rsquo;s announcements, then tap any headline to open it.
+          Announcements are read over the PA on Wednesday and Friday mornings. Pick a highlighted day on the calendar to see that morning’s announcements, and click on a headline to read the whole announcement.
         </p>
         {loading && <Loading label="Loading announcements…" />}
         {view && (
@@ -657,16 +655,15 @@ function AppBanner() {
         <div className="lg:col-span-8">
           <p className="eyebrow-on-dark">Fremont ASB app</p>
           <h2 id="app-banner-title" className="mt-3 font-display text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl">
-            What the website can't do, the app can.
+            Use the app for things that need a sign-in
           </h2>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/90 sm:text-lg">
-            Submit club forms, check spirit points, pull up today's bell schedule, and log teacher bonuses. Sign in with
-            your school Google account.
+            In the app, you can submit club forms, check spirit points, see today’s bell schedule, and log teacher bonuses. You sign in with your school Google account.
           </p>
         </div>
         <div className="lg:col-span-4 lg:justify-self-end">
           <Button to="/download-app" text="Download the App" variant="inverse" />
-          <p className="mt-3 text-sm text-white/80">In development. Store links post here first.</p>
+          <p className="mt-3 text-sm text-white/80">The app is still in development. Download links will be posted here first.</p>
         </div>
       </div>
     </section>

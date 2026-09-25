@@ -9,7 +9,7 @@ const GROUPS = [
   {
     eyebrow: 'For students',
     title: 'Help, support, and spirit wear',
-    blurb: 'The store students ask the ASB office for most. Community and wellness resources are just below.',
+    blurb: 'This is the store students ask the ASB office about the most. Community and wellness resources are listed below.',
     items: [
       {
         title: 'School Store',
@@ -77,14 +77,14 @@ export default function Resources() {
       <LinkListSection
         eyebrow="Support"
         title="Community Resources"
-        blurb="Local and national support for Firebirds and their families. If you or someone you know is in crisis, reach out. These lines are free and confidential."
+        blurb="These are local and national support resources for Firebirds and their families. If you or someone you know is in crisis, please reach out. These lines are free and confidential."
         groups={resourceLinks.community}
       />
 
       <LinkListSection
         eyebrow="At Fremont"
         title="Student Wellness"
-        blurb="Wellness support at Fremont: talk to a therapist, get a referral, or reach the wellness staff."
+        blurb="Fremont has wellness support on campus. You can talk to a therapist, get a referral, or reach out to the wellness staff."
         groups={resourceLinks.wellness}
       />
     </>

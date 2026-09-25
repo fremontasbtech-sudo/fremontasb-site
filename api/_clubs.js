@@ -78,7 +78,8 @@ function normalizeRow(row) {
     .trim()
 
   const disbanded = /disband/i.test(name)
-  const norm = (s) => String(s || '').replace(/\s+/g, ' ').trim()
+  // Em dashes read as AI-written on the site, so "A — B" shows as "A, B".
+  const norm = (s) => String(s || '').replace(/\s*\u2014\s*/g, ', ').replace(/\s+/g, ' ').trim()
   return {
     __normalized: true,
     name: name.replace(/\s*[(\[]?\s*disbanded\s*[)\]]?\s*/i, ' ').replace(/\s{2,}/g, ' ').trim() || 'Untitled club',

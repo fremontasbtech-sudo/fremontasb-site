@@ -14,7 +14,7 @@ export default function Footer() {
             <p className="tagline text-2xl">“{school.tagline}”</p>
           </div>
           <p className="mt-4 text-sm text-body max-w-sm">
-            The Associated Student Body of Fremont High School: rallies, clubs, Fremont TV, dances, and everything in between.
+            The Associated Student Body of Fremont High School. We plan rallies, dances, and spirit events, support clubs, and make Fremont TV.
           </p>
           <p className="mt-3 text-sm text-body max-w-sm">
             Website designed and maintained by ASB Tech.

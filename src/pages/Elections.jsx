@@ -54,7 +54,7 @@ export default function Elections() {
               No election is running right now.
             </p>
             <p className="mt-3 text-body">
-              Candidate statements show up here once the ballot is set. Check back during election season.
+              Candidate statements will be posted here once the ballot is finalized. Check back during election season.
             </p>
           </div>
         </section>
@@ -69,7 +69,7 @@ export default function Elections() {
       <PageHero
         title="Elections"
         eyebrow="ASB and class cabinets"
-        subtext="View only. Voting happens on the official ballot. Read the statements here first."
+        subtext="This page is only for reading candidate statements. Voting happens on the official ballot."
       />
 
       <div className="container-site section-space">

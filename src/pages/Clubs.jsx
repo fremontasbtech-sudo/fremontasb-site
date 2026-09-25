@@ -124,7 +124,7 @@ export default function Clubs() {
       <PageHero
         title="Clubs"
         eyebrow={school.year}
-        subtext="Every club that is official this year, who runs it, and where it meets. Officers: the tracker and handbook are your two links."
+        subtext="Find every official club for this year, who runs it, and where it meets. If you’re a club officer, the Club Handbook and the key dates below have what you need."
       >
         <Button href={links.clubHandbook} variant="primary" external>Club Handbook</Button>
         <Button href="#club-list" variant="secondary">Browse the club list</Button>
@@ -272,10 +272,10 @@ export default function Clubs() {
             </div>
           </div>
           <aside>
-            <p className="eyebrow mb-2">What's inside</p>
+            <p className="eyebrow mb-2">About the slides</p>
             <div className="rule-accent-left mb-4" />
             <p className="text-sm leading-relaxed text-body">
-              The Clubs Commission's info deck: how to start a club, how to stay official, the strike system, and the events for the year. Tap through it here, or open it full screen.
+              These are the slides from the Clubs Commission’s info meeting. They cover how to start a club, how to stay official, the strike system, and the club events for the year. You can click through them here or open them in full screen.
             </p>
             {links.clubInfoSlides && (
               <div className="mt-6">
@@ -299,8 +299,7 @@ export default function Clubs() {
             <div className="lg:col-span-4">
               <SectionHeader eyebrow="Start a club" title="How to start a club" className="mb-4 sm:mb-5" />
               <p className="text-body leading-relaxed">
-                Three steps to get on the Official Clubs List, then the things every club does during the year to stay on it.
-                The Club Handbook has the full rules.
+                There are 3 steps to get your club on the Official Clubs List. After that, every club has a few things to do during the year to stay on the list. The Club Handbook has all of the rules.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Button href={links.clubHandbook} variant="primary" external>Read the Club Handbook</Button>
@@ -326,7 +325,7 @@ export default function Clubs() {
                 <h3 className="font-display text-xl font-extrabold tracking-tight text-ink sm:text-2xl">Staying active</h3>
                 <div className="rule-accent-left" />
                 <p className="mt-4 text-body leading-relaxed">
-                  Once you’re on the list, ASB tracks these on the Club Accountability Tracker. Missed items show up as strikes on the tracker, so check your club’s row.
+                  Once your club is on the list, ASB keeps track of these on the Club Accountability Tracker. Anything your club misses is recorded as a strike, so make sure to check your club’s row.
                 </p>
                 <dl className="mt-6 border-t border-rule">
                   {ACTIVE_REQUIREMENTS.map((r) => (
@@ -342,8 +341,7 @@ export default function Clubs() {
                 <h3 className="font-display text-xl font-extrabold tracking-tight text-ink sm:text-2xl">Renewing for next year</h3>
                 <div className="rule-accent-left" />
                 <p className="mt-4 text-body leading-relaxed">
-                  Clubs don’t carry over automatically. Incoming officers renew with ASB each year so the club stays on the list.
-                  The renewal steps and the deadline are in the Club Handbook.
+                  Clubs don’t carry over to the next year automatically. Incoming officers have to renew the club with ASB every year for it to stay on the list. The renewal steps and deadline are in the Club Handbook.
                 </p>
               </div>
             </div>
@@ -358,12 +356,12 @@ function HelpLinks({ className = '' }) {
   return (
     <div className={`border-t border-rule pt-5 text-sm text-body ${className}`}>
       <p>
-        Missing or out of date? Email{' '}
+        If your club is missing or out of date, email{' '}
         <a href={`mailto:${school.email}`} className="link-brand">{school.email}</a> or edit the{' '}
         <a href={links.clubsListSheet} className="link-brand" target="_blank" rel="noopener noreferrer">Official Clubs List sheet</a>.
       </p>
       <p className="mt-3">
-        Don’t see yours? <a href="#start-a-club" className="link-brand">Start a club</a>.
+        Don’t see your club? <a href="#start-a-club" className="link-brand">Start a club</a>.
       </p>
     </div>
   )
@@ -558,25 +556,25 @@ function ClubDates() {
 const START_STEPS = [
   {
     title: 'Find a teacher advisor.',
-    body: 'A Fremont staff member has to agree to advise the club and host its meetings. Ask before you do anything else.',
+    body: 'A Fremont staff member has to agree to advise your club and host its meetings, so ask a teacher before you do anything else.',
   },
   {
     title: 'Write a club constitution.',
-    body: 'Club name, purpose, officer positions, and how you meet. The Club Handbook covers what it needs to include.',
+    body: 'Your constitution should include the club’s name, purpose, officer positions, and how often you meet. The Club Handbook explains everything it needs to include.',
   },
   {
     title: 'Submit it to ASB.',
-    body: 'Turn the constitution in to ASB. Approved clubs go on the Official Clubs List above and get a row on the Club Accountability Tracker.',
+    body: 'Turn in your constitution to ASB. Once it’s approved, your club will be added to the Official Clubs List above and the Club Accountability Tracker.',
   },
 ]
 
 // Row labels match the tracker columns. No dates here on purpose, the Handbook owns them.
 const ACTIVE_REQUIREMENTS = [
   { label: 'Club Constitution', body: 'On file with ASB.' },
-  { label: 'Clubs Day', body: 'Table at Clubs Day both semesters. This is where clubs pick up most of their members.' },
+  { label: 'Clubs Day', body: 'Have a table at Clubs Day both semesters. This is where most clubs get their members.' },
   { label: 'October Check-In', body: 'First check-in of the year with ASB.' },
   { label: 'Dec/Jan Check-In', body: 'Second check-in.' },
   { label: 'Feb/March Check-In', body: 'Third check-in.' },
-  { label: 'Grub Day', body: 'Take part in Grub Day. Food sales need Fundraiser Approval first. See the Resources page.' },
+  { label: 'Grub Day', body: 'Take part in Grub Day. Selling food needs Fundraiser Approval first, which you can find on the Resources page.' },
   { label: 'Strikes', body: 'Missed items are recorded as strikes on the Club Accountability Tracker.' },
 ]
