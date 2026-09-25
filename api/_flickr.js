@@ -91,7 +91,7 @@ export async function fetchAlbums(apiKey, userId) {
     method: 'flickr.photosets.getList',
     api_key: key,
     user_id: userId,
-    primary_photo_extras: 'url_z,url_c,url_m',
+    primary_photo_extras: 'url_b,url_c,url_z,url_m',
     format: 'json',
     nojsoncallback: '1',
   })
@@ -104,8 +104,8 @@ export async function fetchAlbums(apiKey, userId) {
   const albums = sets.map((s) => {
     const ex = s.primary_photo_extras || {}
     const cover =
-      ex.url_z || ex.url_c || ex.url_m ||
-      (ex.server ? `https://live.staticflickr.com/${ex.server}/${s.primary}_${ex.secret}_z.jpg` : '')
+      ex.url_b || ex.url_c || ex.url_z || ex.url_m ||
+      (ex.server ? `https://live.staticflickr.com/${ex.server}/${s.primary}_${ex.secret}_b.jpg` : '')
     const createEpoch = Number(s.date_create) || 0
     return {
       id: s.id,
