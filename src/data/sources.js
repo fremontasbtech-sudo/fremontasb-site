@@ -17,7 +17,9 @@ export const sheets = {
   // is the sum of its row, so adding an event = adding a column. Nothing else to do.
   // Spirit Points now lives as a TAB in the shared Firebird Hub Events sheet (one sheet for everything);
   // read by tab name so it can't break if the tab's gid changes. Old standalone sheet is kept but dormant.
-  spiritPoints: 'https://docs.google.com/spreadsheets/d/11Pm2zUc_O40E0oTZekYvsD_D8FenH9s7PiJ43m7JCH0/edit?sheetName=Spirit%20Points',
+  // The Events sheet is PRIVATE (no link sharing), so this tab is read through /api/sheet (the Apps
+  // Script reads it as the owner and only ever returns the public tabs).
+  spiritPoints: '/api/sheet?tab=Spirit%20Points',
 
   // Home → Latest News.  Columns: title | date | blurb   (newest rows first or last, we sort by date)
   news: null,
@@ -189,7 +191,8 @@ export const announcementsSheet =
 //     one volleyball...), so flagging a whole season still shows one row at a time;
 //     when that game's day passes it drops out and that sport's next y-game appears
 //     automatically -- no editing needed.
-// Edit the sheet -- both surfaces update. Keep "anyone with link - Viewer".
+// Edit the sheet -- the site updates. The sheet is PRIVATE: /api/events reads the Events and
+// Sports tabs through the Apps Script (api/_sheet.js), not a public link.
 // -----------------------------------------------------------------------------
 export const eventsSheet =
   'https://docs.google.com/spreadsheets/d/11Pm2zUc_O40E0oTZekYvsD_D8FenH9s7PiJ43m7JCH0/edit'

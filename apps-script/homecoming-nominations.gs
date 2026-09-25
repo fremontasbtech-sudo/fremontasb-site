@@ -164,10 +164,59 @@ function doGet(e) {
     var c = readConfig_();
     return json_({ open: c.open, mode: c.mode, cycle: c.cycle, deadline: c.deadline });
   }
+  if (view === 'sheet') {
+    var tab = e && e.parameter ? String(e.parameter.tab || '') : '';
+    return ContentService.createTextOutput(publicTabCsv_(tab)).setMimeType(ContentService.MimeType.CSV);
+  }
   return HtmlService.createHtmlOutputFromFile('Index')
     .setTitle('Homecoming Court Nominations')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT);
+}
+
+// ---------------------------------------------------------------------
+// PUBLIC TABS. The Events spreadsheet is private (no link sharing), so the website reads the few
+// tabs that are meant to be public through here (GET ?view=sheet&tab=Spirit%20Points), as CSV.
+// ONLY the tabs listed below can ever be read; Nominations, Test Submissions and Config cannot.
+// ---------------------------------------------------------------------
+var PUBLIC_TABS_ = ['Spirit Points', 'Events', 'Sports'];
+
+function publicTabCsv_(tab) {
+  if (PUBLIC_TABS_.indexOf(tab) < 0) return '';
+  var cache = CacheService.getScriptCache();
+  var key = 'tab_' + tab.replace(/\W/g, '_');
+  var hit = cache.get(key);
+  if (hit != null) return hit;
+  var csv = '';
+  // Same CSV the site used to get from the public link (gviz), fetched with the owner's access.
+  try {
+    var url = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID_ + '/gviz/tq?tqx=out:csv&sheet=' +
+      encodeURIComponent(tab);
+    var r = UrlFetchApp.fetch(url, { muteHttpExceptions: true, followRedirects: true,
+      headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() } });
+    var body = r.getContentText();
+    if (r.getResponseCode() === 200 && body && body.charAt(0) !== '<') csv = body;
+  } catch (err) { csv = ''; }
+  // Fallback: build the CSV from the tab itself (dates as YYYY-MM-DD).
+  if (!csv) {
+    try {
+      var ss = book_();
+      var sh = ss.getSheetByName(tab);
+      if (!sh) return '';
+      var range = sh.getDataRange();
+      var vals = range.getValues(), shown = range.getDisplayValues();
+      var tz = ss.getSpreadsheetTimeZone();
+      csv = shown.map(function (row, i) {
+        return row.map(function (cell, j) {
+          var v = vals[i][j];
+          if (v instanceof Date && v.getFullYear() > 1900) cell = Utilities.formatDate(v, tz, 'yyyy-MM-dd');
+          return '"' + String(cell).replace(/"/g, '""') + '"';
+        }).join(',');
+      }).join('\n');
+    } catch (err2) { return ''; }
+  }
+  try { cache.put(key, csv, 60); } catch (err3) { /* too big to cache */ }
+  return csv;
 }
 
 // POST — the ONLY submission path. fremontasb.org/api/nominate forwards the student's Google

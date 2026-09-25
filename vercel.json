@@ -11,6 +11,12 @@
     },
     "api/nominations-config.js": {
       "maxDuration": 60
+    },
+    "api/sheet.js": {
+      "maxDuration": 60
+    },
+    "api/events.js": {
+      "maxDuration": 60
     }
   }
 }

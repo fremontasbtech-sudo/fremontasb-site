@@ -1,3 +1,4 @@
+import { publicTabUrl } from './_sheet.js'
 // Shared server-side helper: pull the Firebird Hub "Events (26-27)" Google Sheet
 // (the SAME sheet the app reads) and return the CURATED items only:
 //   • events — the 'Events' tab (read BY NAME, not gid): EVERY dated row shows,
@@ -157,9 +158,11 @@ async function fetchScores() {
 export async function fetchEvents(sheetUrl) {
   const id = idOf(sheetUrl)
   if (!id) return { events: [], games: [] }
+  // The sheet is private now: read its public tabs through the Apps Script (runs as the owner).
+  const tabUrl = (sheet) => `${publicTabUrl(sheet)}&_cb=${Date.now()}`
   const [eventsRows, sportsRows, scores] = await Promise.all([
-    fetchRows(csvUrl(id, { sheet: 'Events' })).catch(() => []),
-    fetchRows(csvUrl(id, { sheet: 'Sports' })).catch(() => []),
+    fetchRows(tabUrl('Events')).catch(() => []),
+    fetchRows(tabUrl('Sports')).catch(() => []),
     fetchScores(),
   ])
   const games = parseGames(sportsRows)
