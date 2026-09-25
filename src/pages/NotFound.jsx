@@ -3,7 +3,7 @@ import Button from '../components/Button'
 
 export default function NotFound() {
   return (
-    <PageHero title="Page not found" subtext="That link doesn't go anywhere. It may have moved when we rebuilt the site.">
+    <PageHero title="Page not found" subtext="We couldn’t find this page. It may have been moved when the website was updated.">
       <Button to="/" text="Back to Home" />
     </PageHero>
   )

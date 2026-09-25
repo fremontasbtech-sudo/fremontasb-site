@@ -24,7 +24,7 @@ const WEBSITE = [
 const APP = [
   { t: 'Club form submissions', d: 'Submit club forms in the app.' },
   { t: 'Spirit points tracking', d: 'Points are tracked and updated automatically.' },
-  { t: 'Bell schedules', d: 'The day’s bell schedule.' },
+  { t: 'Bell schedules', d: 'Today’s bell schedule.' },
   { t: 'Teacher bonuses', d: 'Teachers award bonus spirit points.' },
 ]
 
@@ -36,7 +36,7 @@ export default function DownloadApp() {
       <PageHero
         title="Download the App"
         eyebrow="In development"
-        subtext="The Fremont ASB app is being built by ASB Tech. It handles club forms, spirit points, bell schedules and teacher bonuses, the parts of ASB that need a sign-in."
+        subtext="The Fremont ASB app is being built by ASB Tech. It will handle the parts of ASB that need a sign-in, like club forms, spirit points, bell schedules, and teacher bonuses."
       />
 
       <section className="section-space">
@@ -58,7 +58,7 @@ export default function DownloadApp() {
                 <p className="mt-5 text-sm leading-relaxed text-body">
                   {anyLive
                     ? 'Sign in with Google after installing.'
-                    : 'Store links will be added here when the app is released. Until then, everything in the website list still works.'}
+                    : 'Download links will be added here when the app is released. Until then, you can still use everything listed under the website.'}
                 </p>
               </div>
             </div>
@@ -67,7 +67,7 @@ export default function DownloadApp() {
             <div className="lg:col-span-7">
               <p className="eyebrow">Website vs. app</p>
               <h2 className="mt-2 font-display text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">
-                The website is for reading. The app is for doing.
+                The website is for reading information, and the app is for things you need to sign in for.
               </h2>
               <div className="rule-accent-left" />
 

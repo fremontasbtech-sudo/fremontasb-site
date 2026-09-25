@@ -47,7 +47,7 @@ export default function Contact() {
                 >
                   {school.email}
                 </a>
-                <p className="mt-1 text-sm text-body">Best for club questions, fundraiser approvals, and anything the form doesn&rsquo;t cover.</p>
+                <p className="mt-1 text-sm text-body">Email us for club questions, fundraiser approvals, or anything the form doesn’t cover.</p>
               </div>
 
               <div>
@@ -83,7 +83,7 @@ export default function Contact() {
                 >
                   @firebirdfelipe
                 </a>
-                <p className="text-sm text-body">Fastest place to catch rally, dance, and spirit-week updates.</p>
+                <p className="text-sm text-body">Follow us for the latest rally, dance, and spirit week updates.</p>
               </div>
             </div>
           </aside>

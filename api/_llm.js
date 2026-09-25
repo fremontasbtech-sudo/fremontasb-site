@@ -73,6 +73,7 @@ export async function llmTitles(texts, instruction) {
     const arr = JSON.parse((content.match(/\[[\s\S]*\]/) || [content])[0])
     if (!Array.isArray(arr) || arr.length !== texts.length) return null
     lastError = ''
-    return arr.map((t) => String(t == null ? '' : t).replace(/^["'\s]+|["'\s.]+$/g, '').trim())
+    // No em dashes in anything shown on the site: "A — B" becomes "A, B".
+    return arr.map((t) => String(t == null ? '' : t).replace(/\s*[\u2014]\s*|\s+--\s+/g, ', ').replace(/^["'\s]+|["'\s.]+$/g, '').trim())
   } catch (e) { lastError = String(e && e.message || e).slice(0, 300); return null }
 }

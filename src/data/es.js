@@ -143,8 +143,7 @@ export const ES = {
   'Main': 'Principal',
 
   // ── Footer ──
-  'The Associated Student Body of Fremont High School: rallies, clubs, Fremont TV, dances, and everything in between.':
-    'El cuerpo estudiantil (ASB) de Fremont High School: rallies, clubes, Fremont TV, bailes y todo lo demás.',
+  "The Associated Student Body of Fremont High School. We plan rallies, dances, and spirit events, support clubs, and make Fremont TV.": "El Cuerpo Estudiantil Asociado de Fremont High School. Organizamos rallies, bailes y eventos de espíritu, apoyamos a los clubes y hacemos Fremont TV.",
   'Find us': 'Encuéntranos',
   'Follow': 'Síguenos',
   'Address': 'Dirección',
@@ -155,14 +154,12 @@ export const ES = {
   'Flickr: event photos': 'Flickr: fotos de eventos',
 
   // ── Home: hero + spirit ──
-  "We're the students behind the rallies, the clubs, and Fremont TV, plus the spirit points race that keeps all four grades going. Glad you're here, Firebird.":
-    'Somos los estudiantes detrás de los rallies, los clubes y Fremont TV, además de la competencia de puntos de espíritu que mantiene activos a los cuatro grados. Nos alegra que estés aquí.',
+  "We’re the student leaders who plan rallies, run clubs, make Fremont TV, and keep track of spirit points for all four grades. This site has everything you need to stay updated on what’s happening at Fremont.": "Somos los líderes estudiantiles que organizan los rallies, dirigen los clubes, hacen Fremont TV y llevan la cuenta de los puntos de espíritu de los cuatro grados. En este sitio encontrarás todo lo que necesitas para estar al tanto de lo que pasa en Fremont.",
   'Watch Fremont TV': 'Ver Fremont TV',
   'Spirit points': 'Puntos de espíritu',
   'Class competition': 'Competencia entre clases',
   'Spirit Points Tracker': 'Marcador de puntos de espíritu',
-  'Every rally, dress-up day, and class competition adds points to your class total. ASB updates the numbers after each event. Seniors, juniors, sophomores, freshmen. One class wins the year.':
-    'Cada rally, día temático y competencia entre clases suma puntos al total de tu grado. ASB actualiza los números después de cada evento. Seniors, juniors, sophomores, freshmen: un solo grado gana el año.',
+  "Every rally, dress-up day, and class competition adds points to your class’s total. ASB updates the numbers after each event, and the class with the most points at the end of the year wins.": "Cada rally, día temático y competencia entre clases suma puntos al total de tu grado. ASB actualiza los números después de cada evento, y el grado con más puntos al final del año gana.",
   'Leading': 'Va ganando',
   'Tied': 'Empate',
   'Tied for first:': 'Empate en primer lugar:',
@@ -175,7 +172,7 @@ export const ES = {
   'Juniors': 'Juniors (11.º)',
   'Sophomores': 'Sophomores (10.º)',
   'Freshmen': 'Freshmen (9.º)',
-  'No spirit points posted yet. Check back after the first rally.': 'Aún no hay puntos de espíritu publicados. Vuelve después del primer rally.',
+  "No spirit points have been posted yet. Check back after the first rally.": "Todavía no se han publicado puntos de espíritu. Vuelve después del primer rally.",
   'Showing local sample data. Connect the spirit points Google Sheet in sources.js to go live.': '',
 
   // ── Home: Latest News ──
@@ -187,31 +184,29 @@ export const ES = {
   'View': 'Ver',
   'Announcement': 'Anuncio',
   'Event': 'Evento',
-  'Nothing posted yet. Check back once school events get going.': 'Aún no hay nada publicado: vuelve cuando comiencen los eventos escolares.',
+  "Nothing has been posted yet. Check back once school events start.": "Todavía no se ha publicado nada. Vuelve cuando empiecen los eventos escolares.",
   'New Fremont TV episode': 'Nuevo episodio de Fremont TV',
   'New album on Flickr': 'Nuevo álbum en Flickr',
   'Fremont TV episodes and rally videos': 'Episodios de Fremont TV y videos de rallies',
   'Event albums on Flickr': 'Álbumes de eventos en Flickr',
-  'Official list, handbook, renewal forms': 'Lista oficial, manual y formularios de renovación',
-  'ASB cards, dance tickets, gear': 'Tarjetas ASB, boletos de baile y mercancía',
+  "The official club list, handbook, and renewal forms": "La lista oficial de clubes, el manual y los formularios de renovación",
+  "ASB cards, dance tickets, and spirit wear": "Tarjetas ASB, boletos de baile y ropa de espíritu",
 
   // ── Home / DownloadApp: app band ──
-  "What the website can't do, the app can.": 'Lo que el sitio no puede hacer, la app sí.',
-  "Submit club forms, check spirit points, pull up today's bell schedule, and log teacher bonuses. Sign in with your school Google account.":
-    'Envía formularios de clubes, revisa puntos de espíritu, consulta el horario de campanas de hoy y registra bonos de maestros. Inicia sesión con tu cuenta de Google escolar.',
-  'In development. Store links post here first.': 'En desarrollo: los enlaces de las tiendas se publicarán aquí primero.',
+  "Use the app for things that need a sign-in": "Usa la app para lo que requiere iniciar sesión",
+  "In the app, you can submit club forms, check spirit points, see today’s bell schedule, and log teacher bonuses. You sign in with your school Google account.": "En la app puedes enviar formularios de clubes, ver los puntos de espíritu, consultar el horario de campanas de hoy y registrar bonos de maestros. Inicias sesión con tu cuenta escolar de Google.",
+  "The app is still in development. Download links will be posted here first.": "La app todavía está en desarrollo. Los enlaces de descarga se publicarán aquí primero.",
   'In development': 'En desarrollo',
   'Coming soon': 'Próximamente',
   'Get the app': 'Obtén la app',
-  'The website is for reading. The app is for doing.': 'El sitio es para leer. La app es para hacer.',
+  "The website is for reading information, and the app is for things you need to sign in for.": "El sitio web es para leer información, y la app es para lo que requiere iniciar sesión.",
   'Website vs. app': 'Sitio web vs. app',
-  'The Fremont ASB app is being built by ASB Tech. It handles club forms, spirit points, bell schedules and teacher bonuses, the parts of ASB that need a sign-in.':
-    'La app de Fremont ASB está siendo creada por ASB Tech. Maneja formularios de clubes, puntos de espíritu, horarios de campanas y bonos de maestros: las partes de ASB que requieren iniciar sesión.',
+  "The Fremont ASB app is being built by ASB Tech. It will handle the parts of ASB that need a sign-in, like club forms, spirit points, bell schedules, and teacher bonuses.": "ASB Tech está creando la app de Fremont ASB. Se encargará de las partes de ASB que requieren iniciar sesión, como formularios de clubes, puntos de espíritu, horarios de campanas y bonos de maestros.",
   'The app requires Google sign-in.': 'La app requiere iniciar sesión con Google.',
   'Submit club forms in the app.': 'Envía formularios de clubes en la app.',
   'Only in the app': 'Solo en la app',
   'Bell schedules': 'Horarios de campanas',
-  'The day’s bell schedule.': 'El horario de campanas del día.',
+  "Today’s bell schedule.": "El horario de campanas de hoy.",
   'Spirit points tracking': 'Seguimiento de puntos de espíritu',
   'Points are tracked and updated automatically.': 'Los puntos se registran y actualizan automáticamente.',
   'Teacher bonuses': 'Bonos de maestros',
@@ -223,8 +218,7 @@ export const ES = {
   'Fremont TV episodes and event photos': 'Episodios de Fremont TV y fotos de eventos',
   'Fremont TV video announcements are created by the ASB Technology and Content Creation Commission and are played bi-weekly during 4th block.':
     'Los anuncios en video de Fremont TV son creados por la Comisión de Tecnología y Creación de Contenido de ASB y se transmiten cada dos semanas durante el 4.º bloque.',
-  'New episodes play in 4th block every other week. Missed one? Everything we’ve published is in the archive below.':
-    'Los nuevos episodios se transmiten en el 4.º bloque cada dos semanas. ¿Te perdiste uno? Todo lo que hemos publicado está en el archivo de abajo.',
+  "New episodes play during 4th block every other week. If you missed one, you can find every episode in the archive below.": "Los episodios nuevos se transmiten durante el 4.º bloque cada dos semanas. Si te perdiste uno, puedes encontrar todos los episodios en el archivo de abajo.",
   'Latest episode': 'Último episodio',
   'Archive': 'Archivo',
   'All': 'Todos',
@@ -234,7 +228,7 @@ export const ES = {
   'Play episode': 'Reproducir episodio',
   'Watch on YouTube': 'Ver en YouTube',
   'All videos on YouTube': 'Todos los videos en YouTube',
-  'Older videos and full rally recordings live on the channel.': 'Los videos antiguos y las grabaciones completas de rallies están en el canal.',
+  "Older videos and full rally recordings are on our YouTube channel.": "Los videos más antiguos y las grabaciones completas de los rallies están en nuestro canal de YouTube.",
   'YouTube channel': 'Canal de YouTube',
   'Filter videos by type': 'Filtrar videos por tipo',
   'Fremont TV · Rallies · Events': 'Fremont TV · Rallies · Eventos',
@@ -242,13 +236,11 @@ export const ES = {
   // ── Photos page ──
   'Click a photo below to see all photos from individual events, or click the button below to be redirected to the Fremont ASB Flickr page.':
     'Haz clic en una foto para ver todas las fotos de cada evento, o usa el botón de abajo para ir a la página de Flickr de Fremont ASB.',
-  'Every album (rallies, dances, spirit weeks) is on the ASB Flickr. Took photos at an event? Email them to':
-    'Cada álbum (rallies, bailes, semanas de espíritu) está en el Flickr de ASB. ¿Tomaste fotos en un evento? Envíalas a',
+  "All of our albums, including rallies, dances, and spirit weeks, are on the ASB Flickr. If you took photos at an event, you can email them to": "Todos nuestros álbumes, incluidos los rallies, bailes y semanas de espíritu, están en el Flickr de ASB. Si tomaste fotos en un evento, puedes enviarlas por correo a",
   'All albums on Flickr': 'Todos los álbumes en Flickr',
 
   // ── Clubs page ──
-  'Every club that is official this year, who runs it, and where it meets. Officers: the tracker and handbook are your two links.':
-    'Cada club oficial de este año, quién lo dirige y dónde se reúne. Directivos: el registro (tracker) y el manual son sus dos enlaces.',
+  "Find every official club for this year, who runs it, and where it meets. If you’re a club officer, the Club Handbook and the key dates below have what you need.": "Encuentra todos los clubes oficiales de este año, quién los dirige y dónde se reúnen. Si eres oficial de un club, el Manual de Clubes y las fechas clave de abajo tienen lo que necesitas.",
   'Club Accountability Tracker': 'Registro de Responsabilidad de Clubes',
   'Club Handbook': 'Manual de Clubes',
   'Browse the club list': 'Ver la lista de clubes',
@@ -258,10 +250,10 @@ export const ES = {
   'Find a club': 'Busca un club',
   'Search by name, purpose, advisor, or room': 'Busca por nombre, propósito, asesor o salón',
   'active clubs': 'clubes activos',
-  'Missing or out of date? Email': '¿Falta algo o está desactualizado? Escribe a',
+  "If your club is missing or out of date, email": "Si tu club no aparece o está desactualizado, escribe a",
   'or edit the': 'o edita la',
   'Official Clubs List sheet': 'hoja de Lista Oficial de Clubes',
-  'Don’t see yours?': '¿No ves el tuyo?',
+  "Don’t see your club?": "¿No ves tu club?",
   'Start a club': 'Inicia un club',
   'Show fewer': 'Mostrar menos',
   'Meets': 'Se reúne',
@@ -278,49 +270,39 @@ export const ES = {
   'Grub Day': 'Grub Day',
   'New to clubs?': '¿Nuevo en los clubes?',
   'Club Info Meeting': 'Reunión Informativa de Clubes',
-  'What’s inside': 'Qué contiene',
-  'The Clubs Commission’s info deck: how to start a club, how to stay official, the strike system, and the events for the year. Tap through it here, or open it full screen.':
-    'La presentación informativa de la Comisión de Clubes: cómo iniciar un club, cómo mantenerse oficial, el sistema de strikes y los eventos del año. Pásala aquí o ábrela en pantalla completa.',
+  "About the slides": "Sobre las diapositivas",
+  "These are the slides from the Clubs Commission’s info meeting. They cover how to start a club, how to stay official, the strike system, and the club events for the year. You can click through them here or open them in full screen.": "Estas son las diapositivas de la reunión informativa de la Comisión de Clubes. Explican cómo iniciar un club, cómo mantenerlo oficial, el sistema de faltas y los eventos de clubes del año. Puedes verlas aquí o abrirlas en pantalla completa.",
   'Open the slides': 'Abrir la presentación',
-  'Three steps to get on the Official Clubs List, then the things every club does during the year to stay on it. The Club Handbook has the full rules.':
-    'Tres pasos para entrar en la Lista Oficial de Clubes, y luego lo que todo club hace durante el año para permanecer en ella. El Manual de Clubes tiene las reglas completas.',
+  "There are 3 steps to get your club on the Official Clubs List. After that, every club has a few things to do during the year to stay on the list. The Club Handbook has all of the rules.": "Hay 3 pasos para que tu club entre en la Lista Oficial de Clubes. Después, cada club tiene algunas cosas que hacer durante el año para seguir en la lista. El Manual de Clubes tiene todas las reglas.",
   'Find a teacher advisor.': 'Encuentra un asesor docente.',
-  'A Fremont staff member has to agree to advise the club and host its meetings. Ask before you do anything else.':
-    'Un miembro del personal de Fremont debe aceptar asesorar el club y albergar sus reuniones. Pregúntale antes que nada.',
+  "A Fremont staff member has to agree to advise your club and host its meetings, so ask a teacher before you do anything else.": "Un miembro del personal de Fremont tiene que aceptar asesorar a tu club y recibir sus reuniones, así que pregúntale a un maestro antes de hacer cualquier otra cosa.",
   'Write a club constitution.': 'Redacta una constitución del club.',
-  'Club name, purpose, officer positions, and how you meet. The Club Handbook covers what it needs to include.':
-    'Nombre del club, propósito, puestos de directivos y cómo se reúnen. El Manual de Clubes explica qué debe incluir.',
+  "Your constitution should include the club’s name, purpose, officer positions, and how often you meet. The Club Handbook explains everything it needs to include.": "Tu constitución debe incluir el nombre del club, su propósito, los cargos de los oficiales y con qué frecuencia se reúnen. El Manual de Clubes explica todo lo que debe incluir.",
   'Submit it to ASB.': 'Entrégala a ASB.',
-  'Turn the constitution in to ASB. Approved clubs go on the Official Clubs List above and get a row on the Club Accountability Tracker.':
-    'Entrega la constitución a ASB. Los clubes aprobados aparecen en la Lista Oficial de Clubes de arriba y obtienen una fila en el Registro de Responsabilidad de Clubes.',
+  "Turn in your constitution to ASB. Once it’s approved, your club will be added to the Official Clubs List above and the Club Accountability Tracker.": "Entrega tu constitución a ASB. Cuando sea aprobada, tu club se agregará a la Lista Oficial de Clubes de arriba y al Club Accountability Tracker.",
   'Staying active': 'Mantenerse activo',
-  'Once you’re on the list, ASB tracks these on the Club Accountability Tracker. Missed items show up as strikes on the tracker, so check your club’s row.':
-    'Una vez en la lista, ASB registra esto en el Registro de Responsabilidad de Clubes. Lo que falte aparece como strikes en el registro, así que revisa la fila de tu club.',
+  "Once your club is on the list, ASB keeps track of these on the Club Accountability Tracker. Anything your club misses is recorded as a strike, so make sure to check your club’s row.": "Cuando tu club esté en la lista, ASB lleva el control de esto en el Club Accountability Tracker. Todo lo que tu club no cumpla se registra como una falta, así que revisa la fila de tu club.",
   'Club Constitution': 'Constitución del Club',
   'On file with ASB.': 'Archivada con ASB.',
-  'Table at Clubs Day both semesters. This is where clubs pick up most of their members.':
-    'Ten una mesa en el Día de Clubes ambos semestres. Ahí es donde los clubes consiguen la mayoría de sus miembros.',
+  "Have a table at Clubs Day both semesters. This is where most clubs get their members.": "Tener una mesa en el Día de Clubes ambos semestres. Aquí es donde la mayoría de los clubes consiguen a sus miembros.",
   'October Check-In': 'Registro de octubre',
   'First check-in of the year with ASB.': 'Primer registro del año con ASB.',
   'Dec/Jan Check-In': 'Registro de dic./ene.',
   'Second check-in.': 'Segundo registro.',
   'Feb/March Check-In': 'Registro de feb./marzo',
   'Third check-in.': 'Tercer registro.',
-  'Take part in Grub Day. Food sales need Fundraiser Approval first. See the Resources page.':
-    'Participa en el Grub Day. Las ventas de comida necesitan primero la Aprobación de Recaudación: consulta la página de Recursos.',
+  "Take part in Grub Day. Selling food needs Fundraiser Approval first, which you can find on the Resources page.": "Participar en Grub Day. Para vender comida primero se necesita la Aprobación de Recaudación, que puedes encontrar en la página de Recursos.",
   'Strikes': 'Strikes',
   'Missed items are recorded as strikes on the Club Accountability Tracker.':
     'Lo que falte se registra como strikes en el Registro de Responsabilidad de Clubes.',
   'Renewing for next year': 'Renovación para el próximo año',
-  'Clubs don’t carry over automatically. Incoming officers renew with ASB each year so the club stays on the list. The renewal steps and the deadline are in the Club Handbook.':
-    'Los clubes no se renuevan automáticamente. Los nuevos directivos renuevan con ASB cada año para que el club siga en la lista. Los pasos de renovación y la fecha límite están en el Manual de Clubes.',
+  "Clubs don’t carry over to the next year automatically. Incoming officers have to renew the club with ASB every year for it to stay on the list. The renewal steps and deadline are in the Club Handbook.": "Los clubes no pasan al siguiente año automáticamente. Los nuevos oficiales tienen que renovar el club con ASB cada año para que siga en la lista. Los pasos de renovación y la fecha límite están en el Manual de Clubes.",
   'Read the Club Handbook': 'Lee el Manual de Clubes',
 
   // ── Resources page ──
   'For students': 'Para estudiantes',
   'Help, support, and spirit wear': 'Ayuda, apoyo y ropa escolar',
-  'The store students ask the ASB office for most. Community and wellness resources are just below.':
-    'La tienda que más piden los estudiantes en la oficina de ASB. Los recursos comunitarios y de bienestar están justo debajo.',
+  "This is the store students ask the ASB office about the most. Community and wellness resources are listed below.": "Esta es la tienda por la que más preguntan los estudiantes en la oficina de ASB. Los recursos comunitarios y de bienestar están abajo.",
   'School Store': 'Tienda Escolar',
   'The online store for Fremont spirit wear and ASB purchases, run through MySchoolCentral.':
     'La tienda en línea de ropa escolar de Fremont y compras de ASB, gestionada a través de MySchoolCentral.',
@@ -341,12 +323,10 @@ export const ES = {
   'Go to FUHSD': 'Ir a FUHSD',
   'Support': 'Apoyo',
   'Community Resources': 'Recursos Comunitarios',
-  'Local and national support for Firebirds and their families. If you or someone you know is in crisis, reach out. These lines are free and confidential.':
-    'Apoyo local y nacional para los Firebirds y sus familias. Si tú o alguien que conoces está en crisis, comunícate: estas líneas son gratuitas y confidenciales.',
+  "These are local and national support resources for Firebirds and their families. If you or someone you know is in crisis, please reach out. These lines are free and confidential.": "Estos son recursos de apoyo locales y nacionales para los Firebirds y sus familias. Si tú o alguien que conoces está en crisis, por favor busca ayuda. Estas líneas son gratuitas y confidenciales.",
   'At Fremont': 'En Fremont',
   'Student Wellness': 'Bienestar Estudiantil',
-  'Wellness support at Fremont: talk to a therapist, get a referral, or reach the wellness staff.':
-    'Apoyo de bienestar en Fremont: habla con un terapeuta, obtén una referencia o contacta al personal de bienestar.',
+  "Fremont has wellness support on campus. You can talk to a therapist, get a referral, or reach out to the wellness staff.": "Fremont tiene apoyo de bienestar en el campus. Puedes hablar con un terapeuta, pedir una referencia o comunicarte con el personal de bienestar.",
   'Suicide Prevention': 'Prevención del Suicidio',
   'Community Counseling (sliding fee scale)': 'Consejería Comunitaria (tarifa según ingresos)',
   'LGBTQ Resources': 'Recursos LGBTQ',
@@ -368,31 +348,33 @@ export const ES = {
   'Postings shared by the college and career counselors. New ones are added to the document below.':
     'Publicaciones compartidas por los consejeros universitarios y de carreras. Las nuevas se agregan al documento de abajo.',
   'About these postings': 'Sobre estas publicaciones',
-  'The college and career counselors share these postings. The document updates whenever they add to it. For questions about a specific posting, ask the College & Career Center.':
-    'Los consejeros universitarios y de carreras comparten estas publicaciones. El documento se actualiza cada vez que agregan algo. Para preguntas sobre una publicación específica, consulta al Centro Universitario y de Carreras.',
+  "These postings are shared by the college and career counselors, and the document is updated whenever they add something new. If you have questions about a posting, ask the College & Career Center.": "Estas publicaciones las comparten los consejeros universitarios y de carrera, y el documento se actualiza cada vez que agregan algo nuevo. Si tienes preguntas sobre una publicación, pregunta en el College & Career Center.",
   'Open the document in Google Docs': 'Abrir el documento en Google Docs',
 
   // ── Contact page ──
   'Contact ASB': 'Contactar a ASB',
   'Fremont ASB strives to improve your school environment. Please submit any feedback or questions you may have below.':
     'Fremont ASB se esfuerza por mejorar tu ambiente escolar. Por favor envía cualquier comentario o pregunta a continuación.',
-  'Fastest place to catch rally, dance, and spirit-week updates.': 'El lugar más rápido para enterarte de rallies, bailes y semanas de espíritu.',
-  'Best for club questions, fundraiser approvals, and anything the form doesn’t cover.': 'Ideal para preguntas de clubes, aprobaciones de recaudaciones y cualquier cosa que el formulario no cubra.',
+  "Follow us for the latest rally, dance, and spirit week updates.": "Síguenos para ver las últimas novedades de rallies, bailes y semanas de espíritu.",
+  "Email us for club questions, fundraiser approvals, or anything the form doesn’t cover.": "Escríbenos para preguntas de clubes, aprobaciones de recaudaciones o cualquier cosa que el formulario no cubra.",
 
   // ── Homecoming Court / Elections placeholders ──
   'Homecoming Court isn’t live right now.': 'La Corte de Homecoming no está disponible en este momento.',
   'Check back during homecoming season. This is where the court’s names, photos, and bios will be once nominations are in.':
     'Vuelve durante la temporada de homecoming. Aquí aparecerán los nombres, fotos y biografías de la corte una vez que se reciban las nominaciones.',
   'No election is running right now.': 'No hay ninguna elección en curso en este momento.',
-  'Candidate statements show up here once the ballot is set. Check back during election season.':
-    'Las declaraciones de los candidatos aparecerán aquí una vez definida la boleta: vuelve durante la temporada de elecciones.',
+  "Candidate statements will be posted here once the ballot is finalized. Check back during election season.": "Las declaraciones de los candidatos se publicarán aquí cuando la boleta esté lista. Vuelve durante la temporada de elecciones.",
 
   // ── 404 ──
   'Page not found': 'Página no encontrada',
-  'That link doesn’t go anywhere. It may have moved when we rebuilt the site.': 'Ese enlace no lleva a ningún lado. Puede haber cambiado cuando reconstruimos el sitio.',
+  "We couldn’t find this page. It may have been moved when the website was updated.": "No pudimos encontrar esta página. Puede que se haya movido cuando se actualizó el sitio web.",
   'Back to Home': 'Volver al inicio',
 
   // ── shared loading / notices ──
   'Loading the latest…': 'Cargando lo último…',
   'Loading spirit points…': 'Cargando puntos de espíritu…',
+  "There are no events in the next three weeks. Check back soon for updates.": "No hay eventos en las próximas tres semanas. Vuelve pronto para ver novedades.",
+  "Announcements are read over the PA on Wednesday and Friday mornings. Pick a highlighted day on the calendar to see that morning’s announcements, and click on a headline to read the whole announcement.": "Los anuncios se leen por el altavoz los miércoles y viernes por la mañana. Elige un día marcado en el calendario para ver los anuncios de esa mañana, y haz clic en un titular para leer el anuncio completo.",
+  "This page is only for reading candidate statements. Voting happens on the official ballot.": "Esta página es solo para leer las declaraciones de los candidatos. La votación se hace en la boleta oficial.",
+  "Download links will be added here when the app is released. Until then, you can still use everything listed under the website.": "Los enlaces de descarga se agregarán aquí cuando se lance la app. Mientras tanto, puedes seguir usando todo lo que aparece en la lista del sitio web.",
 }

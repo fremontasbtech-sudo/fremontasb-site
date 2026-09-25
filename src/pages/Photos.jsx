@@ -48,7 +48,7 @@ export default function Photos() {
 
           <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-rule pt-8">
             <p className="text-sm text-body">
-              Every album (rallies, dances, spirit weeks) is on the ASB Flickr. Took photos at an event? Email them to{' '}
+              All of our albums, including rallies, dances, and spirit weeks, are on the ASB Flickr. If you took photos at an event, you can email them to{' '}
               <a href={`mailto:${school.email}`} className="link-brand">{school.email}</a>.
             </p>
             <Button variant="secondary" href={links.flickr} external>All albums on Flickr</Button>

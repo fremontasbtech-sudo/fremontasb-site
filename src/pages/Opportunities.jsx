@@ -41,8 +41,7 @@ export default function Opportunities() {
             <p className="eyebrow mb-2">About these postings</p>
             <div className="rule-accent-left mb-4" />
             <p className="text-sm leading-relaxed text-body">
-              The college and career counselors share these postings. The document updates whenever they
-              add to it. For questions about a specific posting, ask the College &amp; Career Center.
+              These postings are shared by the college and career counselors, and the document is updated whenever they add something new. If you have questions about a posting, ask the College &amp; Career Center.
             </p>
             {links.opportunitiesDeck ? (
               <div className="mt-6">
