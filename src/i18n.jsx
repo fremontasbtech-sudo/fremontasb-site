@@ -33,7 +33,10 @@ function readStored() {
 
 function translateTree(root, dict) {
   if (!root || root.querySelectorAll === undefined) return
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT)
+  // Skip anything marked translate="no" (e.g. nominee names typed by students).
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode: (t) => (t.parentElement && t.parentElement.closest('[translate="no"]') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+  })
   const nodes = []
   let n
   while ((n = walker.nextNode())) nodes.push(n)

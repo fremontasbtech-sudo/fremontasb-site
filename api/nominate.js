@@ -17,12 +17,22 @@ const MAX = 4
 const MAX_LEN = 60
 
 const clean = (v) =>
-  typeof v === 'string' ? v.replace(/[\t\n\r]/g, ' ').replace(/[\x00-\x1F\x7F]/g, '').replace(/\s+/g, ' ').trim() : ''
+  typeof v === 'string'
+    ? v.normalize('NFKC').replace(/\s/g, ' ').replace(/[\p{Cc}\p{Cf}]/gu, '').replace(/\s+/g, ' ').trim()
+    : ''
+// Must start with a letter (so nothing becomes a spreadsheet formula) and use only letters,
+// accents, spaces, hyphens, apostrophes and periods. Same rule as the Apps Script.
+const NAME_OK = /^\p{Script=Latin}[\p{Script=Latin}\p{M} .'\u2019-]*$/u
+const nameKey = (first, last) =>
+  (first + last).normalize('NFD').replace(/\p{M}/gu, '').replace(/[^A-Za-z]/g, '').toLowerCase()
 
 async function verify(credential) {
   if (typeof credential !== 'string' || credential.length < 100 || credential.length > 4096) return null
   const r = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`)
-  if (!r.ok) return null
+  // 400 = Google says the token is bad. Anything else (429/5xx) means "couldn't check": return
+  // undefined and let the Apps Script (which checks the token itself) decide.
+  if (r.status === 400) return null
+  if (!r.ok) return undefined
   const t = await r.json()
   const email = String(t.email || '').trim().toLowerCase()
   const domain = email.split('@')[1] || ''
@@ -43,7 +53,10 @@ function validate(raw) {
     const last = clean(raw[i]?.last)
     if (!first || !last) return { error: `Nominee ${i + 1} needs both a first and a last name.` }
     if (first.length > MAX_LEN || last.length > MAX_LEN) return { error: `Nominee ${i + 1}: names must be ${MAX_LEN} characters or fewer.` }
-    const key = `${first} ${last}`.toLowerCase()
+    if (!NAME_OK.test(first) || !NAME_OK.test(last)) {
+      return { error: `Nominee ${i + 1}: use letters only (spaces, hyphens, apostrophes and periods are fine).` }
+    }
+    const key = nameKey(first, last)
     if (seen.has(key)) return { error: `You listed ${first} ${last} more than once. Each nominee can only appear one time.` }
     seen.add(key)
     out.push({ first, last })
@@ -87,10 +100,8 @@ export default async function handler(req, res) {
     nominees = v.nominees
   }
 
-  // Speed: start the Apps Script call and our own Google check AT THE SAME TIME. The script
-  // re-verifies the token itself before writing anything, so running them in parallel is safe;
-  // our check only exists to give clear sign-in errors without waiting on the script.
-  const scriptP = callScript({ action, credential: body.credential, nominees }).then((v) => ({ v }), (e) => ({ e }))
+  // Check the token with Google FIRST; only a token that passes (or that Google couldn't check
+  // right now) is forwarded, so junk requests never reach the Apps Script or use its quota.
   let who
   try { who = await verify(body.credential) } catch { who = undefined }
   if (who === null) return res.status(401).json({ ok: false, error: 'signin', message: 'Your sign-in expired. Please sign in again.' })
@@ -98,7 +109,7 @@ export default async function handler(req, res) {
     return res.status(403).json({ ok: false, error: 'wrong-domain', email: who.email, message: 'That’s not a school account. Sign in with your @student.fuhsd.org account.' })
   }
 
-  const s = await scriptP
+  const s = await callScript({ action, credential: body.credential, nominees }).then((v) => ({ v }), (e) => ({ e }))
   const out = s.v
   if (!out || typeof out !== 'object' || s.e) {
     return res.status(502).json({ ok: false, error: 'busy', message: 'Couldn’t save right now. Please try again in a moment.' })
@@ -110,7 +121,7 @@ export default async function handler(req, res) {
   if (out.error === 'signin' || out.error === 'wrong-domain') return res.status(401).json(out)
   const email = (who && who.email) || out.email || ''
   if (action === 'state') {
-    if (out.ok === false) return res.status(200).json(out)
+    if (out.ok === false) return res.status(out.error === 'busy' ? 502 : 200).json(out)
     return res.status(200).json({ ok: true, email, config: out.config, existing: out.existing || null })
   }
   return res.status(200).json({ ...out, email })

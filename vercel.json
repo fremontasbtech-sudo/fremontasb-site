@@ -8,6 +8,9 @@
   "functions": {
     "api/nominate.js": {
       "maxDuration": 60
+    },
+    "api/nominations-config.js": {
+      "maxDuration": 60
     }
   }
 }

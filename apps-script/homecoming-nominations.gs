@@ -50,7 +50,7 @@ function book_() {
 
 // Nominations are written to the Nominations / Test Submissions tabs of the same Events
 // spreadsheet (ASB's own sheet: ASB Tech, ASB Cabinet and the advisor).
-var NOM_SHEET_PROP_ = 'NOM_SHEET_ID'; // only used by moveNominationsBack() below
+var NOM_SHEET_PROP_ = 'NOM_SHEET_ID'; // only used by moveNominationsBack_() below
 var NOM_HEADERS_ = ['Timestamp', 'Nominator Email', 'N1 First', 'N1 Last', 'N2 First', 'N2 Last',
   'N3 First', 'N3 Last', 'N4 First', 'N4 Last'];
 
@@ -61,7 +61,7 @@ function nomBook_() {
 // ONE-TIME (Run from the editor, Sept 24 2026): copies any rows saved in the temporary separate
 // spreadsheet back into the Events sheet tabs (newer row per email wins), then forgets that
 // spreadsheet's id. Safe to re-run; does nothing once the id is gone.
-function moveNominationsBack() {
+function moveNominationsBack_() {
   var props = PropertiesService.getScriptProperties();
   var id = props.getProperty(NOM_SHEET_PROP_);
   if (!id) { Logger.log('Nothing to move back.'); return; }
@@ -303,15 +303,22 @@ function cleanName_(v) {
   if (typeof v !== 'string' && typeof v !== 'number') return '';
   var s;
   try { s = String(v); } catch (err) { s = ''; }
-  s = s.replace(/[\t\n\r]/g, ' ');
-  s = s.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+  try { s = s.normalize('NFKC'); } catch (err) { /* keep as is */ }
+  s = s.replace(/\s/g, ' ');
+  s = s.replace(/[\p{Cc}\p{Cf}]/gu, ''); // controls, zero-width, RTL/LTR overrides
   s = s.replace(/\s+/g, ' ');
   return s.trim();
 }
 
-// Key used for duplicate detection: "first last", lowercase, single-spaced.
+// A name must START with a letter (so nothing can become a spreadsheet formula: = + - @) and
+// contain only letters, accents, spaces, hyphens, apostrophes and periods.
+var NAME_OK_ = /^\p{Script=Latin}[\p{Script=Latin}\p{M} .'\u2019-]*$/u;
+
+// Key used for duplicate detection: letters only, accents folded, lowercase
+// ("José O'Brien" == "jose obrien").
 function normName_(first, last) {
-  return (cleanName_(first) + ' ' + cleanName_(last)).replace(/\s+/g, ' ').trim().toLowerCase();
+  return (cleanName_(first) + cleanName_(last)).normalize('NFD')
+    .replace(/\p{M}/gu, '').replace(/[^A-Za-z]/g, '').toLowerCase();
 }
 
 function isArray_(v) {
@@ -347,6 +354,9 @@ function validateNominees_(raw) {
     if (first.length > MAX_NAME_LEN_ || last.length > MAX_NAME_LEN_) {
       return { ok: false, message: 'Nominee ' + n + ': names must be ' + MAX_NAME_LEN_ + ' characters or fewer.' };
     }
+    if (!NAME_OK_.test(first) || !NAME_OK_.test(last)) {
+      return { ok: false, message: 'Nominee ' + n + ': use letters only (spaces, hyphens, apostrophes and periods are fine).' };
+    }
     var key = normName_(first, last);
     if (Object.prototype.hasOwnProperty.call(seen, key)) {
       return { ok: false, message: 'You listed ' + seen[key] + ' more than once. Each nominee can only appear one time.' };
@@ -376,7 +386,8 @@ function stateFor_(id) {
       var sh = nb && nb.getSheetByName(tabNameForMode_(config.mode));
       if (sh) existing = readOwnPicks_(sh, id.email);
     } catch (err) {
-      existing = null;
+      return { ok: false, error: 'busy',
+        message: 'Couldn\'t check your nominations right now. Please try again in a moment.' };
     }
   }
   return {
@@ -413,26 +424,30 @@ function submitFor_(id, nominees) {
     return { ok: false, error: 'invalid', message: v.message };
   }
 
+  // Open the spreadsheet BEFORE taking the lock so the locked section stays short.
+  var tabName = tabNameForMode_(config.mode);
+  var sh;
+  try {
+    var nb = nomBook_();
+    sh = nb && nb.getSheetByName(tabName);
+  } catch (err) {
+    return { ok: false, error: 'busy',
+      message: 'Couldn\'t save right now. Please try again in a moment.' };
+  }
+  if (!sh) {
+    return { ok: false, error: 'no-tab',
+      message: 'The "' + tabName + '" tab is missing from the spreadsheet. Please tell ASB.' };
+  }
+
   var lock = LockService.getScriptLock();
   try {
-    lock.waitLock(20000);
+    lock.waitLock(25000);
   } catch (err) {
     return { ok: false, error: 'busy',
       message: 'The server is busy right now. Please try again in a moment.' };
   }
 
   try {
-    var tabName = tabNameForMode_(config.mode);
-    var nb = nomBook_();
-    if (!nb) {
-      return { ok: false, error: 'no-tab',
-        message: 'Nominations storage isn\'t set up yet. Please tell ASB.' };
-    }
-    var sh = nb.getSheetByName(tabName);
-    if (!sh) {
-      return { ok: false, error: 'no-tab',
-        message: 'The "' + tabName + '" tab is missing from the spreadsheet. Please tell ASB.' };
-    }
 
     var row = [new Date(), id.email];
     for (var i = 0; i < MAX_NOMINEES_; i++) {
@@ -449,12 +464,15 @@ function submitFor_(id, nominees) {
     // OVERWRITES their row (under the script lock, so two saves can't create two rows), and only
     // the latest set counts. After the deadline config.open is false and we never get here.
     var existingRow = findRowByEmail_(sh, id.email);
+    var at = existingRow > 0 ? existingRow : sh.getLastRow() + 1;
+    // Names are stored as plain text, never interpreted (dates, numbers, formulas).
+    sh.getRange(at, 3, 1, row.length - 2).setNumberFormat('@');
     if (existingRow > 0) {
       sh.getRange(existingRow, 1, 1, row.length).setValues([row]);
       SpreadsheetApp.flush();
       return { ok: true, replaced: true };
     }
-    sh.appendRow(row);
+    sh.getRange(at, 1, 1, row.length).setValues([row]);
     SpreadsheetApp.flush();
     return { ok: true, replaced: false };
   } catch (err) {

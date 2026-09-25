@@ -50,10 +50,16 @@ export const ES = {
   // In-site sign-in + form (NominationForm.jsx)
   'This is a test run. Anything you submit here will': 'Esta es una prueba. Lo que envíes aquí',
   'Sign in to nominate': 'Inicia sesión para nominar',
-  'Sign in with your': 'Inicia sesión con tu cuenta de Google',
-  'Google account. We use this to verify your identity.': '. La usamos para verificar tu identidad.',
+  'Sign in with your': 'Inicia sesión con tu cuenta',
+  'Google account. We use this to verify your identity.': 'de Google. La usamos para verificar tu identidad.',
   'View our Privacy policies': 'Consulta nuestras políticas de privacidad',
   'here': 'aquí',
+  'Couldn’t check your nominations': 'No pudimos revisar tus nominaciones',
+  'The server is busy right now. Please try again in a moment.': 'El servidor está ocupado. Inténtalo de nuevo en un momento.',
+  'Nominations have closed.': 'Las nominaciones cerraron.',
+  'Your picks are still here. Review them and save.': 'Tus nominaciones siguen aquí. Revísalas y guárdalas.',
+  'Your picks are still here. Review them and submit.': 'Tus nominaciones siguen aquí. Revísalas y envíalas.',
+  'Try again': 'Intentar de nuevo',
   'Google account. That’s how we know each set of picks is really yours. There’s no email to type.':
     '. Así sabemos que cada conjunto de nominaciones es realmente tuyo. No hay que escribir ningún correo.',
   'Trouble signing in?': '¿Problemas para iniciar sesión?',
