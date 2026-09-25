@@ -148,7 +148,6 @@ function SpiritPoints() {
         {/* 7/12 - ranked ladder */}
         <div className="lg:col-span-7">
           {loading && <Loading label="Loading spirit points…" />}
-          {error && <Notice>Couldn't reach the Google Sheet ({error}). Showing the last saved numbers.</Notice>}
           {!loading && classes.length > 0 && (
             <ol className="mt-4 divide-y divide-rule border-y border-rule lg:mt-0">
               {classes.map((c, i) => {

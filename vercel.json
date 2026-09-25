@@ -1,3 +1,7 @@
 {
-  "rewrites": [{ "source": "/((?!api/).*)", "destination": "/index.html" }]
+  "rewrites": [{ "source": "/((?!api/).*)", "destination": "/index.html" }],
+  "functions": {
+    "api/sheet.js": { "maxDuration": 60 },
+    "api/events.js": { "maxDuration": 60 }
+  }
 }
