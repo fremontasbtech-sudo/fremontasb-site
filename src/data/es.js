@@ -141,9 +141,9 @@ export const ES = {
 
   // ── Media page ──
   'Fremont TV episodes and event photos': 'Episodios de Fremont TV y fotos de eventos',
-  'Fremont TV video announcements are created by the ASB Technology and Content Creation Commission and are played bi-weekly during 4th block.':
-    'Los anuncios en video de Fremont TV son creados por la Comisión de Tecnología y Creación de Contenido de ASB y se transmiten cada dos semanas durante el 4.º bloque.',
-  "New episodes play during 4th block every other week. If you missed one, you can find every episode in the archive below.": "Los episodios nuevos se transmiten durante el 4.º bloque cada dos semanas. Si te perdiste uno, puedes encontrar todos los episodios en el archivo de abajo.",
+  'Fremont TV video announcements are created by the ASB Technology and Content Creation Commission and are played every week during 4th block.':
+    'Los anuncios en video de Fremont TV son creados por la Comisión de Tecnología y Creación de Contenido de ASB y se transmiten cada semana durante el 4.º bloque.',
+  "New episodes play during 4th block every week. If you missed one, you can find every episode in the archive below.": "Los episodios nuevos se transmiten durante el 4.º bloque cada semana. Si te perdiste uno, puedes encontrar todos los episodios en el archivo de abajo.",
   'Latest episode': 'Último episodio',
   'Archive': 'Archivo',
   'All': 'Todos',

@@ -10,7 +10,9 @@ import { makeCache, fetchJsonRetry } from './liveData'
 const CACHE_KEY = 'fasb.flickr.v1'
 const CACHE_TTL = 6 * 60 * 60 * 1000
 const cache = makeCache(CACHE_KEY, CACHE_TTL)
-const clean = (arr) => (Array.isArray(arr) ? arr.filter((a) => a && a.coverImageUrl) : [])
+// Covers at 1024px (_b) instead of 640px (_z); the same photo secret works for both sizes.
+const sharp = (u) => String(u).replace(/(live\.staticflickr\.com\/.+)_[zcm]\.jpg$/, '$1_b.jpg')
+const clean = (arr) => (Array.isArray(arr) ? arr.filter((a) => a && a.coverImageUrl).map((a) => ({ ...a, coverImageUrl: sharp(a.coverImageUrl) })) : [])
 
 export function useFlickr(fallbackAlbums = []) {
   const [state, setState] = useState(() => {

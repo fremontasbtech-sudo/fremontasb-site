@@ -17,7 +17,9 @@ const KINDS = ['Fremont TV', 'Rally', 'Event']
 
 const embedUrl = (id) => `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`
 const watchUrl = (id) => `https://www.youtube.com/watch?v=${id}`
-const thumbUrl = (id) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`
+// Sharpest thumbnail first (1280x720), falling back when YouTube doesn't have that size.
+const THUMB_SIZES = ['maxresdefault', 'sddefault', 'hqdefault']
+const thumbUrl = (id, i = 0) => `https://i.ytimg.com/vi/${id}/${THUMB_SIZES[i]}.jpg`
 
 function formatDate(iso) {
   const d = new Date(`${iso}T00:00:00`)
@@ -49,7 +51,7 @@ export default function Media() {
       <PageHero
         title="Media"
         eyebrow="Fremont TV · Rallies · Events"
-        subtext="Fremont TV video announcements are created by the ASB Technology and Content Creation Commission and are played bi-weekly during 4th block."
+        subtext="Fremont TV video announcements are created by the ASB Technology and Content Creation Commission and are played every week during 4th block."
       >
         <Button variant="secondary" href={links.youtube} external>YouTube channel</Button>
       </PageHero>
@@ -74,7 +76,7 @@ export default function Media() {
                   <Meta label="Type">{latest.kind}</Meta>
                 </dl>
                 <p className="mt-6 text-sm leading-relaxed text-body">
-                  New episodes play during 4th block every other week. If you missed one, you can find every episode in the archive below.
+                  New episodes play during 4th block every week. If you missed one, you can find every episode in the archive below.
                 </p>
                 <a href={watchUrl(latest.youtubeId)} target="_blank" rel="noopener noreferrer"
                    className="link-brand mt-4 inline-flex min-h-[44px] items-center gap-1.5 text-sm font-bold">
@@ -217,7 +219,19 @@ function Thumb({ id, alt, className }) {
       alt={alt}
       loading="lazy"
       className={className}
-      onError={(e) => { e.currentTarget.style.visibility = 'hidden' }}
+      data-size="0"
+      onLoad={(e) => {
+        // A missing maxres thumbnail can come back as YouTube's 120x90 gray placeholder.
+        const img = e.currentTarget
+        const i = Number(img.dataset.size)
+        if (img.naturalWidth <= 120 && i < THUMB_SIZES.length - 1) { img.dataset.size = String(i + 1); img.src = thumbUrl(id, i + 1) }
+      }}
+      onError={(e) => {
+        const img = e.currentTarget
+        const i = Number(img.dataset.size)
+        if (i < THUMB_SIZES.length - 1) { img.dataset.size = String(i + 1); img.src = thumbUrl(id, i + 1) }
+        else img.style.visibility = 'hidden'
+      }}
     />
   )
 }
