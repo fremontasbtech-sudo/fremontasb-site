@@ -72,30 +72,43 @@ function toStandings(rows) {
   }).filter(Boolean)
 }
 
+const CACHE_KEY = 'fasb.spirit.v1' // last good standings in this browser (instant repeat visits)
+function readCache() {
+  try {
+    const d = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null')
+    return Array.isArray(d) && d.length ? d : null
+  } catch { return null }
+}
+
+// Paints INSTANTLY (this browser's last good numbers, else the snapshot bundled at deploy time),
+// then refreshes from the sheet in the background. A slow or failed refresh never shows an
+// error or a spinner to visitors; the numbers just stay as they were.
 export function useSpiritPoints(sheetUrl, fallbackRows = []) {
-  const [state, setState] = useState({
-    rows: sheetUrl ? [] : fallbackRows,
-    loading: Boolean(sheetUrl),
-    error: null,
-    source: sheetUrl ? 'sheet' : 'local',
+  const [state, setState] = useState(() => {
+    const cached = sheetUrl ? readCache() : null
+    return { rows: cached || fallbackRows, loading: false, error: null, source: cached ? 'sheet' : 'local' }
   })
 
   useEffect(() => {
     if (!sheetUrl) return
     let cancelled = false
-    fetch(toCsvUrl(sheetUrl))
+    const ctrl = new AbortController()
+    const timer = setTimeout(() => ctrl.abort(), 15000)
+    fetch(toCsvUrl(sheetUrl), { signal: ctrl.signal })
       .then((r) => { if (!r.ok) throw new Error(`Sheet returned ${r.status}`); return r.text() })
       .then((text) => {
         if (cancelled) return
         const rows = toStandings(parseRows(text))
         if (!rows.length) throw new Error('No class rows found in sheet')
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify(rows)) } catch { /* private mode */ }
         setState({ rows, loading: false, error: null, source: 'sheet' })
       })
       .catch((err) => {
         if (cancelled) return
-        setState({ rows: fallbackRows, loading: false, error: err.message, source: 'local' })
+        setState((s) => ({ ...s, loading: false, error: err.message }))
       })
-    return () => { cancelled = true }
+      .finally(() => clearTimeout(timer))
+    return () => { cancelled = true; ctrl.abort(); clearTimeout(timer) }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sheetUrl])
 
