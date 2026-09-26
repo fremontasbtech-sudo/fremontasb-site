@@ -377,4 +377,40 @@ export const ES = {
   "Announcements are read over the PA on Wednesday and Friday mornings. Pick a highlighted day on the calendar to see that morning’s announcements, and click on a headline to read the whole announcement.": "Los anuncios se leen por el altavoz los miércoles y viernes por la mañana. Elige un día marcado en el calendario para ver los anuncios de esa mañana, y haz clic en un titular para leer el anuncio completo.",
   "This page is only for reading candidate statements. Voting happens on the official ballot.": "Esta página es solo para leer las declaraciones de los candidatos. La votación se hace en la boleta oficial.",
   "Download links will be added here when the app is released. Until then, you can still use everything listed under the website.": "Los enlaces de descarga se agregarán aquí cuando se lance la app. Mientras tanto, puedes seguir usando todo lo que aparece en la lista del sitio web.",
+
+  // ── Contact form (ContactForm.jsx) ──
+  'Send us a message': 'Envíanos un mensaje',
+  'Contact Fremont ASB': 'Contacta a Fremont ASB',
+  "Have a question, suggestion, or idea for Fremont’s Associated Student Body? We want to hear from you. Use this form to reach your student officers, share feedback about an event, or ask about upcoming school activities.":
+    "¿Tienes una pregunta, sugerencia o idea para el Cuerpo Estudiantil Asociado de Fremont? Queremos escucharte. Usa este formulario para comunicarte con tus representantes estudiantiles, dar tu opinión sobre un evento o preguntar sobre las próximas actividades escolares.",
+  'Full name (first and last)': 'Nombre completo (nombre y apellido)',
+  'School email': 'Correo escolar',
+  '(required)': '(obligatorio)',
+  'We’ll only use this to reply to you.': 'Solo lo usaremos para responderte.',
+  'Message or question for Fremont ASB': 'Mensaje o pregunta para Fremont ASB',
+  'Send message': 'Enviar mensaje',
+  'Sending…': 'Enviando…',
+  'Sending your message.': 'Enviando tu mensaje.',
+  'Please fix this:': 'Corrige esto:',
+  'Please enter your first and last name.': 'Escribe tu nombre y apellido.',
+  'Please enter your school email.': 'Escribe tu correo escolar.',
+  'Please check your email address.': 'Revisa tu correo electrónico.',
+  'Please write your message or question.': 'Escribe tu mensaje o pregunta.',
+  'Your name must be 100 characters or fewer.': 'Tu nombre debe tener 100 caracteres o menos.',
+  'Your message must be 2000 characters or fewer.': 'Tu mensaje debe tener 2000 caracteres o menos.',
+  'You’ve sent a few messages in a row. Please wait a few minutes and try again.':
+    'Enviaste varios mensajes seguidos. Espera unos minutos e inténtalo de nuevo.',
+  'Couldn’t send your message right now. Please try again in a moment, or email us at':
+    'No pudimos enviar tu mensaje en este momento. Inténtalo de nuevo en un momento, o escríbenos a',
+  'Your name, email, and message are saved in an ASB Google Sheet that only ASB advisors and ASB Tech can see. We use them only to read and answer your message.':
+    'Tu nombre, correo y mensaje se guardan en una hoja de Google de ASB que solo pueden ver los asesores de ASB y ASB Tech. Solo los usamos para leer y responder tu mensaje.',
+  'Read our privacy policy': 'Lee nuestra política de privacidad',
+  'Message sent': 'Mensaje enviado',
+  'Thanks for reaching out': 'Gracias por escribirnos',
+  'Your message is with the ASB officers now. If you asked a question, we’ll reply to the email you gave us.':
+    'Tu mensaje ya lo tienen los representantes de ASB. Si hiciste una pregunta, te responderemos al correo que nos diste.',
+  'What you sent': 'Lo que enviaste',
+  'From': 'De',
+  'Message': 'Mensaje',
+  'Send another message': 'Enviar otro mensaje',
 }

@@ -1,10 +1,10 @@
 import PageHero from '../components/PageHero'
-import Embed from '../components/Embed'
-import { embeds, school, links } from '../data/sources'
+import ContactForm from '../components/ContactForm'
+import { school, links } from '../data/sources'
 
 /**
- * Contact - Google Form embed + the same address/email the footer shows.
- * Swapping the form = change `embeds.contactForm` in src/data/sources.js.
+ * Contact - the in-site contact form (saves to the "Contact" tab of the Events sheet via
+ * /api/contact) + the same address/email the footer shows.
  */
 export default function Contact() {
   return (
@@ -18,23 +18,7 @@ export default function Contact() {
         <div className="grid gap-10 lg:grid-cols-[7fr_5fr] lg:gap-14">
           {/* Form first in source order so it comes first on mobile */}
           <div className="min-w-0">
-            {/*
-              The real Google Form sets its own height inside the iframe; this is just the box it
-              sits in. 520px on phones, 760px from lg up. ASB Tech: adjust minHeight / lg:!min-h-[…]
-              here if the form is longer or shorter than that.
-            */}
-            <Embed
-              src={embeds.contactForm}
-              title="Contact Fremont ASB form"
-              minHeight="520px"
-              className="lg:!min-h-[760px]"
-              fallback={
-                <>
-                  The contact form isn&rsquo;t up yet. Email{' '}
-                  <a href={`mailto:${school.email}`} className="link-brand [overflow-wrap:anywhere]">{school.email}</a>.
-                </>
-              }
-            />
+            <ContactForm />
           </div>
 
           <aside>

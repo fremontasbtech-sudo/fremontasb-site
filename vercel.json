@@ -17,6 +17,9 @@
     },
     "api/events.js": {
       "maxDuration": 60
+    },
+    "api/contact.js": {
+      "maxDuration": 60
     }
   }
 }

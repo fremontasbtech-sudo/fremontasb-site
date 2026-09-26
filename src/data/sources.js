@@ -114,7 +114,7 @@ export const links = {
 }
 
 export const embeds = {
-  // Contact page: Google Form → Send → <> Embed → copy the src="…" URL
+  // Old Contact page Google Form. NOT used anymore: the Contact page has its own form (src/components/ContactForm.jsx).
   contactForm: 'https://docs.google.com/forms/d/e/1FAIpQLScNFE8IoooVpQER65d2GIse6ru1nLIp03EHcBjeGBVpsOJMZQ/viewform?embedded=true',
 
   // Opportunities page: the College & Career Center's "Job & Internship Opportunities" Google Doc.

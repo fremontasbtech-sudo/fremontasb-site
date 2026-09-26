@@ -27,6 +27,13 @@ export default function Privacy() {
             deleted after that event&rsquo;s results are final. Your name and email are never shown publicly.
           </p>
 
+          <h2 className="font-display text-xl font-extrabold tracking-tight text-ink">The contact form</h2>
+          <p>
+            You don&rsquo;t need to sign in to send us a message. When you use the form on the Contact page, we save your
+            name, the email you give us, and your message in an ASB Google Sheet. Only ASB advisors and ASB Tech can see
+            it. We use it only to read your message and reply to you, and we never share it or show it publicly.
+          </p>
+
           <h2 className="font-display text-xl font-extrabold tracking-tight text-ink">Questions</h2>
           <p>
             Email <a href={`mailto:${school.email}`} className="link-brand [overflow-wrap:anywhere]">{school.email}</a> and

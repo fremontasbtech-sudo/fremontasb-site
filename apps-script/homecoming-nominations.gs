@@ -232,6 +232,10 @@ function doPost(e) {
   var body = {};
   try { body = JSON.parse((e && e.postData && e.postData.contents) || '{}') || {}; } catch (err) { body = {}; }
 
+  // The Contact page form needs no sign-in (parents and staff use it too), so it is handled
+  // before the token check. See contactSubmit_ below.
+  if (body.action === 'contact') return json_(contactSubmit_(body));
+
   var email = verifiedEmail_(body.credential);
   if (email === null) {
     return json_({ ok: false, error: 'signin', message: 'Your sign-in expired. Please sign in again.' });
@@ -531,4 +535,94 @@ function submitFor_(id, nominees) {
   } finally {
     try { lock.releaseLock(); } catch (err2) { /* ignore */ }
   }
+}
+
+
+// ---------------------------------------------------------------------
+// Contact form (fremontasb.org/contact)
+// ---------------------------------------------------------------------
+// api/contact.js validates first and forwards { action:'contact', name, email, message, ip }.
+// Each message is one new row in the private "Contact" tab of the Events spreadsheet (created
+// on first use). That tab is NOT in PUBLIC_TABS_, so only people the sheet is shared with can read it.
+var CONTACT_TAB_ = 'Contact';
+var CONTACT_HEADERS_ = ['Timestamp', 'Full Name', 'School Email', 'Message', 'Status'];
+var CONTACT_LIMITS_ = { name: 100, email: 254, message: 2000 };
+var CONTACT_PER_10_MIN_ = 5; // per email and per IP
+
+function contactClean_(v, max, multiline) {
+  var s = typeof v === 'string' ? v.normalize('NFKC') : '';
+  s = s.replace(/\r\n?/g, '\n').replace(/[\u0000-\u0008\u000B-\u001F\u007F\u200B-\u200F\u2028-\u202E\u2060-\u2064\uFEFF]/g, '');
+  s = multiline ? s.replace(/[ \t]+\n/g, '\n').replace(/\n{4,}/g, '\n\n\n') : s.replace(/\s+/g, ' ');
+  s = s.trim();
+  return s.length > max ? null : s;
+}
+
+// A leading apostrophe makes Sheets store the text as-is, so "=", "+", "-" or "@" at the start
+// can never turn a message into a formula. The apostrophe itself is not shown in the cell.
+function contactSafe_(s) {
+  return /^[=+\-@\t]/.test(s) ? "'" + s : s;
+}
+
+function contactRateOk_(key) {
+  var cache = CacheService.getScriptCache();
+  var k = 'ct_' + Utilities.base64EncodeWebSafe(
+    Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, key)).slice(0, 40);
+  var n = Number(cache.get(k) || 0);
+  if (n >= CONTACT_PER_10_MIN_) return false;
+  cache.put(k, String(n + 1), 600);
+  return true;
+}
+
+function contactSubmit_(body) {
+  var name = contactClean_(body.name, CONTACT_LIMITS_.name, false);
+  var email = contactClean_(body.email, CONTACT_LIMITS_.email, false);
+  var message = contactClean_(body.message, CONTACT_LIMITS_.message, true);
+  if (!name || !email || !message) {
+    return { ok: false, error: 'invalid', message: 'Please fill in your name, school email and message.' };
+  }
+  email = email.toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { ok: false, error: 'invalid', message: 'Please check your email address.' };
+  }
+  var ip = typeof body.ip === 'string' ? body.ip.slice(0, 64) : '';
+  if (!contactRateOk_('e:' + email) || (ip && !contactRateOk_('i:' + ip))) {
+    return { ok: false, error: 'rate', message: 'You\'ve sent a few messages in a row. Please wait a few minutes and try again.' };
+  }
+
+  var book, sh;
+  try {
+    book = book_();
+    sh = book.getSheetByName(CONTACT_TAB_);
+  } catch (err) {
+    return { ok: false, error: 'busy', message: 'Couldn\'t send right now. Please try again in a moment.' };
+  }
+  if (!sh) {
+    var lock = LockService.getScriptLock();
+    try { lock.waitLock(20000); } catch (err) {
+      return { ok: false, error: 'busy', message: 'Couldn\'t send right now. Please try again in a moment.' };
+    }
+    try {
+      sh = book.getSheetByName(CONTACT_TAB_);
+      if (!sh) {
+        sh = book.insertSheet(CONTACT_TAB_);
+        sh.getRange(1, 1, 1, CONTACT_HEADERS_.length).setValues([CONTACT_HEADERS_]).setFontWeight('bold');
+        sh.setFrozenRows(1);
+        sh.setColumnWidth(1, 160); sh.setColumnWidth(2, 180); sh.setColumnWidth(3, 240);
+        sh.setColumnWidth(4, 480); sh.setColumnWidth(5, 110);
+        sh.getRange('D:D').setWrap(true);
+      }
+    } catch (err) {
+      return { ok: false, error: 'busy', message: 'Couldn\'t send right now. Please try again in a moment.' };
+    } finally {
+      try { lock.releaseLock(); } catch (err2) { /* ignore */ }
+    }
+  }
+
+  try {
+    sh.appendRow([new Date(), contactSafe_(name), contactSafe_(email), contactSafe_(message), 'New']);
+    SpreadsheetApp.flush();
+  } catch (err) {
+    return { ok: false, error: 'busy', message: 'Couldn\'t send right now. Please try again in a moment.' };
+  }
+  return { ok: true };
 }
