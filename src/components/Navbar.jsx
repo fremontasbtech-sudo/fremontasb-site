@@ -24,7 +24,7 @@ const more = [
 
 // Desktop link: rust text + 2px rust rule underneath when active; hover is color only.
 const desktopLink = ({ isActive }) =>
-  `relative inline-flex h-16 items-center px-1.5 min-[1150px]:px-2.5 xl:px-3.5 min-[1360px]:px-4 font-display text-[14px] xl:text-[15px] font-bold tracking-[0.01em] transition-colors
+  `relative inline-flex h-16 items-center px-1.5 min-[1150px]:px-2.5 xl:px-3.5 min-[1360px]:px-4 font-display text-[14px] xl:text-[15px] font-bold min-[1150px]:tracking-[0.01em] transition-colors
    after:absolute after:inset-x-1.5 min-[1150px]:after:inset-x-2.5 xl:after:inset-x-3.5 min-[1360px]:after:inset-x-4 after:bottom-0 after:h-0.5 after:bg-brand after:transition-opacity
    ${isActive ? 'text-brand after:opacity-100' : 'text-ink hover:text-brand after:opacity-0'}`
 
@@ -58,7 +58,7 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-40 border-b border-rule bg-paper" aria-label="Main">
-      <div className="mx-auto flex h-16 w-full max-w-[84rem] items-center justify-between gap-4 px-5 sm:px-8">
+      <div className="mx-auto flex h-16 w-full max-w-[84rem] items-center justify-between gap-4 lg:gap-3 min-[1150px]:gap-4 px-5 sm:px-8 lg:px-5 min-[1150px]:px-8">
         <Link to="/" className="flex min-h-[44px] items-center gap-2.5 shrink-0" aria-label="Fremont ASB home">
           <img src={logo} alt="" className="h-9 w-auto" />
           <span className="font-display text-lg font-extrabold tracking-tight text-ink leading-none">
@@ -75,7 +75,7 @@ export default function Navbar() {
               onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setMoreOpen(false) }}>
             <button type="button" aria-haspopup="true" aria-expanded={moreOpen}
               onClick={() => setMoreOpen((v) => !v)}
-              className={`relative inline-flex h-16 items-center gap-1 px-1.5 min-[1150px]:px-2.5 xl:px-3.5 min-[1360px]:px-4 font-display text-[14px] xl:text-[15px] font-bold tracking-[0.01em] transition-colors
+              className={`relative inline-flex h-16 items-center gap-1 px-1.5 min-[1150px]:px-2.5 xl:px-3.5 min-[1360px]:px-4 font-display text-[14px] xl:text-[15px] font-bold min-[1150px]:tracking-[0.01em] transition-colors
                 after:absolute after:inset-x-1.5 min-[1150px]:after:inset-x-2.5 xl:after:inset-x-3.5 min-[1360px]:after:inset-x-4 after:bottom-0 after:h-0.5 after:bg-brand
                 ${moreActive ? 'text-brand after:opacity-100' : 'text-ink hover:text-brand after:opacity-0'}`}>
               More <Chevron open={moreOpen} />
@@ -95,7 +95,7 @@ export default function Navbar() {
           </li>
         </ul>
 
-        <LangToggle className="ml-2 mr-1 lg:ml-3" />
+        <LangToggle className="ml-2 mr-1 lg:ml-1 min-[1150px]:ml-3" />
 
         {/* Mobile toggle */}
         <button type="button" onClick={() => setOpen((v) => !v)}
