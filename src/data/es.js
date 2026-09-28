@@ -413,4 +413,22 @@ export const ES = {
   'From': 'De',
   'Message': 'Mensaje',
   'Send another message': 'Enviar otro mensaje',
+
+  // ── Homecoming Court: nominations closed page ──
+  'Nominations close Wednesday, September 30 at 12 PM.': 'Las nominaciones cierran el miércoles 30 de septiembre a las 12 PM.',
+  'Nominations are closed. Thank you to everyone who nominated a senior!': 'Las nominaciones están cerradas. ¡Gracias a todos los que nominaron a un estudiante de último año!',
+  'Nominations closed': 'Nominaciones cerradas',
+  'Thank you for nominating': 'Gracias por nominar',
+  'Nominations closed on Wednesday, September 30 at 12 PM, and new nominations or changes can’t be saved anymore. If you already nominated, your most recent picks are the ones that count.':
+    'Las nominaciones cerraron el miércoles 30 de septiembre a las 12 PM, y ya no se pueden guardar nominaciones nuevas ni cambios. Si ya nominaste, tus nominaciones más recientes son las que cuentan.',
+  'What happens next': 'Qué sigue',
+  'Counting the nominations': 'Contando las nominaciones',
+  'ASB is going through every student’s nominations now.': 'ASB está revisando las nominaciones de cada estudiante.',
+  'The court is announced': 'Se anuncia la corte',
+  '8 members come from student nominations, and the other 4 are selected by teachers. All 12 will be posted on this page.':
+    '8 miembros salen de las nominaciones de los estudiantes y los otros 4 los eligen los maestros. Los 12 se publicarán en esta página.',
+  'Royalty voting': 'Votación de la realeza',
+  'Voting for the 2 Homecoming Royalty winners happens during Homecoming Week, October 5 to 9.':
+    'La votación para los 2 ganadores de la Realeza de Homecoming será durante la Semana de Homecoming, del 5 al 9 de octubre.',
+  'Questions? Contact ASB': '¿Preguntas? Contacta a ASB',
 }

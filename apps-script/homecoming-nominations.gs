@@ -87,6 +87,8 @@ function moveNominationsBack_() {
 var ALLOWED_DOMAINS_ = ['student.fuhsd.org', 'fuhsd.org'];
 var MAX_NOMINEES_ = 4;
 var MAX_NAME_LEN_ = 60;
+// Nominations close at this exact moment no matter what the Config tab says: Wed Sep 30 2026, 12:00 PM PDT.
+var CLOSES_AT_ = Date.parse('2026-09-30T12:00:00-07:00');
 
 // ---------------------------------------------------------------------
 // Config
@@ -106,6 +108,8 @@ function readConfig_() {
   // Automatic close: if the deadline cell is a real DATE, nominations close at the end of that
   // day even if nobody flips "open" to no. (A plain-text deadline is display-only.)
   if (cfg.deadlineEnd && Date.now() > cfg.deadlineEnd) cfg.open = false;
+  // Hard deadline (same moment as homecomingNominationsClosesAt in the site's sources.js).
+  if (Date.now() >= CLOSES_AT_) cfg.open = false;
   return cfg;
 }
 

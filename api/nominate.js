@@ -9,7 +9,10 @@
 // writes (defense in depth), so there is no shared secret anywhere.
 //
 // Body: { credential: <Google ID token>, action: 'state' | 'submit', nominees?: [{first,last}] }
-import { homecomingNominationsApi, googleClientId } from '../src/data/sources.js'
+import { homecomingNominationsApi, googleClientId, homecomingNominationsClosesAt } from '../src/data/sources.js'
+
+// Hard deadline: after this moment no submit is forwarded, whatever the Config tab says.
+const CLOSES_AT = Date.parse(homecomingNominationsClosesAt)
 
 const CLIENT_ID = googleClientId
 const ALLOWED = ['student.fuhsd.org', 'fuhsd.org']
@@ -93,6 +96,9 @@ export default async function handler(req, res) {
   body = body || {}
 
   const action = body.action === 'submit' ? 'submit' : 'state'
+  if (action === 'submit' && Number.isFinite(CLOSES_AT) && Date.now() >= CLOSES_AT) {
+    return res.status(200).json({ ok: false, error: 'closed', message: 'Nominations have closed.' })
+  }
   let nominees
   if (action === 'submit') {
     const v = validate(body.nominees)

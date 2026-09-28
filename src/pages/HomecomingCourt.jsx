@@ -1,6 +1,8 @@
 import PageHero from '../components/PageHero'
 import { Loading, DevNote } from '../components/DataState'
-import { sheets, googleClientId } from '../data/sources'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { sheets, googleClientId, homecomingNominationsClosesAt, homecomingNominationsClosesLabel } from '../data/sources'
 import { useSheetData, isHidden } from '../data/useSheetData'
 import localCourt from '../data/homecomingCourt.json'
 import NominationForm from '../components/NominationForm'
@@ -22,14 +24,37 @@ import { useNominationConfig } from '../data/useNominationConfig'
  * This page intentionally shares nothing with /elections, they run on different
  * schedules and are edited by different people.
  */
+const CLOSE_MS = Date.parse(homecomingNominationsClosesAt)
+// The closed page shows from the deadline until the court is posted (or 45 days, whichever is first).
+const CLOSED_PAGE_MS = 45 * 24 * 60 * 60 * 1000
+
+/** true once the nomination deadline has passed. Flips on its own at the deadline, no reload needed. */
+function useNominationsClosed() {
+  const [closed, setClosed] = useState(() => Number.isFinite(CLOSE_MS) && Date.now() >= CLOSE_MS)
+  useEffect(() => {
+    if (closed || !Number.isFinite(CLOSE_MS)) return
+    const ms = CLOSE_MS - Date.now()
+    if (ms > 2 ** 31 - 1) return // more than ~24 days away; a later visit will pick it up
+    const t = setTimeout(() => setClosed(true), Math.max(0, ms) + 250)
+    return () => clearTimeout(t)
+  }, [closed])
+  return closed
+}
+
 export default function HomecomingCourt() {
   const { rows, loading, error, source } = useSheetData(sheets.homecomingCourt, localCourt.candidates)
   const { config: nom, loading: nomLoading } = useNominationConfig()
+  const pastDeadline = useNominationsClosed()
+  const showClosed = pastDeadline && Date.now() < CLOSE_MS + CLOSED_PAGE_MS
 
   const candidates = rows.filter((r) => (r.name || '').trim() !== '' && !isHidden(r.active))
   const active = source === 'sheet' ? candidates.length > 0 : localCourt.active !== false
   const cycle =
     rows.find((r) => (r.cycle || '').trim())?.cycle.trim() || nom?.cycle || localCourt.cycle || 'Homecoming Court'
+
+  // Once the deadline passes, the closed page shows until the final court is posted. It does not
+  // wait for the Config tab, so it appears exactly on time even if nobody touches the sheet.
+  if (showClosed && !active && !loading) return <NominationsClosed cycle={cycle} />
 
   if (loading || nomLoading) {
     return (
@@ -45,7 +70,7 @@ export default function HomecomingCourt() {
   // nominations close and the final 12 are entered. Students nominate right here: Sign in
   // with Google, then /api/nominate verifies the token server-side before anything is saved
   // (no email is ever typed). See useNominationConfig + NominationForm.
-  if (nom?.open) {
+  if (nom?.open && !pastDeadline) {
     return (
       <>
         <PageHero
@@ -85,13 +110,15 @@ export default function HomecomingCourt() {
                 Once the court is chosen, voting for the 2 Homecoming Royalty winners will happen during
                 Homecoming Week.
               </p>
-              {nom?.deadline && googleClientId ? (
-                <p className="text-sm font-bold text-ink">Nominations close {nom.deadline}.</p>
+              {googleClientId && (homecomingNominationsClosesLabel || nom?.deadline) ? (
+                <p className="text-sm font-bold text-ink">
+                  {`Nominations close ${homecomingNominationsClosesLabel || nom.deadline}.`}
+                </p>
               ) : null}
             </div>
           </div>
           <div className="mt-8">
-            <NominationForm mode={nom.mode} deadline={nom.deadline} />
+            <NominationForm mode={nom.mode} deadline={homecomingNominationsClosesLabel || nom.deadline} />
           </div>
         </section>
       </>
@@ -148,6 +175,62 @@ export default function HomecomingCourt() {
                 </li>
               ))}
             </ul>
+          </div>
+        </div>
+      </section>
+    </>
+  )
+}
+
+/** Shown from the nomination deadline until the final court is posted. */
+function NominationsClosed({ cycle }) {
+  const steps = [
+    { title: 'Counting the nominations', text: 'ASB is going through every student’s nominations now.' },
+    { title: 'The court is announced', text: '8 members come from student nominations, and the other 4 are selected by teachers. All 12 will be posted on this page.' },
+    { title: 'Royalty voting', text: 'Voting for the 2 Homecoming Royalty winners happens during Homecoming Week, October 5 to 9.' },
+  ]
+  return (
+    <>
+      <PageHero
+        title="Homecoming Court"
+        eyebrow={cycle !== 'Homecoming Court' ? cycle : 'Nominations'}
+        subtext="Nominations are closed. Thank you to everyone who nominated a senior!"
+      />
+      <section className="container-site section-space">
+        <div className="mx-auto max-w-xl">
+          <div className="card-surface p-6 sm:p-8">
+            <p className="eyebrow flex items-center gap-2">
+              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-brand-tint text-brand" aria-hidden="true">
+                <svg className="h-3 w-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M4 8h8" /></svg>
+              </span>
+              Nominations closed
+            </p>
+            <h2 className="mt-2 font-display text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">
+              Thank you for nominating
+            </h2>
+            <p className="mt-4 leading-relaxed text-body">
+              {`Nominations closed on ${homecomingNominationsClosesLabel}, and new nominations or changes can’t be saved anymore. If you already nominated, your most recent picks are the ones that count.`}
+            </p>
+
+            <p className="mt-7 font-display text-xs font-bold uppercase tracking-[0.14em] text-ink">What happens next</p>
+            <ol className="mt-3 space-y-3">
+              {steps.map((s, i) => (
+                <li key={s.title} className="flex gap-3 rounded-lg border border-rule px-4 py-3">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-tint font-display text-sm font-bold text-brand" aria-hidden="true">
+                    {i + 1}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="font-display font-bold text-ink">{s.title}</p>
+                    <p className="mt-0.5 text-sm leading-relaxed text-body">{s.text}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+
+            <div className="mt-7 flex flex-col gap-3 border-t border-rule pt-6 sm:flex-row sm:items-center sm:gap-5">
+              <Link to="/" className="btn-secondary">Back to Home</Link>
+              <Link to="/contact" className="text-sm font-bold text-brand underline-offset-4 hover:underline">Questions? Contact ASB</Link>
+            </div>
           </div>
         </div>
       </section>
