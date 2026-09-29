@@ -11,6 +11,7 @@
 const DEFAULT_API_KEY = '50ce36c804dbe7a0ee3942cb833f460c'
 
 import { llmTitles, llmError } from './_llm.js'
+import { cleanAlbumTitle } from '../src/data/albumTitle.js'
 
 // LLM-cleaned album titles. Rule (matches the announcements titling): return the event
 // name only, in Title Case, with any YEAR/DATE removed — the site shows the album's real
@@ -43,7 +44,8 @@ async function applyAlbumTitles(albums) {
     const titles = await llmTitles(chunk, ALBUM_INSTRUCTION)
     if (titles) { used = true; chunk.forEach((n, j) => { if (titles[j]) albumTitleCache.set(n, titles[j]) }) }
   }
-  const out = albums.map((a) => ({ ...a, title: albumTitleCache.get(a.name) || '' }))
+  // Same cleanup as the client fallback, so an LLM title can't keep a stray date either.
+  const out = albums.map((a) => { const t = albumTitleCache.get(a.name); return { ...a, title: t ? cleanAlbumTitle(t) : '' } })
   out.titleSource = used ? 'llm' : 'heuristic'
   out.titleError = used ? '' : llmError()
   return out

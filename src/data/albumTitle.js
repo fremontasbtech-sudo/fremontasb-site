@@ -9,6 +9,9 @@ export function cleanAlbumTitle(name) {
   s = s.replace(/(^|[\s(–\u2014-])\d{1,2}\/\d{1,2}(\/\d{2,4})?(?=$|[\s)(,–\u2014-])/g, '$1')
   // "Mon." / "Month" + year: "Aug. 2026", "August 2026"
   s = s.replace(/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?\s+(19|20)\d{2}\b/ig, ' ')
+  // short years with an apostrophe: "'26", "’26", "Clubs Day - '26" (keep "Class of '26")
+  s = s.replace(/(^|[\s(–—-])['‘’`]\d{2}(?=$|[\s)(,–—-])/g, (m, pre, off, str) =>
+    /\bof\s*$/i.test(str.slice(0, off + pre.length)) ? m : pre)
   // leading bare year: "2025 Winter Rally"
   s = s.replace(/^(19|20)\d{2}\s+/, '')
   // trailing bare year, but keep "Class of YYYY" and hyphen ranges (2023-2024)
