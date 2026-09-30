@@ -190,16 +190,16 @@ export default function HomecomingCourt() {
 /** Shown from the nomination deadline until the final court is posted. */
 function NominationsClosed({ cycle }) {
   const steps = [
-    { title: 'Counting the nominations', text: 'ASB is going through every student’s nominations now.' },
-    { title: 'The court is announced', text: '8 members come from student nominations, and the other 4 are selected by teachers. All 12 will be posted on this page.' },
-    { title: 'Royalty voting', text: 'Voting for the 2 Homecoming Royalty winners happens during Homecoming Week, October 5 to 9.' },
+    { title: 'We count the nominations', text: 'We go through every student’s nominations and count them.' },
+    { title: 'We announce the court', text: '8 members come from your nominations, and teachers pick the other 4. We’ll post all 12 on this page.' },
+    { title: 'You vote for royalty', text: 'During Homecoming Week, October 5 to 9, you’ll vote for the 2 Homecoming Royalty winners.' },
   ]
   return (
     <>
       <PageHero
         title="Homecoming Court"
         eyebrow={cycle !== 'Homecoming Court' ? cycle : 'Nominations'}
-        subtext="Nominations are closed. Thank you to everyone who nominated a senior!"
+        subtext="Nominations are closed. Thank you to everyone who nominated a senior."
       />
       <section className="container-site section-space">
         <div className="mx-auto max-w-xl">
@@ -211,10 +211,10 @@ function NominationsClosed({ cycle }) {
               Nominations closed
             </p>
             <h2 className="mt-2 font-display text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">
-              Thank you for nominating
+              Thanks for nominating
             </h2>
             <p className="mt-4 leading-relaxed text-body">
-              {`Nominations closed on ${homecomingNominationsClosesLabel}, and new nominations or changes can’t be saved anymore. If you already nominated, your most recent picks are the ones that count.`}
+              {`Nominations closed on ${homecomingNominationsClosesLabel}. We can’t save new nominations or changes anymore. If you nominated, we have your most recent picks, and those are the ones that count.`}
             </p>
 
             <p className="mt-7 font-display text-xs font-bold uppercase tracking-[0.14em] text-ink">What happens next</p>
@@ -234,7 +234,7 @@ function NominationsClosed({ cycle }) {
 
             <div className="mt-7 flex flex-col gap-3 border-t border-rule pt-6 sm:flex-row sm:items-center sm:gap-5">
               <Link to="/" className="btn-secondary">Back to Home</Link>
-              <Link to="/contact" className="text-sm font-bold text-brand underline-offset-4 hover:underline">Questions? Contact ASB</Link>
+              <Link to="/contact" className="text-sm font-bold text-brand underline-offset-4 hover:underline">Questions? Contact us</Link>
             </div>
           </div>
         </div>

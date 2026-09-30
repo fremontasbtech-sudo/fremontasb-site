@@ -416,19 +416,19 @@ export const ES = {
 
   // ── Homecoming Court: nominations closed page ──
   'Nominations close Wednesday, September 30 at 12 PM.': 'Las nominaciones cierran el miércoles 30 de septiembre a las 12 PM.',
-  'Nominations are closed. Thank you to everyone who nominated a senior!': 'Las nominaciones están cerradas. ¡Gracias a todos los que nominaron a un estudiante de último año!',
+  'Nominations are closed. Thank you to everyone who nominated a senior.': 'Las nominaciones están cerradas. Gracias a todos los que nominaron a un estudiante de último año.',
   'Nominations closed': 'Nominaciones cerradas',
-  'Thank you for nominating': 'Gracias por nominar',
-  'Nominations closed on Wednesday, September 30 at 12 PM, and new nominations or changes can’t be saved anymore. If you already nominated, your most recent picks are the ones that count.':
-    'Las nominaciones cerraron el miércoles 30 de septiembre a las 12 PM, y ya no se pueden guardar nominaciones nuevas ni cambios. Si ya nominaste, tus nominaciones más recientes son las que cuentan.',
+  'Thanks for nominating': 'Gracias por nominar',
+  'Nominations closed on Wednesday, September 30 at 12 PM. We can’t save new nominations or changes anymore. If you nominated, we have your most recent picks, and those are the ones that count.':
+    'Las nominaciones cerraron el miércoles 30 de septiembre a las 12 PM. Ya no podemos guardar nominaciones nuevas ni cambios. Si nominaste, tenemos tus nominaciones más recientes, y esas son las que cuentan.',
   'What happens next': 'Qué sigue',
-  'Counting the nominations': 'Contando las nominaciones',
-  'ASB is going through every student’s nominations now.': 'ASB está revisando las nominaciones de cada estudiante.',
-  'The court is announced': 'Se anuncia la corte',
-  '8 members come from student nominations, and the other 4 are selected by teachers. All 12 will be posted on this page.':
-    '8 miembros salen de las nominaciones de los estudiantes y los otros 4 los eligen los maestros. Los 12 se publicarán en esta página.',
-  'Royalty voting': 'Votación de la realeza',
-  'Voting for the 2 Homecoming Royalty winners happens during Homecoming Week, October 5 to 9.':
-    'La votación para los 2 ganadores de la Realeza de Homecoming será durante la Semana de Homecoming, del 5 al 9 de octubre.',
-  'Questions? Contact ASB': '¿Preguntas? Contacta a ASB',
+  'We count the nominations': 'Contamos las nominaciones',
+  'We go through every student’s nominations and count them.': 'Revisamos y contamos las nominaciones de cada estudiante.',
+  'We announce the court': 'Anunciamos la corte',
+  '8 members come from your nominations, and teachers pick the other 4. We’ll post all 12 on this page.':
+    '8 miembros salen de sus nominaciones y los maestros eligen a los otros 4. Publicaremos a los 12 en esta página.',
+  'You vote for royalty': 'Votas por la realeza',
+  'During Homecoming Week, October 5 to 9, you’ll vote for the 2 Homecoming Royalty winners.':
+    'Durante la Semana de Homecoming, del 5 al 9 de octubre, votarás por los 2 ganadores de la Realeza de Homecoming.',
+  'Questions? Contact us': '¿Preguntas? Contáctanos',
 }
