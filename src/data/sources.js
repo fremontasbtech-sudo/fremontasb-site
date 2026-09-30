@@ -73,7 +73,7 @@ export const googleClientId = '276898272987-f2qepltpkfs8um36rh6qpeesfk1u5i57.app
 // /api/nominate, /api/nominations-config and the Apps Script each compare the current time against it
 // on every request, so closing does NOT depend on anyone editing the Config tab or on a scheduled job.
 // For the next cycle: change both lines (and CLOSES_AT_ in apps-script/homecoming-nominations.gs).
-export const homecomingNominationsClosesAt = '2026-09-30T12:00:00-07:00'
+export const homecomingNominationsClosesAt = '2026-09-29T00:00:00-07:00' // CLOSED EARLY BY HAND (real deadline was 2026-09-30T12:00:00-07:00)
 export const homecomingNominationsClosesLabel = 'Wednesday, September 30 at 12 PM'
 
 export const homecomingNominationsApi = 'https://script.google.com/macros/s/AKfycbyGZ8M4yXzqgyx6985ITpaS9fBkPM89ro-98zc2oTwMWg0ntWHVGu1Bn6-mSz8qxmSlpA/exec'
