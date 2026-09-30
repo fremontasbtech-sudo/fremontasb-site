@@ -45,7 +45,11 @@ export default function HomecomingCourt() {
   const { rows, loading, error, source } = useSheetData(sheets.homecomingCourt, localCourt.candidates)
   const { config: nom, loading: nomLoading } = useNominationConfig()
   const pastDeadline = useNominationsClosed()
-  const showClosed = pastDeadline && Date.now() < CLOSE_MS + CLOSED_PAGE_MS
+  // Closed by hand: Config open = no while mode = live (the emergency switch in the sheet).
+  const configClosed = !!nom && !nom.open && nom.mode === 'live'
+  // ?preview=closed shows the closed page without closing anything (for checking the design).
+  const previewClosed = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('preview') === 'closed'
+  const showClosed = previewClosed || ((pastDeadline || configClosed) && Date.now() < CLOSE_MS + CLOSED_PAGE_MS)
 
   const candidates = rows.filter((r) => (r.name || '').trim() !== '' && !isHidden(r.active))
   const active = source === 'sheet' ? candidates.length > 0 : localCourt.active !== false
@@ -55,6 +59,7 @@ export default function HomecomingCourt() {
   // Once the deadline passes, the closed page shows until the final court is posted. It does not
   // wait for the Config tab, so it appears exactly on time even if nobody touches the sheet.
   if (showClosed && !active && !loading) return <NominationsClosed cycle={cycle} />
+  if (previewClosed) return <NominationsClosed cycle={cycle} />
 
   if (loading || nomLoading) {
     return (
