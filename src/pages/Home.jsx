@@ -559,13 +559,16 @@ function MorningAnnouncements() {
 
   const [selected, setSelected] = useState(null)
   const [view, setView] = useState(null)
+  // Follow the newest morning until the visitor picks a day themselves, so a fresh pull (or
+  // 8:30 AM passing) moves the calendar to the new day instead of leaving it on a cached one.
+  const picked = useRef(false)
+  const pick = (d) => { picked.current = true; setSelected(d) }
   useEffect(() => {
-    if (dates.length && !selected) {
-      setSelected(dates[0])
-      const [y, mm] = dates[0].split('-').map(Number)
-      setView({ y, m: mm - 1 })
-    }
-  }, [dates, selected])
+    if (!latest || picked.current || selected === latest) return
+    setSelected(latest)
+    const [y, mm] = latest.split('-').map(Number)
+    setView({ y, m: mm - 1 })
+  }, [latest, selected])
 
   const jumpLatest = () => {
     if (!latest) return
@@ -588,7 +591,7 @@ function MorningAnnouncements() {
         {view && (
           <>
             <div className="mx-auto max-w-md">
-              <Calendar view={view} setView={setView} datesWith={byDate} selected={selected} onSelect={setSelected} years={years} latest={latest} onJumpLatest={jumpLatest} />
+              <Calendar view={view} setView={setView} datesWith={byDate} selected={selected} onSelect={pick} years={years} latest={latest} onJumpLatest={jumpLatest} />
             </div>
 
             <div className="mt-10">

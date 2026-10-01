@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { makeCache, fetchJsonRetry } from './liveData'
 
 /**
@@ -33,6 +33,7 @@ function visible(all) {
 }
 
 export function useAnnouncements() {
+  const raw = useRef(null)
   const [state, setState] = useState(() => {
     const cached = cache.read()
     return Array.isArray(cached) && cached.length ? { items: visible(cached), loading: false } : { items: [], loading: true }
@@ -45,10 +46,23 @@ export function useAnnouncements() {
         if (cancelled) return
         const all = data.announcements
         cache.write(all)
+        raw.current = all
         setState({ items: visible(all), loading: false })
       })
       .catch(() => { if (!cancelled) setState((s) => ({ items: s.items, loading: false })) })
     return () => { cancelled = true }
+  }, [])
+
+  // Re-check every minute so a page left open reveals the new morning at 8:30 without a reload.
+  useEffect(() => {
+    const id = setInterval(() => {
+      const list = raw.current || cache.read()
+      if (Array.isArray(list) && list.length) {
+        const next = visible(list)
+        setState((s) => (next.length !== s.items.length ? { items: next, loading: false } : s))
+      }
+    }, 60 * 1000)
+    return () => clearInterval(id)
   }, [])
 
   return state
