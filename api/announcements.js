@@ -8,9 +8,11 @@ export default async function handler(req, res) {
   try {
     res.setHeader('Access-Control-Allow-Origin', '*')  // let the Firebird Hub app read this feed
     const announcements = await fetchAnnouncements(announcementsSheet)
-    if (announcements && announcements.length && announcements.titleFallbacks) {
+    const health = announcements.health || null
+    if (announcements && announcements.length && (announcements.titleFallbacks || (health && health.failed.length))) {
       // Some recent titles are heuristic stand-ins because the LLM hiccuped: keep this copy for
       // only 2 min so a later request tries the LLM again, instead of pinning them for 30 min.
+      // Same if a sheet tab failed to load this time.
       res.setHeader('Cache-Control', 's-maxage=120, stale-while-revalidate=120')
     } else if (announcements && announcements.length) {
       // Short CDN cache so sheet edits show within a few minutes; SWR keeps it instant.
@@ -18,7 +20,7 @@ export default async function handler(req, res) {
     } else {
       res.setHeader('Cache-Control', 'no-store') // don't cache an empty parse
     }
-    res.status(200).json({ announcements, titleSource: announcements.titleSource || 'heuristic', titleFallbacks: announcements.titleFallbacks || 0, titleError: announcements.titleError || '' })
+    res.status(200).json({ announcements, titleSource: announcements.titleSource || 'heuristic', titleFallbacks: announcements.titleFallbacks || 0, titleError: announcements.titleError || '', health })
   } catch (err) {
     res.status(200).json({ announcements: [], error: String(err && err.message || err) })
   }

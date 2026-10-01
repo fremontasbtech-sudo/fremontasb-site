@@ -5,7 +5,7 @@ import { llmTitles, llmError } from './_llm.js'
 // The sheet is a public gviz CSV — no key. The CLIENT decides what's visible
 // (past-only + 8:30 AM cutoff); this just extracts everything with real dates.
 
-const WEEK_RE = /week of\s+(\d{1,2})\/(\d{1,2})/i
+const WEEK_RE = /\bw(?:ee)?k\.?\s*of\s*:?\s*(\d{1,2})\s*[\/.-]\s*(\d{1,2})/i
 // A "day header" cell: an optional weekday word then a date — "Wednesday 9/9", "Mon 9/8",
 // or just a bare date "9/9" / "9/9/2026". Anchored + date-only, so a real announcement
 // paragraph can never match it. Used ONLY to detect + skip header rows.
@@ -103,62 +103,62 @@ function makeDate(mon, day, now) { return new Date(schoolYearFor(mon, now), mon 
 function mondayOf(d) { const x = new Date(d); const wd = x.getDay(); x.setDate(x.getDate() + (wd === 0 ? -6 : 1 - wd)); return x }
 function isoOf(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}` }
 
-// Each week block starts with "Week of M/D - M/D". We anchor on that week's Monday and place
-// each announcement by its column's WEEKDAY LABEL (Wed = Mon+2, Fri = Mon+4) — NOT the date typed
-// in the header cell, which in this sheet is often off by a day. So a "Wednesday" announcement
-// always goes out on the real Wednesday even when the sheet's date is wrong.
-export function parseAnnouncements(rows, now = new Date()) {
-  // WEEKLY blocks: a "Week of M/D - M/D" row, then a day-header row whose columns are the
-  // weekdays (Monday..Friday), then the week's announcements stacked under each day's column.
-  // Announcements are read over the PA on Wednesday and Friday, and the SAME item is usually
-  // typed into BOTH the Wed and the Fri column (lightly reworded for the day). So we date each
-  // cell by ITS OWN COLUMN's weekday: a Wednesday-column item shows only on Wednesday, a
-  // Friday-column item only on Friday. (Previously every cell was dumped onto both reading
-  // days, which surfaced Friday's items on Wednesday as duplicate "repeats".)
-  // Header dates are typed inconsistently, so a column's weekday comes from its header WORD
-  // when present, else its left-to-right position (Mon,Tue,Wed,Thu,Fri); the date is computed
-  // off the reliable "Week of" Monday.
-  const WEEKDAY_OFFSET = [['monday', 0], ['tuesday', 1], ['wednesday', 2], ['thursday', 3], ['friday', 4], ['saturday', 5], ['sunday', 6]]
-  const weekdayOffset = (cell) => {
-    const t = String(cell || '').trim().toLowerCase()
-    for (const [w, off] of WEEKDAY_OFFSET) if (t.startsWith(w)) return off
-    return null
-  }
+// HOW THE SHEET IS LAID OUT (and why this parser is cell-by-cell, not row-by-row):
+// Each week block starts with a "Week of M/D - M/D" cell. Columns B..F are Mon..Fri; the
+// announcements stack under Wednesday (D) and Friday (F). People edit this sheet by hand, so
+// the header rows are messy: header dates are often wrong, a header can be missing, and day
+// headers sometimes sit on the SAME row as "Week of" or share a row with an announcement
+// (Sept 28 2026 week: "Wednesday 9/30" was typed next to "Week of", and "Monday 9/29" sat
+// next to the first announcement, which made the old row-based parser drop the whole week).
+// So: every cell is judged on its own. "Week of" sets the week's Monday. A short day-header
+// cell ("Wednesday 9/30", "9/9/2026") only tells us its column's weekday, and only if it names
+// one. Anything else in a column with a weekday is an announcement, dated Monday + weekday.
+// A column with no usable header falls back to the fixed layout (B=Mon .. F=Fri).
+const WEEKDAY_WORDS = [['mon', 0], ['tue', 1], ['wed', 2], ['thu', 3], ['fri', 4], ['sat', 5], ['sun', 6]]
+const DEFAULT_COLS = { 1: 0, 2: 1, 3: 2, 4: 3, 5: 4 } // B..F = Mon..Fri
+function weekdayOffset(cell) {
+  const t = String(cell || '').trim().toLowerCase()
+  for (const [w, off] of WEEKDAY_WORDS) if (t.startsWith(w)) return off
+  return null
+}
+// A header-ish cell: a weekday word and/or a date, nothing else ("Wednesday", "Wed 9/30", "9/30").
+// Only a SHORT cell can be a week marker, so an announcement that mentions "the week of 10/12" can't reset the week.
+const weekCell = (cell) => cell.length <= 40 ? cell.match(WEEK_RE) : null
+const BARE_DAY_RE = /^\s*(?:mon|tue|tues|wed|weds|thu|thur|thurs|fri|sat|sun)[a-z]*\.?\s*$/i
+
+export function parseAnnouncements(rows, now = new Date(), stats = null) {
   const out = []
   let weekMonday = null
-  let colOffset = null // { columnIndex: weekdayOffset } for the current week block
+  let cols = null
   for (const row of rows) {
-    for (const c of row) {
-      const wm = (c || '').match(WEEK_RE)
-      if (wm) { weekMonday = mondayOf(makeDate(+wm[1], +wm[2], now)) }
-    }
-    // Day-header row (2+ weekday/date cells): learn which column maps to which weekday.
-    const headerCells = row.filter((c) => DAY_HEADER_RE.test((c || '').trim())).length
-    if (headerCells >= 2) {
-      colOffset = {}
-      let n = 0
-      for (let i = 0; i < row.length; i++) {
-        const cell = (row[i] || '').trim()
-        if (!DAY_HEADER_RE.test(cell)) continue
-        const w = weekdayOffset(cell)
-        colOffset[i] = (w == null ? n : w)
-        n++
-      }
-      continue
-    }
-    if (!weekMonday || !colOffset) continue
+    // Pass 1: structure cells on this row ("Week of", day headers) update the week + columns.
     for (let i = 0; i < row.length; i++) {
-      const off = colOffset[i]
-      if (off == null) continue                 // not a dated day-column
-      const cell = (row[i] || '').trim()
+      const cell = String(row[i] || '').trim()
       if (!cell) continue
-      if (WEEK_RE.test(cell) || DAY_HEADER_RE.test(cell)) continue
+      const wm = weekCell(cell)
+      if (wm) { weekMonday = mondayOf(makeDate(+wm[1], +wm[2], now)); cols = { ...DEFAULT_COLS }; continue }
+      if (DAY_HEADER_RE.test(cell) || BARE_DAY_RE.test(cell)) {
+        const w = weekdayOffset(cell)
+        if (!weekMonday) {
+          // No "Week of" above this block yet: anchor on the header's own date.
+          const dm = cell.match(/(\d{1,2})\/(\d{1,2})/)
+          if (dm) { const d = makeDate(+dm[1], +dm[2], now); weekMonday = mondayOf(d); cols = { ...DEFAULT_COLS } }
+        }
+        if (cols && w != null && w <= 4) cols[i] = w
+      }
+    }
+    // Pass 2: everything else is an announcement in its column's weekday.
+    for (let i = 0; i < row.length; i++) {
+      const cell = String(row[i] || '').trim()
+      if (!cell || weekCell(cell) || DAY_HEADER_RE.test(cell) || BARE_DAY_RE.test(cell)) continue
+      const off = cols ? cols[i] : null
+      if (!weekMonday || off == null) { if (stats && cell.length > 15) stats.unplaced.push(cell.slice(0, 60)); continue }
       // Explicit title override: start a cell with [[My Title]] to force the headline
       // shown on the site; the marker is stripped from the body.
       const ov = cell.match(/^\[\[\s*([^\]]{1,60}?)\s*\]\]\s*([\s\S]*)$/)
       const xtitle = ov ? ov[1].trim() : ''
       const body = ov ? ov[2].trim() : cell
-      if (!body) continue
+      if (!body || body.length < 3) continue
       const d = new Date(weekMonday); d.setDate(d.getDate() + off)
       out.push({ date: isoOf(d), text: cleanText(body), xtitle })
     }
@@ -190,15 +190,44 @@ function monthTabs(now) {
 
 function sheetIdOf(url) { return url.match(/\/d\/([a-zA-Z0-9-_]+)/)?.[1] }
 
-async function fetchTab(id, name, now) {
-  const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(name)}&_cb=${Date.now()}`
-  const res = await fetch(url)
-  if (!res.ok) return []
-  const text = await res.text()
-  // A bad/missing tab can still return 200 with a non-CSV error body — parseAnnouncements
-  // simply finds no week/day rows in that case, so this stays safe.
-  if (/<!DOCTYPE html|google\.visualization\.Query/i.test(text)) return []
-  return parseAnnouncements(parseCsvRows(text), now)
+// Tabs of the 2026-27 sheet (name -> gid), read with the Sheets API on Oct 1 2026. Only a
+// fallback: the live tab list is discovered on every refresh, so new or renamed tabs still work.
+const KNOWN_TABS = {
+  'August 2026': '0', 'September 2026': '1007087965', 'October 2026': '1219675023', 'November 2026': '1494443075',
+  'December 2026': '1196573666', 'January 2027': '286229313', 'February 2027': '82642728', 'March 2027': '1685315849',
+  'April 2027': '1932660215', 'May 2027': '1501388823', 'June 2027': '1074733884',
+}
+
+async function fetchText(url, ms = 12000) {
+  const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), ms)
+  try {
+    const res = await fetch(url, { signal: ctrl.signal, redirect: 'follow' })
+    if (!res.ok) return null
+    return await res.text()
+  } catch { return null } finally { clearTimeout(t) }
+}
+const looksLikeHtml = (text) => /^\s*<|<!DOCTYPE html|google\.visualization\.Query/i.test(text || '')
+
+// Every tab in the sheet, from its public htmlview page: [{ name, gid }]. Merged with the
+// known list and this year's month names, so one source failing never hides a month.
+async function listTabs(id, now) {
+  const tabs = new Map(Object.entries(KNOWN_TABS).map(([name, gid]) => [name, gid]))
+  const html = await fetchText(`https://docs.google.com/spreadsheets/d/${id}/htmlview?_cb=${Date.now()}`)
+  if (html) for (const m of html.matchAll(/name:\s*"((?:[^"\\]|\\.)+)"[^}]*?gid:\s*"(\d+)"/g)) tabs.set(m[1].replace(/\\(.)/g, '$1'), m[2])
+  for (const name of monthTabs(now)) if (!tabs.has(name)) tabs.set(name, null) // gid unknown: read by name
+  return [...tabs].map(([name, gid]) => ({ name, gid }))
+}
+
+// One tab's rows. The plain CSV export is exact (no type guessing). gviz is only a backup:
+// it guesses column types and can blank cells that don't fit the guess.
+async function fetchTabRows(id, { name, gid }) {
+  if (gid != null) {
+    const text = await fetchText(`https://docs.google.com/spreadsheets/d/${id}/export?format=csv&gid=${gid}&_cb=${Date.now()}`)
+    if (text != null && !looksLikeHtml(text)) return { rows: parseCsvRows(text), via: 'export' }
+  }
+  const text = await fetchText(`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&headers=0&sheet=${encodeURIComponent(name)}&_cb=${Date.now()}`)
+  if (text != null && !looksLikeHtml(text)) return { rows: parseCsvRows(text), via: 'gviz' }
+  return { rows: null, via: 'failed' }
 }
 
 // ── Clean topic titles via an LLM (optional) ──────────────────────────────────
@@ -242,8 +271,11 @@ function mergeSameDayTitle(items) {
 // Older ones use titleOf(), which is decent on its own. `titleFallbacks` counts only the newest
 // items that missed an LLM title, so the endpoint caches that response briefly and retries.
 const LLM_NEWEST = 30
-async function applyTitles(items) {
-  const newest = new Set(items.slice(0, LLM_NEWEST).map((it) => it.text)) // items are newest-first
+async function applyTitles(items, now = new Date()) {
+  const tomorrow = new Date(now); tomorrow.setDate(tomorrow.getDate() + 1)
+  const cut = isoOf(tomorrow)
+  // newest-first; the ones already read (or read tomorrow) are what visitors see
+  const newest = new Set(items.filter((it) => it.date <= cut).slice(0, LLM_NEWEST).map((it) => it.text))
   const need = [...new Set(items.filter((it) => !it.xtitle && newest.has(it.text)).map((it) => it.text).filter((t) => !titleCache.has(t)))]
   let usedLLM = false
   if (need.length) {
@@ -266,23 +298,49 @@ async function applyTitles(items) {
   return out
 }
 
-// Pull EVERY month tab by name and merge. Falls back to the default sheet (old single-tab
-// layout) if the tabbed fetch turns up nothing, so it keeps working either way.
+// Pull EVERY tab and merge. Safety nets, so the feed never silently loses days again:
+//  - each tab: exact CSV export, then gviz by name;
+//  - if a tab fails this time, the last good copy of that tab (kept in memory) is used;
+//  - `health` reports tabs read, tabs failed and any text the parser couldn't place, so a
+//    check (or a person) can see a problem instead of guessing.
+const lastGoodTab = new Map()
 export async function fetchAnnouncements(sheetUrl, now = new Date()) {
   if (!sheetUrl) throw new Error('no announcements sheet url')
   const id = sheetIdOf(sheetUrl)
   let items = []
+  const health = { tabs: 0, failed: [], stale: [], unplaced: [] }
   if (id) {
-    const perTab = await Promise.all(monthTabs(now).map((name) => fetchTab(id, name, now).catch(() => [])))
+    const tabs = await listTabs(id, now)
+    const perTab = await Promise.all(tabs.map(async (tab) => {
+      const { rows } = await fetchTabRows(id, tab).catch(() => ({ rows: null }))
+      if (!rows) {
+        health.failed.push(tab.name)
+        if (lastGoodTab.has(tab.name)) { health.stale.push(tab.name); return lastGoodTab.get(tab.name) }
+        return []
+      }
+      health.tabs++
+      const stats = { unplaced: [] }
+      const parsed = parseAnnouncements(rows, now, stats)
+      health.unplaced.push(...stats.unplaced.map((t) => `${tab.name}: ${t}`))
+      lastGoodTab.set(tab.name, parsed)
+      return parsed
+    }))
     items = perTab.flat()
   }
   if (!items.length) {
-    const res = await fetch(toCsvUrl(sheetUrl))
-    if (!res.ok) throw new Error(`sheet ${res.status}`)
-    items = parseAnnouncements(parseCsvRows(await res.text()), now)
+    const text = await fetchText(toCsvUrl(sheetUrl))
+    if (text == null) throw new Error('sheet unreachable')
+    items = parseAnnouncements(parseCsvRows(text), now)
   }
+  // Every tab is read (so a week typed into the "wrong" month tab still counts), but items far
+  // in the future are dropped: only past mornings are ever shown, and the LLM titles go to the
+  // newest REAL items, not to drafts typed ahead for spring.
+  const horizon = new Date(now); horizon.setDate(horizon.getDate() + 10)
+  const maxIso = isoOf(horizon)
   const seen = new Set()
-  const uniq = items.filter((a) => { const k = a.date + '|' + a.text; if (seen.has(k)) return false; seen.add(k); return true })
+  const uniq = items.filter((a) => { if (a.date > maxIso) return false; const k = a.date + '|' + a.text; if (seen.has(k)) return false; seen.add(k); return true })
   uniq.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0))
-  return applyTitles(uniq)
+  const out = await applyTitles(uniq, now)
+  out.health = health
+  return out
 }
