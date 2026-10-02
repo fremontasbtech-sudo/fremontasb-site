@@ -5,11 +5,10 @@ import { LangToggle } from '../i18n'
 
 // Primary links show in the bar; "More" holds seasonal + secondary pages.
 // Homecoming Court and Elections are separate pages on separate schedules, never merge them.
-// Homecoming Court is promoted to the bar during homecoming season (nominations QR codes point
-// at /homecoming-court). After homecoming, move it back to `more`; the URL never changes.
+// Homecoming Court is out of the nav after nominations closed (Oct 2026). The /homecoming-court
+// page still exists so old QR codes land on the closed page; re-add a link here next season.
 const primary = [
   { to: '/', label: 'Home', end: true },
-  { to: '/homecoming-court', label: 'Homecoming' },
   { to: '/media', label: 'Media' },
   { to: '/photos', label: 'Photos' },
   { to: '/clubs', label: 'Clubs' },
