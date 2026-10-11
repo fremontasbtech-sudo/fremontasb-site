@@ -206,6 +206,9 @@ const quickLinks = [
 ]
 
 function LatestNews({ eventsRecent = [], eventsUpcoming = [], eventsAll = [], eventsFinished = [], eventsLoading = false }) {
+  // At most 5 upcoming items at a time, soonest first. Senior nights don't count toward the 5.
+  let nonSenior = 0
+  const upcomingShown = eventsUpcoming.filter((it) => it.seniorNight || /senior\s*night/i.test(it.title || '') || ++nonSenior <= 5)
   const { rows, loading: newsLoading, source } = useSheetData(sheets.news, newsJson)
   const { rows: videos, loading: vLoading } = useYouTube(mediaOverlay)
   const { albums, loading: aLoading } = useFlickr(photoAlbums)
@@ -242,7 +245,7 @@ function LatestNews({ eventsRecent = [], eventsUpcoming = [], eventsAll = [], ev
             {eventsLoading && eventsUpcoming.length === 0 && <Loading label="Loading upcoming events…" />}
             {eventsUpcoming.length > 0 && (
               <ol className="divide-y divide-rule border-t border-rule">
-                {eventsUpcoming.map((item) => (
+                {upcomingShown.map((item) => (
                   <li key={item.key}>
                     <NewsItem item={item} />
                   </li>
@@ -347,7 +350,8 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = [], curatedE
     title: a.title || cleanAlbumTitle(a.name),
     href: a.flickrUrl || null,
     count: a.count || 0,
-    when: parseDate(a.date),
+    // takenAt (last photo's capture time) orders same-day albums by when they happened.
+    when: a.takenAt && a.takenAt.slice(0, 10) === a.date ? new Date(a.takenAt) : parseDate(a.date),
   }))
   const norm = (s2) => String(s2 || '').toLowerCase().replace(/[^a-z0-9]/g, '')
   const consumed = new Set()

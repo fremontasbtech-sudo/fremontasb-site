@@ -1,6 +1,22 @@
 [
-  { "grade": "Seniors", "classOf": "2027", "points": 25 },
-  { "grade": "Juniors", "classOf": "2028", "points": 0 },
-  { "grade": "Sophomores", "classOf": "2029", "points": 25 },
-  { "grade": "Freshmen", "classOf": "2030", "points": 10 }
+  {
+    "grade": "Seniors",
+    "classOf": "2027",
+    "points": 336
+  },
+  {
+    "grade": "Juniors",
+    "classOf": "2028",
+    "points": 376
+  },
+  {
+    "grade": "Sophomores",
+    "classOf": "2029",
+    "points": 249
+  },
+  {
+    "grade": "Freshmen",
+    "classOf": "2030",
+    "points": 29
+  }
 ]

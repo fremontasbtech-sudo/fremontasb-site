@@ -61,7 +61,7 @@ const eventDateCache = new Map()
 async function applyEventDates(albums, key) {
   const recent = albums.filter((a) => a.id).sort((a, b) => b.createEpoch - a.createEpoch).slice(0, 14)
   await Promise.all(recent.map(async (a) => {
-    if (eventDateCache.has(a.id)) { a.date = eventDateCache.get(a.id); return }
+    if (eventDateCache.has(a.id)) { Object.assign(a, eventDateCache.get(a.id)); return }
     try {
       const u = `https://api.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=${encodeURIComponent(key)}&photoset_id=${a.id}&extras=date_taken&per_page=300&format=json&nojsoncallback=1`
       const r = await fetch(u)
@@ -70,7 +70,7 @@ async function applyEventDates(albums, key) {
       const photos = (j && j.photoset && j.photoset.photo) || []
       const anchor = a.createEpoch ? a.createEpoch * 1000 : Date.now()
       const lo = anchor - 60 * 86400000, hi = anchor + 2 * 86400000
-      const counts = new Map()
+      const counts = new Map(), latest = new Map()
       for (const p of photos) {
         const dt = p.datetaken || ''
         if (!/^\d{4}-\d{2}-\d{2}/.test(dt)) continue
@@ -78,10 +78,24 @@ async function applyEventDates(albums, key) {
         if (Number.isNaN(ms) || ms < lo || ms > hi) continue // drop wrong-clock outliers
         const day = dt.slice(0, 10)
         counts.set(day, (counts.get(day) || 0) + 1)
+        if (dt > (latest.get(day) || '')) latest.set(day, dt)
       }
       let best = '', bestN = 0
       for (const [day, n] of counts) if (n > bestN) { bestN = n; best = day }
-      if (best) { a.date = best; eventDateCache.set(a.id, best) }
+      // Every camera clock wrong (e.g. all photos say 2019)? Use the date typed in the album
+      // title instead ("Homecoming '26 Rally - 10/9/26", "Clubs Day - 9/16 '26").
+      if (!best) {
+        const m = /(\d{1,2})\/(\d{1,2})(?:\/|\s*')(\d{2}|\d{4})\b/.exec(a.name || '')
+        if (m) {
+          const y = m[3].length === 2 ? 2000 + Number(m[3]) : Number(m[3])
+          const iso = `${y}-${String(m[1]).padStart(2, '0')}-${String(m[2]).padStart(2, '0')}`
+          const ms = new Date(`${iso}T12:00:00`).getTime()
+          if (!Number.isNaN(ms) && ms >= lo && ms <= hi) best = iso
+        }
+      }
+      // takenAt: the last photo's local capture time that day, so same-day albums sort by when
+      // they happened (the night dance above the afternoon rally). Blank when the clock was wrong.
+      if (best) { const v = { date: best, takenAt: (latest.get(best) || '').replace(' ', 'T') }; Object.assign(a, v); eventDateCache.set(a.id, v) }
     } catch { /* keep the date_create fallback */ }
   }))
 }
