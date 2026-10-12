@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     } else {
       res.setHeader('Cache-Control', 'no-store') // don't cache an empty/failed Flickr pull
     }
-    res.status(200).json({ albums, titleSource: albums.titleSource || 'heuristic', titleError: albums.titleError || '' })
+    res.status(200).json({ albums, titleSource: albums.titleSource || 'heuristic', titleFallbacks: albums.titleFallbacks || 0, titleError: albums.titleError || '' })
   } catch (err) {
     // Never hard-fail: the page falls back to photos.json when albums is empty.
     res.status(200).json({ albums: [], error: String(err && err.message || err) })

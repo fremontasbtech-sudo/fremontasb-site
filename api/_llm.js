@@ -14,6 +14,15 @@ async function fetchWithTimeout(url, opts, ms) {
 }
 export function llmError() { return lastError }
 
+// Where a batch of cleaned values came from, for the diagnostic fields the /api routes return:
+// 'llm' when every value came from the LLM (a call made now), 'cache' when every value came from
+// earlier LLM calls on this instance, 'mixed' when some fell back to the heuristic and
+// 'heuristic' when all of them did. Pass counts of values: { fresh, cached, fallback }.
+export function llmSource({ fresh = 0, cached = 0, fallback = 0 } = {}) {
+  if (fallback) return fresh || cached ? 'mixed' : 'heuristic'
+  return !fresh && cached ? 'cache' : 'llm'
+}
+
 export async function llmTitles(texts, instruction) {
   const AK = process.env.ANTHROPIC_API_KEY, OK = process.env.OPENAI_API_KEY, GK = process.env.GEMINI_API_KEY
   if (!texts.length || (!AK && !OK && !GK)) return null
@@ -21,21 +30,25 @@ export async function llmTitles(texts, instruction) {
   try {
     let content
     if (AK) {
-      const r = await fetch('https://api.anthropic.com/v1/messages', {
+      // Claude Haiku 5.5. Thinking is off (allowed at its default effort) because this is a short
+      // formatting job; the reply's text block is found by type rather than position.
+      const r = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: { 'content-type': 'application/json', 'x-api-key': AK, 'anthropic-version': '2023-06-01' },
-        body: JSON.stringify({ model: 'claude-3-5-haiku-latest', max_tokens: 1024,
+        body: JSON.stringify({ model: 'claude-haiku-5-5', max_tokens: 4096, thinking: { type: 'disabled' },
           messages: [{ role: 'user', content: instruction + '\n\nItems:\n' + payload }] }),
-      })
-      if (!r.ok) throw new Error('anthropic ' + r.status)
-      content = (await r.json()).content?.[0]?.text
+      }, 12000)
+      if (!r.ok) throw new Error('anthropic ' + r.status + ' ' + (await r.text()).slice(0, 100))
+      const msg = await r.json()
+      if (msg.stop_reason === 'refusal') throw new Error('anthropic refusal')
+      content = (msg.content || []).find((b) => b.type === 'text')?.text
     } else if (OK) {
-      const r = await fetch('https://api.openai.com/v1/chat/completions', {
+      const r = await fetchWithTimeout('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: { 'content-type': 'application/json', authorization: `Bearer ${OK}` },
         body: JSON.stringify({ model: 'gpt-4o-mini', temperature: 0.2,
           messages: [{ role: 'system', content: instruction }, { role: 'user', content: payload }] }),
-      })
+      }, 12000)
       if (!r.ok) throw new Error('openai ' + r.status)
       content = (await r.json()).choices?.[0]?.message?.content
     } else {
@@ -52,7 +65,8 @@ export async function llmTitles(texts, instruction) {
         for (let attempt = 0; attempt < 2; attempt++) {
           let r
           try {
-            r = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(GK)}`, {
+            // The key goes only in the header, never in the URL (URLs end up in logs).
+            r = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
               method: 'POST',
               headers: { 'content-type': 'application/json', 'x-goog-api-key': GK },
               body,

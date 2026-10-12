@@ -15,7 +15,7 @@ export default async function handler(req, res) {
       // older media.json fallback for 30 min. Let the next request re-hit the RSS.
       res.setHeader('Cache-Control', 'no-store')
     }
-    res.status(200).json({ videos, titleSource: videos.titleSource || 'heuristic', titleError: videos.titleError || '' })
+    res.status(200).json({ videos, titleSource: videos.titleSource || 'heuristic', titleFallbacks: videos.titleFallbacks || 0, titleError: videos.titleError || '' })
   } catch (err) {
     // Never hard-fail: the page falls back to media.json when videos is empty.
     res.status(200).json({ videos: [], error: String(err && err.message || err) })

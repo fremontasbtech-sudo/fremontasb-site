@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     } else {
       res.setHeader('Cache-Control', 'no-store') // don't cache an empty clubs pull
     }
-    res.status(200).json({ clubs, meetingSource: clubs.meetingSource || 'heuristic', meetingError: clubs.meetingError || '' })
+    res.status(200).json({ clubs, meetingSource: clubs.meetingSource || 'heuristic', meetingFallbacks: clubs.meetingFallbacks || 0, tidySource: clubs.tidySource || 'heuristic', meetingError: clubs.meetingError || '' })
   } catch (err) {
     res.status(200).json({ clubs: [], error: String(err && err.message || err) })
   }

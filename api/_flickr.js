@@ -10,7 +10,8 @@
 // Override it anytime (e.g. to rotate) by setting the FLICKR_API_KEY env var — no code change.
 const DEFAULT_API_KEY = '50ce36c804dbe7a0ee3942cb833f460c'
 
-import { llmTitles, llmError } from './_llm.js'
+import { llmTitles, llmError, llmSource } from './_llm.js'
+import { withTimeout } from './_http.js'
 import { cleanAlbumTitle } from '../src/data/albumTitle.js'
 
 // LLM-cleaned album titles. Rule (matches the announcements titling): return the event
@@ -35,19 +36,23 @@ const ALBUM_INSTRUCTION = [
 ].join(' ')
 
 async function applyAlbumTitles(albums) {
-  const need = [...new Set(albums.map((a) => a.name).filter((n) => n && !albumTitleCache.has(n)))].slice(0, 120)
-  let used = false
+  const names = [...new Set(albums.map((a) => a.name).filter(Boolean))]
+  const cached = names.filter((n) => albumTitleCache.has(n)).length
+  const need = names.filter((n) => !albumTitleCache.has(n)).slice(0, 120)
   // Title in small chunks — one giant batch makes the model drop/merge items and the
   // strict count check then rejects the whole thing. Chunks keep each call reliable.
   for (let i = 0; i < need.length; i += 20) {
     const chunk = need.slice(i, i + 20)
     const titles = await llmTitles(chunk, ALBUM_INSTRUCTION)
-    if (titles) { used = true; chunk.forEach((n, j) => { if (titles[j]) albumTitleCache.set(n, titles[j]) }) }
+    if (titles) chunk.forEach((n, j) => { if (titles[j]) albumTitleCache.set(n, titles[j]) })
   }
   // Same cleanup as the client fallback, so an LLM title can't keep a stray date either.
   const out = albums.map((a) => { const t = albumTitleCache.get(a.name); return { ...a, title: t ? cleanAlbumTitle(t) : '' } })
-  out.titleSource = used ? 'llm' : 'heuristic'
-  out.titleError = used ? '' : llmError()
+  // Diagnostics: a title from an earlier call on this instance counts as 'cache', not 'heuristic'.
+  const fallback = names.filter((n) => !albumTitleCache.has(n)).length
+  out.titleSource = llmSource({ fresh: names.length - cached - fallback, cached, fallback })
+  out.titleFallbacks = fallback
+  out.titleError = fallback ? llmError() : ''
   return out
 }
 
@@ -64,9 +69,11 @@ async function applyEventDates(albums, key) {
     if (eventDateCache.has(a.id)) { Object.assign(a, eventDateCache.get(a.id)); return }
     try {
       const u = `https://api.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=${encodeURIComponent(key)}&photoset_id=${a.id}&extras=date_taken&per_page=300&format=json&nojsoncallback=1`
-      const r = await fetch(u)
-      if (!r.ok) return
-      const j = await r.json()
+      const j = await withTimeout(8000, async (signal) => {
+        const r = await fetch(u, { signal })
+        return r.ok ? r.json() : null
+      })
+      if (!j) return
       const photos = (j && j.photoset && j.photoset.photo) || []
       const anchor = a.createEpoch ? a.createEpoch * 1000 : Date.now()
       const lo = anchor - 60 * 86400000, hi = anchor + 2 * 86400000
@@ -100,6 +107,13 @@ async function applyEventDates(albums, key) {
   }))
 }
 
+// A timestamp's calendar day in America/Los_Angeles, as YYYY-MM-DD.
+function ptDay(ms) {
+  const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles', year: 'numeric', month: '2-digit', day: '2-digit' })
+    .formatToParts(new Date(ms)).map((x) => [x.type, x.value]))
+  return `${p.year}-${p.month}-${p.day}`
+}
+
 export async function fetchAlbums(apiKey, userId) {
   const key = apiKey || DEFAULT_API_KEY
   if (!userId) throw new Error('no flickr nsid')
@@ -111,9 +125,11 @@ export async function fetchAlbums(apiKey, userId) {
     format: 'json',
     nojsoncallback: '1',
   })
-  const res = await fetch(`https://api.flickr.com/services/rest/?${params.toString()}`)
-  if (!res.ok) throw new Error(`flickr ${res.status}`)
-  const data = await res.json()
+  const data = await withTimeout(8000, async (signal) => {
+    const res = await fetch(`https://api.flickr.com/services/rest/?${params.toString()}`, { signal })
+    if (!res.ok) throw new Error(`flickr ${res.status}`)
+    return res.json()
+  })
   if (data.stat !== 'ok') throw new Error(data.message || 'flickr error')
 
   const sets = (data.photosets && data.photosets.photoset) || []
@@ -130,8 +146,9 @@ export async function fetchAlbums(apiKey, userId) {
       flickrUrl: `https://www.flickr.com/photos/${userId}/albums/${s.id}`,
       count: Number(s.photos || 0),
       createEpoch,
-      // date_create is the UPLOAD day; refined to the real EVENT day in applyEventDates.
-      date: createEpoch ? new Date(createEpoch * 1000).toISOString().slice(0, 10) : '',
+      // date_create is the UPLOAD day (in Fremont time, not UTC); refined to the real EVENT day
+      // in applyEventDates.
+      date: createEpoch ? ptDay(createEpoch * 1000) : '',
     }
   })
   await applyEventDates(albums, key)

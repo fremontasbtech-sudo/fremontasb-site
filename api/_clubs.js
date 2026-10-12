@@ -9,7 +9,8 @@
 // fetch and unchanged cells are never re-sent. No LLM key / any failure ⇒ a safe heuristic,
 // so the page always renders.
 
-import { llmTitles, llmError } from './_llm.js'
+import { llmTitles, llmError, llmSource } from './_llm.js'
+import { withTimeout } from './_http.js'
 
 const EMAIL_RE = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g
 
@@ -95,16 +96,16 @@ function normalizeRow(row) {
 
 // ── Generic LLM helper: clean a set of field values across all clubs, cached by raw text,
 //    chunked so llmTitles' strict count-check stays reliable. `post` runs on each cleaned
-//    value; `fallback` runs when the LLM has nothing for that value. Mutates in place. ──
+//    value; `fallback` runs when the LLM has nothing for that value. Mutates in place.
+//    Returns counts of distinct values { fresh, cached, fallback } for the diagnostics. ──
 async function cleanField(clubs, fields, cache, instruction, chunkSize, post, fallback) {
-  const need = [...new Set(
-    clubs.flatMap((c) => fields.map((f) => c[f])).filter((v) => v && !cache.has(v)),
-  )].slice(0, 200)
-  let used = false
+  const all = [...new Set(clubs.flatMap((c) => fields.map((f) => c[f])).filter(Boolean))]
+  const cached = all.filter((v) => cache.has(v)).length
+  const need = all.filter((v) => !cache.has(v)).slice(0, 200)
   for (let i = 0; i < need.length; i += chunkSize) {
     const chunk = need.slice(i, i + chunkSize)
     const cleaned = await llmTitles(chunk, instruction)
-    if (cleaned) { used = true; chunk.forEach((raw, j) => { if (cleaned[j]) cache.set(raw, post ? post(cleaned[j]) : cleaned[j]) }) }
+    if (cleaned) chunk.forEach((raw, j) => { if (cleaned[j]) cache.set(raw, post ? post(cleaned[j]) : cleaned[j]) })
   }
   for (const c of clubs) {
     for (const f of fields) {
@@ -113,7 +114,8 @@ async function cleanField(clubs, fields, cache, instruction, chunkSize, post, fa
       c[f] = cache.has(v) ? cache.get(v) : (fallback ? fallback(v) : v)
     }
   }
-  return used
+  const fb = all.filter((v) => !cache.has(v)).length
+  return { fresh: all.length - cached - fb, cached, fallback: fb }
 }
 
 // Meeting location & times → short "Room · Days Time" line.
@@ -202,19 +204,21 @@ function guessCategory(name, purpose) {
 }
 async function classifyCategories(clubs) {
   const inputs = clubs.map((c) => `${c.name} - ${String(c.purpose || c.other || '').slice(0, 160)}`)
-  const need = [...new Set(inputs.filter((v) => v && !categoryCache.has(v)))].slice(0, 200)
-  let used = false
+  const all = [...new Set(inputs.filter(Boolean))]
+  const cached = all.filter((v) => categoryCache.has(v)).length
+  const need = all.filter((v) => !categoryCache.has(v)).slice(0, 200)
   for (let i = 0; i < need.length; i += 20) {
     const chunk = need.slice(i, i + 20)
     const out = await llmTitles(chunk, CATEGORY_INSTRUCTION)
-    if (out) { used = true; chunk.forEach((raw, j) => { const k = String(out[j] || '').trim(); if (CATEGORY_SET.has(k)) categoryCache.set(raw, k) }) }
+    if (out) chunk.forEach((raw, j) => { const k = String(out[j] || '').trim(); if (CATEGORY_SET.has(k)) categoryCache.set(raw, k) })
   }
   clubs.forEach((c, i) => {
     const key = inputs[i]
     const override = CATEGORY_OVERRIDES.get(String(c.name || '').trim().toLowerCase())
     c.category = override || (categoryCache.has(key) ? categoryCache.get(key) : guessCategory(c.name, c.purpose || c.other))
   })
-  return used
+  const fb = all.filter((v) => !categoryCache.has(v)).length
+  return { fresh: all.length - cached - fb, cached, fallback: fb }
 }
 
 function toCsvUrl(url) {
@@ -226,9 +230,11 @@ function toCsvUrl(url) {
 
 export async function fetchClubs(sheetUrl) {
   if (!sheetUrl) throw new Error('no clubs sheet url')
-  const r = await fetch(toCsvUrl(sheetUrl))
-  if (!r.ok) throw new Error(`clubs sheet returned ${r.status}`)
-  const text = await r.text()
+  const text = await withTimeout(10000, async (signal) => {
+    const r = await fetch(toCsvUrl(sheetUrl), { signal })
+    if (!r.ok) throw new Error(`clubs sheet returned ${r.status}`)
+    return r.text()
+  })
   const clubs = parseCsv(text).map(normalizeRow).filter((c) => c.name && c.name !== 'Untitled club')
 
   // Tidy each field with the LLM (all cached by raw text ⇒ only new/changed cells hit it).
@@ -237,8 +243,12 @@ export async function fetchClubs(sheetUrl) {
   const t = await cleanField(clubs, ['purpose', 'other'], textCache, TEXT_INSTRUCTION, 10, endPunct, heuristicText)
   const cat = await classifyCategories(clubs) // sets c.category on every club
 
-  clubs.meetingSource = m ? 'llm' : 'heuristic'
-  clubs.tidySource = (m || n || t || cat) ? 'llm' : 'heuristic'
-  clubs.meetingError = (m || n || t) ? '' : llmError()
+  // Diagnostics: 'cache' when the values came from earlier LLM calls on this instance,
+  // 'heuristic' or 'mixed' only when some values actually fell back.
+  const sum = [m, n, t, cat].reduce((a, c) => ({ fresh: a.fresh + c.fresh, cached: a.cached + c.cached, fallback: a.fallback + c.fallback }))
+  clubs.meetingSource = llmSource(m)
+  clubs.meetingFallbacks = m.fallback
+  clubs.tidySource = llmSource(sum)
+  clubs.meetingError = (m.fallback || n.fallback || t.fallback) ? llmError() : ''
   return clubs
 }

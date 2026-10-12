@@ -10,7 +10,8 @@
 // pulled out separately, so a brand-new episode looks curated without a media.json
 // edit. Cached by raw title; no key / any failure falls back to the heuristic parse.
 
-import { llmTitles, llmError } from './_llm.js'
+import { llmTitles, llmError, llmSource } from './_llm.js'
+import { withTimeout } from './_http.js'
 
 function decodeEntities(s) {
   return String(s)
@@ -23,14 +24,24 @@ function decodeEntities(s) {
     .trim()
 }
 
+// The upload's calendar day in Fremont (America/Los_Angeles), not UTC: an episode uploaded at
+// 10:15 PM on Oct 7 is published 05:15 UTC Oct 8, and belongs on Oct 7.
+function ptDay(iso) {
+  const t = Date.parse(iso)
+  if (Number.isNaN(t)) return String(iso || '').slice(0, 10)
+  const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles', year: 'numeric', month: '2-digit', day: '2-digit' })
+    .formatToParts(new Date(t)).map((x) => [x.type, x.value]))
+  return `${p.year}-${p.month}-${p.day}`
+}
+
 async function fetchRawVideos(channelId) {
   if (!channelId) throw new Error('no channelId')
   const url = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`
-  const res = await fetch(url, {
-    headers: { 'User-Agent': 'Mozilla/5.0 (compatible; FremontASB-site/1.0)' },
+  const xml = await withTimeout(8000, async (signal) => {
+    const res = await fetch(url, { signal, headers: { 'User-Agent': 'Mozilla/5.0 (compatible; FremontASB-site/1.0)' } })
+    if (!res.ok) throw new Error(`feed ${res.status}`)
+    return res.text()
   })
-  if (!res.ok) throw new Error(`feed ${res.status}`)
-  const xml = await res.text()
 
   const videos = []
   for (const entry of xml.split('<entry>').slice(1)) {
@@ -38,7 +49,7 @@ async function fetchRawVideos(channelId) {
     if (!id) continue
     const title = (entry.match(/<title>([\s\S]*?)<\/title>/) || [])[1] || ''
     const published = (entry.match(/<published>([^<]+)<\/published>/) || [])[1] || ''
-    videos.push({ youtubeId: id, title: decodeEntities(title), date: published.slice(0, 10) })
+    videos.push({ youtubeId: id, title: decodeEntities(title), date: ptDay(published) })
   }
   return videos
 }
@@ -82,23 +93,25 @@ export async function applyEpisodeTitles(videos) {
 
   // Then let the LLM produce the display title (cached by raw title, chunked so the
   // strict count-check in llmTitles stays reliable). LLM title wins when available.
-  const need = [...new Set(videos.map((v) => v.title).filter((t) => t && !titleCache.has(t)))].slice(0, 60)
-  let used = false
+  const raws = [...new Set(videos.map((v) => v.title).filter(Boolean))]
+  const titlesCached = raws.filter((t) => titleCache.has(t)).length
+  const kindsCached = raws.filter((t) => kindCache.has(t)).length
+  const need = raws.filter((t) => !titleCache.has(t)).slice(0, 60)
   for (let i = 0; i < need.length; i += 20) {
     const chunk = need.slice(i, i + 20)
     const titles = await llmTitles(chunk, TITLE_INSTRUCTION)
-    if (titles) { used = true; chunk.forEach((raw, j) => { if (titles[j]) titleCache.set(raw, titles[j]) }) }
+    if (titles) chunk.forEach((raw, j) => { if (titles[j]) titleCache.set(raw, titles[j]) })
   }
   for (const v of videos) { if (titleCache.has(v.title)) v.cleanTitle = titleCache.get(v.title) }
 
   // Kind (Fremont TV / Rally / Event) — classified by the LLM so the "one Fremont TV in Latest
   // News" rule catches future uploads whatever they're titled. Heuristic guess is the fallback.
   for (const v of videos) v.kind = guessKind(v.cleanTitle || v.title)
-  const kneed = [...new Set(videos.map((v) => v.title).filter((t) => t && !kindCache.has(t)))].slice(0, 60)
+  const kneed = raws.filter((t) => !kindCache.has(t)).slice(0, 60)
   for (let i = 0; i < kneed.length; i += 20) {
     const chunk = kneed.slice(i, i + 20)
     const kinds = await llmTitles(chunk, KIND_INSTRUCTION)
-    if (kinds) { used = true; chunk.forEach((raw, j) => { const k = String(kinds[j] || '').trim(); if (VALID_KINDS.has(k)) kindCache.set(raw, k) }) }
+    if (kinds) chunk.forEach((raw, j) => { const k = String(kinds[j] || '').trim(); if (VALID_KINDS.has(k)) kindCache.set(raw, k) })
   }
   for (const v of videos) { if (kindCache.has(v.title)) v.kind = kindCache.get(v.title) }
 
@@ -108,8 +121,13 @@ export async function applyEpisodeTitles(videos) {
   // the same day's later games/events. The site's Latest News sort reads this flag.
   for (const v of videos) v.morningShow = v.kind === 'Fremont TV'
 
-  videos.titleSource = used ? 'llm' : 'heuristic'
-  videos.titleError = used ? '' : llmError()
+  // Diagnostics: count titles and kinds served from earlier calls, from this request's calls,
+  // and from the heuristic, so a warm cache reads 'cache' rather than 'heuristic'.
+  const fallback = raws.filter((t) => !titleCache.has(t)).length + raws.filter((t) => !kindCache.has(t)).length
+  const cached = titlesCached + kindsCached
+  videos.titleSource = llmSource({ fresh: raws.length * 2 - cached - fallback, cached, fallback })
+  videos.titleFallbacks = fallback
+  videos.titleError = fallback ? llmError() : ''
   return videos
 }
 
