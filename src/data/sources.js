@@ -282,7 +282,7 @@ export const resourceLinks = {
     ] },
     { name: 'Wellness Staff', note: 'Deirdre Louie, LMFT, School-Based Therapist · (408) 522-2487 · A-Building (downstairs).', links: [
       { label: 'SV Community Services', href: 'https://svcommunityservices.org/' },
-      { label: 'Mayview Community Health', href: 'https://www.mayview.org/' },
+      { label: 'MayView Community Health (now Ravenswood Family Health Network)', href: 'https://ravenswoodfhn.org/' },
       { label: 'YWCA', href: 'https://www.ywca.org/' },
     ] },
   ],

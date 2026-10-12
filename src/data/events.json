@@ -262,26 +262,12 @@
     },
     {
       "sport": "Girls Volleyball",
-      "date": "2026-10-22",
+      "date": "2026-10-19",
       "time": "6:45 PM",
       "level": "Varsity",
       "homeAway": "Home",
-      "opponent": "Lynbrook",
+      "opponent": "Gunn",
       "location": "Fremont Main Gym",
-      "section": "upcoming",
-      "score": "",
-      "seniorNight": true,
-      "push": false,
-      "title": "SENIOR NIGHT - Girls Volleyball Varsity Home vs Lynbrook"
-    },
-    {
-      "sport": "Boys Water Polo",
-      "date": "2026-10-13",
-      "time": "6:30 PM",
-      "level": "Varsity",
-      "homeAway": "Home",
-      "opponent": "Wilcox",
-      "location": "Fremont Pool",
       "section": "upcoming",
       "score": "",
       "seniorNight": true,
@@ -315,6 +301,20 @@
       "seniorNight": true,
       "push": false,
       "title": "SENIOR NIGHT - Girls Water Polo Varsity Home vs Homestead"
+    },
+    {
+      "sport": "Wrestling",
+      "date": "2027-01-21",
+      "time": "5:30 PM",
+      "level": "All",
+      "homeAway": "Home",
+      "opponent": "Wilcox",
+      "location": "Fremont High School",
+      "section": "upcoming",
+      "score": "",
+      "seniorNight": true,
+      "push": false,
+      "title": "SENIOR NIGHT - Wrestling All Home vs Wilcox"
     }
   ]
 }
