@@ -159,6 +159,7 @@ export function parseAnnouncements(rows, now = new Date(), stats = null) {
       const xtitle = ov ? ov[1].trim() : ''
       const body = ov ? ov[2].trim() : cell
       if (!body || body.length < 3) continue
+      if (FILLER_RE.test(body)) continue // calendar labels typed into the grid, not announcements
       const d = new Date(weekMonday); d.setDate(d.getDate() + off)
       out.push({ date: isoOf(d), text: cleanText(body), xtitle })
     }
@@ -168,6 +169,10 @@ export function parseAnnouncements(rows, now = new Date(), stats = null) {
   uniq.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0))
   return uniq.map((a) => ({ ...a, title: a.xtitle || titleOf(a.text) }))
 }
+
+// Short calendar labels people type into the weekly grid ("No School", "Winter Break",
+// "FINALS WEEK!"). They mark the week; they aren't announcements.
+const FILLER_RE = /^(no school|no classes|winter break|spring break|mid-?year break|thanksgiving( break)?|holiday|finals( week)?|minimum day|non-?duty day|break)[.!]*$/i
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
