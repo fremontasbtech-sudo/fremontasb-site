@@ -14,7 +14,7 @@ import newsJson from '../data/news.json'
 import mediaOverlay from '../data/media.json'
 import photoAlbums from '../data/photos.json'
 import { useAnnouncements } from '../data/useAnnouncements'
-import { useEvents } from '../data/useEvents'
+import { useEvents, scoreNote } from '../data/useEvents'
 import { cleanAlbumTitle } from '../data/albumTitle'
 
 /**
@@ -350,28 +350,36 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = [], curatedE
     title: a.title || cleanAlbumTitle(a.name),
     href: a.flickrUrl || null,
     count: a.count || 0,
+    date: a.date || '',
     // takenAt (last photo's capture time) orders same-day albums by when they happened.
     when: a.takenAt && a.takenAt.slice(0, 10) === a.date ? new Date(a.takenAt) : parseDate(a.date),
   }))
   const norm = (s2) => String(s2 || '').toLowerCase().replace(/[^a-z0-9]/g, '')
+  // A score card that took over an album sorts by the album's capture time when it's the same
+  // day, so it keeps the album's place among that day's other albums.
+  const sameDayLater = (gameWhen, albumWhen) =>
+    (albumWhen && gameWhen && albumWhen.toDateString() === gameWhen.toDateString() && albumWhen > gameWhen ? albumWhen : gameWhen)
+  // Game titles say "vs", "at" or ":" by home/away and meet; drop those so "Football vs Westmont"
+  // (an album) still matches "Football at Westmont" (the game).
+  const normGame = (s2) => norm(String(s2 || '').toLowerCase().replace(/\b(vs|v|at)\b/g, ' '))
   const consumed = new Set()
+  const sportNames = [...new Set([...eventsRecent, ...finishedGames].map((g) => g.sport).filter(Boolean))]
+  // Same game: the titles match, or the album is from the game's day and names its exact sport,
+  // e.g. "Homecoming Football Game" on Oct 9 is the Oct 9 "Football vs Jefferson" game.
+  const albumIsGame = (al, g, gi) => {
+    const ai = normGame(al.title)
+    if (ai && gi.length >= 6 && (ai === gi || ai.includes(gi) || (ai.length >= 6 && gi.includes(ai)))) return true
+    return !!al.date && al.date === g.date && namesSport(al.title, g.sport, sportNames)
+  }
 
-  // Recent finished games. If a photo album's title matches the game (same teams), show its
-  // photos link right on the score card and mark the album consumed so it isn't repeated.
+  // Recent finished games. If a photo album matches the game, show its photos link right on the
+  // score card and mark the album consumed so it isn't repeated.
   const games = eventsRecent.map((it) => {
-    const gi = norm(it.title)
-    if (gi.length >= 6) {
-      const m = albumList.find((al) => {
-        if (!al.href || consumed.has(al)) return false
-        const ai = norm(al.title)
-        return ai && (ai === gi || ai.includes(gi) || gi.includes(ai))
-      })
-      if (m) {
-        consumed.add(m)
-        return { ...it, pinned: false, href: m.href, viewLabel: m.count ? `View ${m.count} photos` : 'View photos' }
-      }
-    }
-    return { ...it, pinned: false }
+    const gi = normGame(it.title)
+    const m = albumList.find((al) => al.href && !consumed.has(al) && albumIsGame(al, it, gi))
+    if (!m) return { ...it, pinned: false }
+    consumed.add(m)
+    return { ...it, pinned: false, when: sameDayLater(it.when, m.when), href: m.href, viewLabel: m.count ? `View ${m.count} photos` : 'View photos' }
   })
 
   // A photo album that matches a FINISHED game (any age, not just the last 2 weeks) becomes a
@@ -379,26 +387,22 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = [], curatedE
   // instead of a bare "N new photos" row. So an older game (e.g. the season opener) whose album
   // shows up still leads with its score. Dated by the game, and skipped if a recent game card
   // already covers it.
-  const gameTitles = new Set(games.map((g) => norm(g.title)))
+  const gameTitles = new Set(games.map((g) => normGame(g.title)))
   const finishedCards = []
   for (const al of albumList) {
     if (!al.href || consumed.has(al)) continue
-    const ai = norm(al.title)
-    if (ai.length < 6) continue
-    const fg = (finishedGames || []).find((g) => {
-      const gi = norm(g.title)
-      return gi.length >= 6 && (ai === gi || ai.includes(gi) || gi.includes(ai))
-    })
-    if (!fg || gameTitles.has(norm(fg.title))) continue
+    if (normGame(al.title).length < 6 && !al.date) continue
+    const fg = (finishedGames || []).find((g) => albumIsGame(al, g, normGame(g.title)))
+    if (!fg || gameTitles.has(normGame(fg.title))) continue
     consumed.add(al)
     finishedCards.push({
       key: `gm-${fg.date}-${norm(fg.title)}`,
       type: 'Sports',
       title: fg.title,
       href: al.href,
-      when: fg.when,
+      when: sameDayLater(fg.when, al.when),
       seniorNight: fg.seniorNight,
-      blurb: [fg.seniorNight ? 'Senior Night' : '', fg.score ? `Final ${fg.score}` : 'Final score soon', fg.level].filter(Boolean).join(' · '),
+      blurb: [fg.seniorNight ? 'Senior Night' : '', scoreNote(fg.score, fg.when), fg.level].filter(Boolean).join(' · '),
       viewLabel: al.count ? `View ${al.count} photos` : 'View photos',
       pinned: false,
     })
@@ -453,6 +457,20 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = [], curatedE
       return true
     })
     .slice(0, 5)
+}
+
+// True when an album title names this exact sport as a whole phrase, and not only inside a
+// longer name: "Football" is not "Flag Football", and not the "Firebird Football" spirit event.
+const OTHER_NAMES = ['firebird football', 'powder puff football', 'powderpuff football', 'flag football']
+const phrase = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
+function namesSport(albumTitle, sport, sportNames = []) {
+  const s = phrase(sport)
+  let a = ` ${phrase(albumTitle)} `
+  if (!s || !a.includes(` ${s} `)) return false
+  for (const longer of [...sportNames.map(phrase), ...OTHER_NAMES]) {
+    if (longer !== s && ` ${longer} `.includes(` ${s} `)) a = a.split(` ${longer} `).join(' | ')
+  }
+  return a.includes(` ${s} `)
 }
 
 function NewsItem({ item, featured }) {

@@ -6,6 +6,7 @@ import Calendar from '../components/Calendar'
 import SectionHeader from '../components/SectionHeader'
 import { Loading, DevNote } from '../components/DataState'
 import { useClubs } from '../data/useClubs'
+import { ptIsoDate } from '../data/liveData'
 import { links, school, embeds, clubDates } from '../data/sources'
 import clubsJson from '../data/clubs.json'
 
@@ -481,7 +482,7 @@ function ClubDates() {
   }, [items])
   const datesWith = useMemo(() => new Set(byDate.keys()), [byDate])
   const years = useMemo(() => [...new Set(items.map((it) => +it.iso.slice(0, 4)))], [items])
-  const todayIso = new Date().toISOString().slice(0, 10)
+  const todayIso = ptIsoDate() // Fremont's date, not UTC (which turns over at 5 PM PT)
   const nextIso = items.find((it) => it.iso >= todayIso)?.iso ?? items[items.length - 1]?.iso
   const [open, setOpen] = useState(true)
   const [selected, setSelected] = useState(nextIso)

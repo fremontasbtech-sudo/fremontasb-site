@@ -187,6 +187,7 @@ export const ES = {
   "Nothing has been posted yet. Check back once school events start.": "Todavía no se ha publicado nada. Vuelve cuando empiecen los eventos escolares.",
   'New Fremont TV episode': 'Nuevo episodio de Fremont TV',
   'New album on Flickr': 'Nuevo álbum en Flickr',
+  'The final score has not been posted yet': 'Todavía no se ha publicado el marcador final',
   'Fremont TV episodes and rally videos': 'Episodios de Fremont TV y videos de rallies',
   'Event albums on Flickr': 'Álbumes de eventos en Flickr',
   "The official club list, handbook, and renewal forms": "La lista oficial de clubes, el manual y los formularios de renovación",

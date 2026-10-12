@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
-import { makeCache, fetchJsonRetry } from './liveData'
+import { useCallback, useRef, useState } from 'react'
+import { makeCache, fetchJsonRetry, useRevalidate } from './liveData'
 
 /**
  * useAnnouncements() — morning announcements from /api/announcements. The server returns the
@@ -39,31 +39,29 @@ export function useAnnouncements() {
     return Array.isArray(cached) && cached.length ? { items: visible(cached), loading: false } : { items: [], loading: true }
   })
 
-  useEffect(() => {
-    let cancelled = false
-    fetchJsonRetry('/api/announcements', { isEmpty: (d) => !(Array.isArray(d && d.announcements) && d.announcements.length) })
+  const refresh = useCallback(({ onStale, alive }) =>
+    fetchJsonRetry('/api/announcements', { onStale, isEmpty: (d) => !(Array.isArray(d && d.announcements) && d.announcements.length) })
       .then((data) => {
-        if (cancelled) return
+        if (!alive()) return
         const all = data.announcements
         cache.write(all)
         raw.current = all
-        setState({ items: visible(all), loading: false })
+        const next = visible(all)
+        setState((s) => (!s.loading && JSON.stringify(next) === JSON.stringify(s.items) ? s : { items: next, loading: false }))
       })
-      .catch(() => { if (!cancelled) setState((s) => ({ items: s.items, loading: false })) })
-    return () => { cancelled = true }
+      .catch(() => { if (alive()) setState((s) => (s.loading ? { items: s.items, loading: false } : s)) }), [])
+
+  // Re-check every minute (while the page is visible, and right when it becomes visible again)
+  // so a page left open reveals the new morning at 8:30 without a reload.
+  const reveal = useCallback(() => {
+    const list = raw.current || cache.read()
+    if (Array.isArray(list) && list.length) {
+      const next = visible(list)
+      setState((s) => (next.length !== s.items.length ? { items: next, loading: false } : s))
+    }
   }, [])
 
-  // Re-check every minute so a page left open reveals the new morning at 8:30 without a reload.
-  useEffect(() => {
-    const id = setInterval(() => {
-      const list = raw.current || cache.read()
-      if (Array.isArray(list) && list.length) {
-        const next = visible(list)
-        setState((s) => (next.length !== s.items.length ? { items: next, loading: false } : s))
-      }
-    }, 60 * 1000)
-    return () => clearInterval(id)
-  }, [])
-
+  // The feed changes twice a week and the edge keeps it 5 minutes, so poll every 5 minutes.
+  useRevalidate(refresh, { pollMs: 5 * 60 * 1000, onTick: reveal })
   return state
 }

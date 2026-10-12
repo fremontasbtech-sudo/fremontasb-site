@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { toCsvUrl } from './useSheetData'
 import { school } from './sources'
+import { useRevalidate, isStaleResponse } from './liveData'
 
 /**
  * useSpiritPoints(sheetUrl, fallbackRows)
@@ -81,36 +82,41 @@ function readCache() {
 }
 
 // Paints INSTANTLY (this browser's last good numbers, else the snapshot bundled at deploy time),
-// then refreshes from the sheet in the background. A slow or failed refresh never shows an
-// error or a spinner to visitors; the numbers just stay as they were.
+// then refreshes from the sheet in the background, and keeps refreshing while the page is open
+// (useRevalidate), so a screen left on during a rally shows new points within a few minutes.
+// A slow or failed refresh never shows an error or a spinner to visitors; the numbers just stay
+// as they were, and a sheet with no class rows never replaces good numbers.
 export function useSpiritPoints(sheetUrl, fallbackRows = []) {
   const [state, setState] = useState(() => {
     const cached = sheetUrl ? readCache() : null
     return { rows: cached || fallbackRows, loading: false, error: null, source: cached ? 'sheet' : 'local' }
   })
 
-  useEffect(() => {
-    if (!sheetUrl) return
-    let cancelled = false
+  const refresh = ({ onStale, alive }) => {
+    if (!sheetUrl) return undefined
     const ctrl = new AbortController()
     const timer = setTimeout(() => ctrl.abort(), 15000)
-    fetch(toCsvUrl(sheetUrl), { signal: ctrl.signal })
-      .then((r) => { if (!r.ok) throw new Error(`Sheet returned ${r.status}`); return r.text() })
+    return fetch(toCsvUrl(sheetUrl), { signal: ctrl.signal })
+      .then((r) => {
+        if (!r.ok) throw new Error(`Sheet returned ${r.status}`)
+        if (onStale && isStaleResponse(r)) onStale()
+        return r.text()
+      })
       .then((text) => {
-        if (cancelled) return
+        if (!alive()) return
         const rows = toStandings(parseRows(text))
         if (!rows.length) throw new Error('No class rows found in sheet')
         try { localStorage.setItem(CACHE_KEY, JSON.stringify(rows)) } catch { /* private mode */ }
-        setState({ rows, loading: false, error: null, source: 'sheet' })
+        setState((s) => (s.source === 'sheet' && !s.error && JSON.stringify(s.rows) === JSON.stringify(rows)
+          ? s : { rows, loading: false, error: null, source: 'sheet' }))
       })
       .catch((err) => {
-        if (cancelled) return
-        setState((s) => ({ ...s, loading: false, error: err.message }))
+        if (!alive()) return
+        setState((s) => (s.error === err.message && !s.loading ? s : { ...s, loading: false, error: err.message }))
       })
       .finally(() => clearTimeout(timer))
-    return () => { cancelled = true; ctrl.abort(); clearTimeout(timer) }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sheetUrl])
+  }
 
+  useRevalidate(refresh)
   return state
 }
