@@ -46,6 +46,7 @@ export function useNominationConfig() {
     fetchJsonRetry(configUrl, {
       attempts: 3,
       delayMs: 1500,
+      timeoutMs: 50000, // the endpoint itself waits up to 45 s for a cold Apps Script
       isEmpty: (d) => !d || typeof d.open === 'undefined',
     })
       .then((d) => {

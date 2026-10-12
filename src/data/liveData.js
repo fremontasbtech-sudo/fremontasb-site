@@ -30,24 +30,30 @@ export const isStaleResponse = (r) => /^stale$/i.test((r && r.headers && r.heade
 
 // Resolve with fresh JSON, retrying on network error, non-OK, or a caller-defined "empty"
 // result. Rejects only after every attempt fails, so the caller keeps whatever it already has.
+// Each attempt gives up after timeoutMs, so one stalled request (a captive portal, a flaky phone
+// network, a filtered school network) counts as a failed attempt instead of hanging forever.
 // onStale() runs when the answer was the edge's stale copy (see useRevalidate).
-export function fetchJsonRetry(url, { attempts = 3, delayMs = 1500, isEmpty = () => false, onStale } = {}) {
+export function fetchJsonRetry(url, { attempts = 3, delayMs = 1500, timeoutMs = 20000, isEmpty = () => false, onStale } = {}) {
   return new Promise((resolve, reject) => {
     let n = 0
     const go = () => {
       n += 1
-      fetch(url)
+      const ctrl = typeof AbortController === 'function' && timeoutMs ? new AbortController() : null
+      const timer = ctrl ? setTimeout(() => ctrl.abort(), timeoutMs) : null
+      fetch(url, ctrl ? { signal: ctrl.signal } : undefined)
         .then((r) => {
           if (!r.ok) return Promise.reject(new Error(`http ${r.status}`))
           if (onStale && isStaleResponse(r)) onStale()
-          return r.json()
+          return r.json() // still under the timer, so a body that never finishes is cut off too
         })
         .then((data) => {
+          clearTimeout(timer)
           if (!isEmpty(data)) return resolve(data)
           if (n < attempts) { setTimeout(go, delayMs); return }
           reject(new Error('empty'))
         })
         .catch((e) => {
+          clearTimeout(timer)
           if (n < attempts) { setTimeout(go, delayMs); return }
           reject(e)
         })
@@ -85,15 +91,17 @@ const INPUT_EVENTS = ['pointerdown', 'pointermove', 'keydown', 'scroll', 'wheel'
  * refresh({ onStale, alive }) should pass onStale to fetchJsonRetry (or call it when
  * isStaleResponse(r)), check alive() before setting state, and keep the no-downgrade rule:
  * never replace a non-empty list with an empty one. Polls reach the CDN, not Apps Script.
+ * refresh() should also settle in bounded time (fetchJsonRetry times out each attempt). As a
+ * backstop, a refresh still running after stuckMs no longer blocks the next one.
  */
-export function useRevalidate(refresh, { minGapMs = 30000, pollMs = 120000, tickMs = 60000, idleMs = 30 * 60000, staleRetryMs = 8000, onTick } = {}) {
+export function useRevalidate(refresh, { minGapMs = 30000, pollMs = 120000, tickMs = 60000, idleMs = 30 * 60000, staleRetryMs = 8000, stuckMs = 3 * 60000, onTick } = {}) {
   const refreshRef = useRef(refresh)
   const tickRef = useRef(onTick)
   refreshRef.current = refresh
   tickRef.current = onTick
 
   useEffect(() => {
-    let alive = true, busy = false, last = 0, lastInput = Date.now(), staleTimer = null
+    let alive = true, busy = false, runId = 0, last = 0, lastInput = Date.now(), staleTimer = null
     let display = false
     try { display = new URLSearchParams(window.location.search).get('display') === '1' } catch { /* no URL */ }
     const visible = () => document.visibilityState !== 'hidden'
@@ -101,7 +109,8 @@ export function useRevalidate(refresh, { minGapMs = 30000, pollMs = 120000, tick
     const tick = () => { if (tickRef.current) tickRef.current() }
 
     const run = (reason) => {
-      if (!alive || busy) return
+      if (!alive || (busy && Date.now() - last < stuckMs)) return
+      const id = ++runId
       busy = true
       last = Date.now()
       // Only a normal fetch may schedule the stale retry, so it happens once, never in a loop.
@@ -110,9 +119,11 @@ export function useRevalidate(refresh, { minGapMs = 30000, pollMs = 120000, tick
         staleTimer = setTimeout(() => { staleTimer = null; run('stale') }, staleRetryMs)
       }
       Promise.resolve()
-        .then(() => refreshRef.current({ onStale, alive: () => alive, reason }))
+        // A run that was given up as stuck and ends late is no longer alive: it can't overwrite
+        // newer data or clear the newer run's busy flag.
+        .then(() => refreshRef.current({ onStale, alive: () => alive && id === runId, reason }))
         .catch(() => { /* the caller keeps its last good data */ })
-        .finally(() => { busy = false })
+        .finally(() => { if (id === runId) busy = false })
     }
     const maybeRun = () => { if (visible() && Date.now() - last >= minGapMs) run('resume') }
     const onVisibility = () => { if (visible()) { tick(); maybeRun() } }

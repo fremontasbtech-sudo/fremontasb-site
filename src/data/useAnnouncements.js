@@ -40,7 +40,9 @@ export function useAnnouncements() {
   })
 
   const refresh = useCallback(({ onStale, alive }) =>
-    fetchJsonRetry('/api/announcements', { onStale, isEmpty: (d) => !(Array.isArray(d && d.announcements) && d.announcements.length) })
+    // A cold rebuild reads about a dozen sheet tabs (and may ask the LLM for titles), so each
+    // attempt gets longer than the usual 20 s before it counts as stalled.
+    fetchJsonRetry('/api/announcements', { onStale, timeoutMs: 45000, isEmpty: (d) => !(Array.isArray(d && d.announcements) && d.announcements.length) })
       .then((data) => {
         if (!alive()) return
         const all = data.announcements

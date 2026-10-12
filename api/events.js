@@ -5,10 +5,12 @@
 import { fetchEvents } from './_events.js'
 import { eventsSheet } from '../src/data/sources.js'
 
-// A good result is fresh for 1 min and served stale for 5 more while one background request
-// refreshes it. stale-if-error keeps the last good copy at the edge for a day whenever a refresh
-// fails (503 below), so visitors never get a broken or half-empty list.
-const GOOD = 's-maxage=60, stale-while-revalidate=300, stale-if-error=86400'
+// A good result is fresh for 2 min and served stale for up to an hour more while one background
+// request refreshes it, so the first visitor after a quiet spell never waits on the slow rebuild
+// (the site refetches a stale copy a few seconds later). stale-if-error keeps the last good copy
+// at the edge for a day whenever a refresh fails (503 below), so visitors never get a broken or
+// half-empty list.
+const GOOD = 's-maxage=120, stale-while-revalidate=3600, stale-if-error=86400'
 // Built from a remembered tab or without the athletics scores: cache it only briefly, so the
 // complete copy replaces it soon.
 const DEGRADED = 's-maxage=30, stale-while-revalidate=60, stale-if-error=86400'

@@ -123,8 +123,8 @@ Content is pulled at runtime through two layers:
    Each `/api/*` route is mirrored by a dev-only route in `vite.config.js`, so localhost behaves
    like production.
 
-Every `/api/*` response is CDN-cached for a short time (events about 60s, announcements about 5
-min, Flickr about 1 hour) with stale-while-revalidate, and each function adds a cache-buster to its
+Every `/api/*` response is CDN-cached for a short time (sheet tabs 1 min, events 2 min,
+announcements 5 min, Flickr 1 hour) with stale-while-revalidate, and each function adds a cache-buster to its
 Google Sheet fetches so it never serves Google's own stale copy. Net effect: sheet edits reach the
 site fast without recomputing for every visitor.
 
