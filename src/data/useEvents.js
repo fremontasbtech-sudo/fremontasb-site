@@ -52,8 +52,9 @@ export function gameTitle(g) {
 
 // Score line for a finished game: the final when athletics has posted it, "Final score soon"
 // for the first few days, then a plain note so an old game doesn't look like it's still going.
-export function scoreNote(score, when, today = startOfToday()) {
+export function scoreNote(score, when, today = startOfToday(), sport = '') {
   if (score && String(score).trim()) return `Final ${String(score).trim()}`
+  if (isMeetSport(sport)) return 'Results are on the team page' // meets never get a single final score
   const days = when ? Math.round((today - when) / 86400000) : 0
   return days >= 3 ? 'The final score has not been posted yet' : 'Final score soon'
 }
@@ -114,7 +115,7 @@ export function shape(data) {
         const k = `${g.sport}|${g.date}`
         const prev = recentBy.get(k)
         if (!prev || prioOf(g) > prev.prio) {
-          const scoreBit = scoreNote(hasScore ? g.score : '', d, start)
+          const scoreBit = scoreNote(hasScore ? g.score : '', d, start, g.sport)
           recentBy.set(k, { prio: prioOf(g), item: { key: `gm-${g.date}-${g.sport}`, type: 'Sports', title, sport: g.sport, date: g.date, href: null, when: d, seniorNight: isSenior, blurb: dashJoin([isSenior ? 'Senior Night' : '', scoreBit, g.level]) } })
         }
       }

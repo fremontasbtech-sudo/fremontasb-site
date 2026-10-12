@@ -10,7 +10,7 @@
       // Runs before the app: canonical URL for this path (src/components/Layout.jsx keeps it in sync
       // on navigation), and the Home hero's first drone frame preloaded only on Home, not every route.
       (function () {
-        var p = location.pathname.replace(/\/+$/, '') || '/'
+        var p = location.pathname.replace(/\/+$/, '').toLowerCase() || '/'
         var c = document.createElement('link'); c.rel = 'canonical'; c.href = 'https://www.fremontasb.org' + p
         document.head.appendChild(c)
         if (p === '/') {

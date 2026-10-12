@@ -213,7 +213,7 @@ function NominationsClosed({ cycle }) {
               Thanks for nominating and voting
             </h2>
             <p className="mt-4 leading-relaxed text-body">
-              {`Nominations closed early, on ${homecomingNominationsClosesLabel}, and students voted for Homecoming Royalty during Homecoming Week, October 5 to 9.`}
+              {`Nominations closed early, on the night of ${homecomingNominationsClosesLabel}, and students voted for Homecoming Royalty during Homecoming Week, October 5 to 9.`}
             </p>
             <p className="mt-3 leading-relaxed text-body">
               We aren’t taking new nominations or changes anymore.

@@ -46,7 +46,7 @@ export default function Calendar({ view, setView, datesWith, selected, onSelect,
           <select aria-label="Month" value={m} onChange={(e) => setView({ y, m: +e.target.value })} className={selectCls}>
             {(narrow ? MONTHS_SHORT[es ? 'es' : 'en'] : months).map((name, i) => <option key={i} value={i}>{name}</option>)}
           </select>
-          <select aria-label="Year" value={y} onChange={(e) => setView({ y: +e.target.value, m })} className={selectCls}>
+          <select aria-label="Year" value={y} onChange={(e) => setView({ y: +e.target.value, m })} className={`${selectCls} shrink-0`}>
             {yearOpts.map((yy) => <option key={yy} value={yy}>{yy}</option>)}
           </select>
         </div>
@@ -83,7 +83,7 @@ export default function Calendar({ view, setView, datesWith, selected, onSelect,
 
 /* Tiny local media-query hook (same idea as Opportunities.jsx useMinWidth). */
 function useNarrow() {
-  const query = '(max-width: 359px)'
+  const query = '(max-width: 374px)' // full month names clip the year select below 375 px
   const [narrow, setNarrow] = useState(() => (typeof window !== 'undefined' ? window.matchMedia(query).matches : false))
   useEffect(() => {
     const mq = window.matchMedia(query)

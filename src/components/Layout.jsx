@@ -27,7 +27,7 @@ function useHeadTags(pathname) {
     }
     if (robots) robots.remove()
     if (!canon) { canon = document.createElement('link'); canon.rel = 'canonical'; document.head.appendChild(canon) }
-    canon.href = SITE_URL + (pathname.replace(/\/+$/, '') || '/')
+    canon.href = SITE_URL + (pathname.replace(/\/+$/, '').toLowerCase() || '/') // routes match case-insensitively
   }, [pathname, lang, title, notFound])
 }
 

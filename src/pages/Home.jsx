@@ -402,7 +402,7 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = [], curatedE
       href: al.href,
       when: sameDayLater(fg.when, al.when),
       seniorNight: fg.seniorNight,
-      blurb: [fg.seniorNight ? 'Senior Night' : '', scoreNote(fg.score, fg.when), fg.level].filter(Boolean).join(' · '),
+      blurb: [fg.seniorNight ? 'Senior Night' : '', scoreNote(fg.score, fg.when, undefined, fg.sport), fg.level].filter(Boolean).join(' · '),
       viewLabel: al.count ? `View ${al.count} photos` : 'View photos',
       pinned: false,
     })

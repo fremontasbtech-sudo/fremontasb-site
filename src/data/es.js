@@ -199,6 +199,7 @@ export const ES = {
   'New album on Flickr': 'Nuevo álbum en Flickr',
   'The final score has not been posted yet': 'Todavía no se ha publicado el marcador final',
   'Final score soon': 'El marcador final se publicará pronto',
+  'Results are on the team page': 'Los resultados están en la página del equipo',
   'Senior Night': 'Noche de los seniors',
   'Fremont TV episodes and rally videos': 'Episodios de Fremont TV y videos de rallies',
   'Event albums on Flickr': 'Álbumes de eventos en Flickr',
@@ -544,8 +545,8 @@ export const ES = {
   'Homecoming 2026 is over. Thank you to everyone who nominated and voted.': 'Homecoming 2026 terminó. Gracias a todos los que nominaron y votaron.',
   'Nominations closed': 'Nominaciones cerradas',
   'Thanks for nominating and voting': 'Gracias por nominar y votar',
-  'Nominations closed early, on Tuesday, September 29, and students voted for Homecoming Royalty during Homecoming Week, October 5 to 9.':
-    'Las nominaciones cerraron antes de tiempo, el martes 29 de septiembre, y los estudiantes votaron por la Realeza de Homecoming durante la Semana de Homecoming, del 5 al 9 de octubre.',
+  'Nominations closed early, on the night of Tuesday, September 29, and students voted for Homecoming Royalty during Homecoming Week, October 5 to 9.':
+    'Las nominaciones cerraron antes de tiempo, la noche del martes 29 de septiembre, y los estudiantes votaron por la Realeza de Homecoming durante la Semana de Homecoming, del 5 al 9 de octubre.',
   'We aren’t taking new nominations or changes anymore.': 'Ya no aceptamos nominaciones nuevas ni cambios.',
   'Questions? Contact us': '¿Preguntas? Contáctanos',
 }

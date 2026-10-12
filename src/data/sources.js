@@ -72,9 +72,10 @@ export const googleClientId = '276898272987-f2qepltpkfs8um36rh6qpeesfk1u5i57.app
 // Homecoming Court nominations close at this exact moment (Pacific time, -07:00 = PDT). The page,
 // /api/nominate, /api/nominations-config and the Apps Script each compare the current time against it
 // on every request, so closing does NOT depend on anyone editing the Config tab or on a scheduled job.
-// For the next cycle: change both lines (and CLOSES_AT_ in apps-script/homecoming-nominations.gs).
+// For the next cycle: change both lines (and CLOSES_AT_ in apps-script/homecoming-nominations.gs), and
+// rewrite the past-tense closed-page copy in HomecomingCourt.jsx (NominationsClosed) and its es.js keys.
 export const homecomingNominationsClosesAt = '2026-09-29T00:00:00-07:00' // CLOSED EARLY BY HAND (real deadline was 2026-09-30T12:00:00-07:00)
-// The label matches the moment above (the start of Tuesday, September 29), not the original deadline.
+// Nominations were closed by hand just after midnight at the end of Tuesday, September 29 (commit 0183ec3).
 export const homecomingNominationsClosesLabel = 'Tuesday, September 29'
 
 export const homecomingNominationsApi = 'https://script.google.com/macros/s/AKfycbyGZ8M4yXzqgyx6985ITpaS9fBkPM89ro-98zc2oTwMWg0ntWHVGu1Bn6-mSz8qxmSlpA/exec'
