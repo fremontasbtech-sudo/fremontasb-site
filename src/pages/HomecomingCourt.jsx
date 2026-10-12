@@ -187,19 +187,18 @@ export default function HomecomingCourt() {
   )
 }
 
-/** Shown from the nomination deadline until the final court is posted. */
+/**
+ * Shown from the nomination deadline until the final court is posted (or the 45-day window ends).
+ * Homecoming 2026 is over, so this reads in the past tense and promises nothing new. If a court
+ * sheet is connected later, the court display above replaces this page on its own.
+ */
 function NominationsClosed({ cycle }) {
-  const steps = [
-    { title: 'We count the nominations', text: 'We go through every student’s nominations and count them.' },
-    { title: 'We announce the court', text: '8 members come from your nominations, and teachers pick the other 4. We’ll post all 12 on this page.' },
-    { title: 'You vote for royalty', text: 'During Homecoming Week, October 5 to 9, you’ll vote for the 2 Homecoming Royalty winners.' },
-  ]
   return (
     <>
       <PageHero
         title="Homecoming Court"
         eyebrow={cycle !== 'Homecoming Court' ? cycle : 'Nominations'}
-        subtext="Nominations are closed. Thank you to everyone who nominated a senior."
+        subtext="Homecoming 2026 is over. Thank you to everyone who nominated and voted."
       />
       <section className="container-site section-space">
         <div className="mx-auto max-w-xl">
@@ -211,30 +210,18 @@ function NominationsClosed({ cycle }) {
               Nominations closed
             </p>
             <h2 className="mt-2 font-display text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">
-              Thanks for nominating
+              Thanks for nominating and voting
             </h2>
             <p className="mt-4 leading-relaxed text-body">
-              {`Nominations closed on ${homecomingNominationsClosesLabel}. We can’t save new nominations or changes anymore. If you nominated, we have your most recent picks, and those are the ones that count.`}
+              {`Nominations closed early, on ${homecomingNominationsClosesLabel}, and students voted for Homecoming Royalty during Homecoming Week, October 5 to 9.`}
             </p>
-
-            <p className="mt-7 font-display text-xs font-bold uppercase tracking-[0.14em] text-ink">What happens next</p>
-            <ol className="mt-3 space-y-3">
-              {steps.map((s, i) => (
-                <li key={s.title} className="flex gap-3 rounded-lg border border-rule px-4 py-3">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-tint font-display text-sm font-bold text-brand" aria-hidden="true">
-                    {i + 1}
-                  </span>
-                  <div className="min-w-0">
-                    <p className="font-display font-bold text-ink">{s.title}</p>
-                    <p className="mt-0.5 text-sm leading-relaxed text-body">{s.text}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
+            <p className="mt-3 leading-relaxed text-body">
+              We aren’t taking new nominations or changes anymore.
+            </p>
 
             <div className="mt-7 flex flex-col gap-3 border-t border-rule pt-6 sm:flex-row sm:items-center sm:gap-5">
               <Link to="/" className="btn-secondary">Back to Home</Link>
-              <Link to="/contact" className="text-sm font-bold text-brand underline-offset-4 hover:underline">Questions? Contact us</Link>
+              <Link to="/contact" className="inline-flex min-h-[44px] items-center text-sm font-bold text-brand underline-offset-4 hover:underline">Questions? Contact us</Link>
             </div>
           </div>
         </div>

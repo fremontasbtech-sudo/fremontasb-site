@@ -184,6 +184,16 @@ export const ES = {
   'View': 'Ver',
   'Announcement': 'Anuncio',
   'Event': 'Evento',
+  'Sports': 'Deportes',
+  'Senior Night': 'Noche de Seniors',
+  '★ Senior Night': '★ Noche de Seniors',
+  'On the calendar': 'En el calendario',
+  'Upcoming Events': 'Próximos eventos',
+  'Loading upcoming events…': 'Cargando los próximos eventos…',
+  'Read on the PA': 'Leídos por el altavoz',
+  'Morning Announcements': 'Anuncios de la mañana',
+  'Loading announcements…': 'Cargando los anuncios…',
+  'Pick a highlighted day on the calendar to read that morning’s announcements.': 'Elige un día marcado en el calendario para leer los anuncios de esa mañana.',
   "Nothing has been posted yet. Check back once school events start.": "Todavía no se ha publicado nada. Vuelve cuando empiecen los eventos escolares.",
   'New Fremont TV episode': 'Nuevo episodio de Fremont TV',
   'New album on Flickr': 'Nuevo álbum en Flickr',
@@ -216,6 +226,19 @@ export const ES = {
   'Teachers award bonus spirit points.': 'Los maestros otorgan puntos de espíritu adicionales.',
   'Club form submissions': 'Envío de formularios de clubes',
   'Fremont ASB app': 'App de Fremont ASB',
+  'On fremontasb.org': 'En fremontasb.org',
+  'Latest news and spirit points totals': 'Últimas noticias y totales de puntos de espíritu',
+  'Club list and handbook': 'Lista de clubes y manual',
+  'Homecoming Court, Elections, Opportunities': 'Corte de Homecoming, Elecciones, Oportunidades',
+  'School Store and Contact links': 'Enlaces a la Tienda Escolar y a Contacto',
+  'Available now': 'Disponible ahora',
+  'Sign in with Google after installing.': 'Inicia sesión con Google después de instalarla.',
+
+  // ── Calendar (aria-labels; month and weekday names are localized in Calendar.jsx) ──
+  'Previous month': 'Mes anterior',
+  'Next month': 'Mes siguiente',
+  'Month': 'Mes',
+  'Year': 'Año',
 
   // ── Media page ──
   'Fremont TV episodes and event photos': 'Episodios de Fremont TV y fotos de eventos',
@@ -241,6 +264,7 @@ export const ES = {
     'Haz clic en una foto para ver todas las fotos de cada evento, o usa el botón de abajo para ir a la página de Flickr de Fremont ASB.',
   "All of our albums, including rallies, dances, and spirit weeks, are on the ASB Flickr. If you took photos at an event, you can email them to": "Todos nuestros álbumes, incluidos los rallies, bailes y semanas de espíritu, están en el Flickr de ASB. Si tomaste fotos en un evento, puedes enviarlas por correo a",
   'All albums on Flickr': 'Todos los álbumes en Flickr',
+  'albums': 'álbumes',
 
   // ── Clubs page ──
   "Find every official club for this year, who runs it, and where it meets. If you’re a club officer, the Club Handbook and the key dates below have what you need.": "Encuentra todos los clubes oficiales de este año, quién los dirige y dónde se reúnen. Si eres oficial de un club, el Manual de Clubes y las fechas clave de abajo tienen lo que necesitas.",
@@ -301,6 +325,62 @@ export const ES = {
   'Renewing for next year': 'Renovación para el próximo año',
   "Clubs don’t carry over to the next year automatically. Incoming officers have to renew the club with ASB every year for it to stay on the list. The renewal steps and deadline are in the Club Handbook.": "Los clubes no pasan al siguiente año automáticamente. Los nuevos oficiales tienen que renovar el club con ASB cada año para que siga en la lista. Los pasos de renovación y la fecha límite están en el Manual de Clubes.",
   'Read the Club Handbook': 'Lee el Manual de Clubes',
+  // Club list: category chips, counts (numbers are their own text nodes), empty and loading states
+  'Filter clubs by category': 'Filtrar clubes por categoría',
+  'Arts & Media': 'Arte y medios',
+  'Culture & Language': 'Cultura e idiomas',
+  'Service & Advocacy': 'Servicio y activismo',
+  'Academics & Business': 'Académicos y negocios',
+  'Sports & Games': 'Deportes y juegos',
+  'Special Interest': 'Intereses especiales',
+  'Loading the list…': 'Cargando la lista…',
+  'Loading the Official Clubs List…': 'Cargando la Lista Oficial de Clubes…',
+  'of': 'de',
+  'clubs': 'clubes',
+  'match “': 'coinciden con “',
+  'in': 'en',
+  'disbanded': 'disueltos',
+  'Show all': 'Ver los',
+  'Show': 'Mostrar',
+  'Hide': 'Ocultar',
+  'disbanded club': 'club disuelto',
+  'disbanded clubs': 'clubes disueltos',
+  'No club matches “': 'Ningún club coincide con “',
+  'No clubs in': 'No hay clubes en',
+  'Clear search & filters': 'Borrar búsqueda y filtros',
+  'Disbanded': 'Disuelto',
+  'Purpose not listed yet.': 'Todavía no se indica el propósito.',
+  'Other information': 'Otra información',
+  'Club Info Meeting slides': 'Diapositivas de la Reunión Informativa de Clubes',
+  'The club info slides aren’t posted yet. Check back soon.': 'Las diapositivas informativas de clubes aún no están publicadas. Vuelve pronto.',
+  // Club dates (sources.js clubDates): labels, details, the note and the legend
+  'All dates': 'Todas las fechas',
+  'Deadline': 'Fecha límite',
+  'Milestone': 'Etapa',
+  'Aug 31': '31 ago',
+  'Sep 2–9': '2–9 sep',
+  'Sep 9–10': '9–10 sep',
+  'Sep 9–13': '9–13 sep',
+  'Sep 16': '16 sep',
+  'Sep 30': '30 sep',
+  'Oct 28': '28 oct',
+  'January': 'Enero',
+  'Jan 27': '27 ene',
+  'Apr 21': '21 abr',
+  'May': 'Mayo',
+  'Applications & renewals due': 'Fecha límite de solicitudes y renovaciones',
+  'No late submissions': 'No se aceptan entregas tarde',
+  'Clubs list finalized': 'Lista de clubes finalizada',
+  'Clubs Day sign-ups': 'Inscripciones para el Día de Clubes',
+  'First monthly check-in due': 'Primer registro mensual',
+  'Due 11:59 PM, then the last of every month': 'Vence a las 11:59 PM, y después el último día de cada mes',
+  'Multicultural Night': 'Noche Multicultural',
+  '2nd-semester applications open': 'Abren las solicitudes del 2.º semestre',
+  'Club Trivia Night': 'Noche de Trivia de Clubes',
+  'Club Grub Day': 'Grub Day de clubes',
+  'Club renewals for next year': 'Renovación de clubes para el próximo año',
+  'New-club applications and renewals for 2026–27 closed August 31. A second application round opens in January.':
+    'Las solicitudes de clubes nuevos y las renovaciones para 2026–27 cerraron el 31 de agosto. Una segunda ronda de solicitudes abre en enero.',
 
   // ── Resources page ──
   'For students': 'Para estudiantes',
@@ -331,7 +411,6 @@ export const ES = {
   'Student Wellness': 'Bienestar Estudiantil',
   "Fremont has wellness support on campus. You can talk to a therapist, get a referral, or reach out to the wellness staff.": "Fremont tiene apoyo de bienestar en el campus. Puedes hablar con un terapeuta, pedir una referencia o comunicarte con el personal de bienestar.",
   'Suicide Prevention': 'Prevención del Suicidio',
-  'Community Counseling (sliding fee scale)': 'Consejería Comunitaria (tarifa según ingresos)',
   'LGBTQ Resources': 'Recursos LGBTQ',
   'Grief Support': 'Apoyo en el Duelo',
   'Emergency Youth Housing': 'Vivienda de Emergencia para Jóvenes',
@@ -345,6 +424,13 @@ export const ES = {
   'Wellness Staff': 'Personal de Bienestar',
   'Referral form': 'Formulario de referencia',
   'Open the check-in form': 'Abrir el formulario de registro',
+  'Link coming soon': 'Enlace próximamente',
+  'Suspected Child Abuse: form & instructions (PDF)': 'Sospecha de abuso infantil: formulario e instrucciones (PDF)',
+  'Books on Mental Health & Wellness (Gale)': 'Libros sobre salud mental y bienestar (Gale)',
+  'FUHSD Mental Health Resources': 'Recursos de salud mental de FUHSD',
+  'MayView Community Health (now Ravenswood Family Health Network)': 'MayView Community Health (ahora Ravenswood Family Health Network)',
+  'Deirdre Louie, LMFT, School-Based Therapist · (408) 522-2487 · A-Building (downstairs).':
+    'Deirdre Louie, LMFT, terapeuta escolar · (408) 522-2487 · Edificio A (planta baja).',
 
   // ── Opportunities page ──
   'Internships, programs, and scholarships': 'Pasantías, programas y becas',
@@ -353,6 +439,8 @@ export const ES = {
   'About these postings': 'Sobre estas publicaciones',
   "These postings are shared by the college and career counselors, and the document is updated whenever they add something new. If you have questions about a posting, ask the College & Career Center.": "Estas publicaciones las comparten los consejeros universitarios y de carrera, y el documento se actualiza cada vez que agregan algo nuevo. Si tienes preguntas sobre una publicación, pregunta en el College & Career Center.",
   'Open the document in Google Docs': 'Abrir el documento en Google Docs',
+  'Opportunities document': 'Documento de oportunidades',
+  'The opportunities deck isn’t posted yet. Check with the College & Career Center.': 'El documento de oportunidades aún no está publicado. Consulta en el College & Career Center.',
 
   // ── Contact page ──
   'Contact ASB': 'Contactar a ASB',
@@ -362,11 +450,45 @@ export const ES = {
   "Email us for club questions, fundraiser approvals, or anything the form doesn’t cover.": "Escríbenos para preguntas de clubes, aprobaciones de recaudaciones o cualquier cosa que el formulario no cubra.",
 
   // ── Homecoming Court / Elections placeholders ──
+  'The court': 'La corte',
+  'nominee': 'nominado',
+  'nominees': 'nominados',
+  'Loading the court…': 'Cargando la corte…',
+  'Listed in no particular order. Photos and bios come from the nominees themselves.':
+    'En ningún orden en particular. Las fotos y biografías las enviaron los mismos nominados.',
+  'View only. Voting happens in class and on the official ballot. This page is for reading up on the court before you vote.':
+    'Solo para consulta. La votación se hace en clase y en la boleta oficial. Esta página es para conocer a la corte antes de votar.',
   'Homecoming Court isn’t live right now.': 'La Corte de Homecoming no está disponible en este momento.',
   'Check back during homecoming season. This is where the court’s names, photos, and bios will be once nominations are in.':
     'Vuelve durante la temporada de homecoming. Aquí aparecerán los nombres, fotos y biografías de la corte una vez que se reciban las nominaciones.',
+  'ASB and class cabinets': 'ASB y gabinetes de clase',
+  'Loading candidates…': 'Cargando candidatos…',
+  'Election sections': 'Secciones de la elección',
+  'Jump to': 'Ir a',
+  'ASB Cabinet': 'Gabinete de ASB',
+  'Freshman Cabinet': 'Gabinete de Freshmen',
+  'Sophomore Cabinet': 'Gabinete de Sophomores',
+  'Junior Cabinet': 'Gabinete de Juniors',
+  'Senior Cabinet': 'Gabinete de Seniors',
   'No election is running right now.': 'No hay ninguna elección en curso en este momento.',
   "Candidate statements will be posted here once the ballot is finalized. Check back during election season.": "Las declaraciones de los candidatos se publicarán aquí cuando la boleta esté lista. Vuelve durante la temporada de elecciones.",
+
+  // ── Privacy page ──
+  'What this website collects, and what it doesn’t.': 'Lo que este sitio web recopila y lo que no.',
+  'Browsing the site': 'Navegar por el sitio',
+  'You can read everything on fremontasb.org without an account. We don’t sell data, run ads, or use tracking cookies. Your browser may save small settings on your own device (like the language you picked, or a copy of the latest news so pages load faster).':
+    'Puedes leer todo en fremontasb.org sin una cuenta. No vendemos datos, no mostramos anuncios ni usamos cookies de seguimiento. Tu navegador puede guardar pequeñas configuraciones en tu propio dispositivo (como el idioma que elegiste, o una copia de las últimas noticias para que las páginas carguen más rápido).',
+  'Sign in with Google (nominations and voting)': 'Iniciar sesión con Google (nominaciones y votaciones)',
+  'Some ASB forms, like Homecoming Court nominations, ask you to sign in with your school Google account so each student gets exactly one say. When you sign in, Google tells us only your name and school email address. We never see your password and get no access to your Google Drive, Gmail, or anything else in your account.':
+    'Algunos formularios de ASB, como las nominaciones para la Corte de Homecoming, te piden iniciar sesión con tu cuenta escolar de Google para que cada estudiante participe exactamente una vez. Cuando inicias sesión, Google solo nos da tu nombre y tu correo escolar. Nunca vemos tu contraseña y no tenemos acceso a tu Google Drive, tu Gmail ni nada más de tu cuenta.',
+  'We store your school email next to what you submitted (for example, your nominees) in an ASB Google Sheet. Only ASB advisors and ASB Tech can see it, it’s used only to count one entry per student, and it is deleted after that event’s results are final. Your name and email are never shown publicly.':
+    'Guardamos tu correo escolar junto con lo que enviaste (por ejemplo, tus nominados) en una hoja de Google de ASB. Solo los asesores de ASB y ASB Tech pueden verla, se usa únicamente para contar una participación por estudiante y se elimina cuando los resultados de ese evento son definitivos. Tu nombre y tu correo nunca se muestran públicamente.',
+  'The contact form': 'El formulario de contacto',
+  'You don’t need to sign in to send us a message. When you use the form on the Contact page, we save your name, the email you give us, and your message in an ASB Google Sheet. Only ASB advisors and ASB Tech can see it. We use it only to read your message and reply to you, and we never share it or show it publicly.':
+    'No necesitas iniciar sesión para enviarnos un mensaje. Cuando usas el formulario de la página de Contacto, guardamos tu nombre, el correo que nos das y tu mensaje en una hoja de Google de ASB. Solo los asesores de ASB y ASB Tech pueden verla. La usamos únicamente para leer tu mensaje y responderte, y nunca la compartimos ni la mostramos públicamente.',
+  'Questions': 'Preguntas',
+  'Email us at': 'Escríbenos a',
+  'and we’ll answer, or remove something you submitted.': 'y te responderemos, o eliminaremos algo que hayas enviado.',
 
   // ── 404 ──
   'Page not found': 'Página no encontrada',
@@ -418,20 +540,12 @@ export const ES = {
   'Send another message': 'Enviar otro mensaje',
 
   // ── Homecoming Court: nominations closed page ──
-  'Nominations close Wednesday, September 30 at 12 PM.': 'Las nominaciones cierran el miércoles 30 de septiembre a las 12 PM.',
-  'Nominations are closed. Thank you to everyone who nominated a senior.': 'Las nominaciones están cerradas. Gracias a todos los que nominaron a un estudiante de último año.',
+  'Nominations close Tuesday, September 29.': 'Las nominaciones cierran el martes 29 de septiembre.',
+  'Homecoming 2026 is over. Thank you to everyone who nominated and voted.': 'Homecoming 2026 terminó. Gracias a todos los que nominaron y votaron.',
   'Nominations closed': 'Nominaciones cerradas',
-  'Thanks for nominating': 'Gracias por nominar',
-  'Nominations closed on Wednesday, September 30 at 12 PM. We can’t save new nominations or changes anymore. If you nominated, we have your most recent picks, and those are the ones that count.':
-    'Las nominaciones cerraron el miércoles 30 de septiembre a las 12 PM. Ya no podemos guardar nominaciones nuevas ni cambios. Si nominaste, tenemos tus nominaciones más recientes, y esas son las que cuentan.',
-  'What happens next': 'Qué sigue',
-  'We count the nominations': 'Contamos las nominaciones',
-  'We go through every student’s nominations and count them.': 'Revisamos y contamos las nominaciones de cada estudiante.',
-  'We announce the court': 'Anunciamos la corte',
-  '8 members come from your nominations, and teachers pick the other 4. We’ll post all 12 on this page.':
-    '8 miembros salen de sus nominaciones y los maestros eligen a los otros 4. Publicaremos a los 12 en esta página.',
-  'You vote for royalty': 'Votas por la realeza',
-  'During Homecoming Week, October 5 to 9, you’ll vote for the 2 Homecoming Royalty winners.':
-    'Durante la Semana de Homecoming, del 5 al 9 de octubre, votarás por los 2 ganadores de la Realeza de Homecoming.',
+  'Thanks for nominating and voting': 'Gracias por nominar y votar',
+  'Nominations closed early, on Tuesday, September 29, and students voted for Homecoming Royalty during Homecoming Week, October 5 to 9.':
+    'Las nominaciones cerraron antes de tiempo, el martes 29 de septiembre, y los estudiantes votaron por la Realeza de Homecoming durante la Semana de Homecoming, del 5 al 9 de octubre.',
+  'We aren’t taking new nominations or changes anymore.': 'Ya no aceptamos nominaciones nuevas ni cambios.',
   'Questions? Contact us': '¿Preguntas? Contáctanos',
 }

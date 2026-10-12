@@ -36,7 +36,7 @@ export default function Privacy() {
 
           <h2 className="font-display text-xl font-extrabold tracking-tight text-ink">Questions</h2>
           <p>
-            Email <a href={`mailto:${school.email}`} className="link-brand [overflow-wrap:anywhere]">{school.email}</a> and
+            Email us at <a href={`mailto:${school.email}`} className="link-brand [overflow-wrap:anywhere]">{school.email}</a> and
             we&rsquo;ll answer, or remove something you submitted.
           </p>
         </div>

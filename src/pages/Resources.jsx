@@ -106,11 +106,11 @@ function LinkListSection({ eyebrow, title, blurb, groups }) {
             <div key={g.name}>
               <h3 className="font-display text-lg font-extrabold tracking-tight text-ink">{g.name}</h3>
               {g.note && <p className="mt-1 text-sm leading-relaxed text-body">{g.note}</p>}
-              <ul className="mt-2 space-y-1">
+              <ul className="mt-1">
                 {g.links.map((l) => (
                   <li key={l.href}>
                     <a href={l.href} target="_blank" rel="noopener noreferrer"
-                      className="link-brand inline-flex min-h-[32px] items-center font-display text-sm font-bold">
+                      className="link-brand inline-flex min-h-[44px] min-w-[44px] items-center font-display text-sm font-bold">
                       {l.label}
                     </a>
                   </li>

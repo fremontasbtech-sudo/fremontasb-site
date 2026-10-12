@@ -74,7 +74,8 @@ export const googleClientId = '276898272987-f2qepltpkfs8um36rh6qpeesfk1u5i57.app
 // on every request, so closing does NOT depend on anyone editing the Config tab or on a scheduled job.
 // For the next cycle: change both lines (and CLOSES_AT_ in apps-script/homecoming-nominations.gs).
 export const homecomingNominationsClosesAt = '2026-09-29T00:00:00-07:00' // CLOSED EARLY BY HAND (real deadline was 2026-09-30T12:00:00-07:00)
-export const homecomingNominationsClosesLabel = 'Wednesday, September 30 at 12 PM'
+// The label matches the moment above (the start of Tuesday, September 29), not the original deadline.
+export const homecomingNominationsClosesLabel = 'Tuesday, September 29'
 
 export const homecomingNominationsApi = 'https://script.google.com/macros/s/AKfycbyGZ8M4yXzqgyx6985ITpaS9fBkPM89ro-98zc2oTwMWg0ntWHVGu1Bn6-mSz8qxmSlpA/exec'
 
@@ -108,8 +109,7 @@ export const links = {
   // Opportunities: a normal link to the same Doc so phones can open it full-screen
   opportunitiesDeck: 'https://docs.google.com/document/d/1Eejgl40HokOrwIrHIZB21hpTecIMvW_AmEOnn9ex7kw/preview',
 
-  // Resources page (placeholders until ASB Tech confirms the real links)
-  communityResources: '#',
+  // Resources page
   studentWellness: 'https://fhs.fuhsd.org/guidance-student-support/student-wellness-resources',
   fundraiserApproval: 'https://app.informedk12.com/link_campaigns/fundraiser-form-59de5f92-6589-4b27-a103-a684782f1c47?token=1D7o2fJ7jgbtjjbREaZxw2sq',
   reimbursements: 'https://app.informedk12.com/link_campaigns/check-request-electronic-form-638b46dd-9d91-411d-9056-ca54f5cb63f1?token=nLaHtqkbjGdUbqL1AvB7f3Mp',
@@ -241,6 +241,9 @@ export const clubDates = {
 // RESOURCE LINK LISTS (Resources page) - ported from the old fremontasb.org
 //   "Community Resources" and "Student Wellness" tabs. Each entry: a name, an
 //   optional note, and one or more { label, href } links. Edit here to update.
+//   Checked 2026-10-12 against fhs.fuhsd.org's Student Wellness & Resources page:
+//   both Google Forms there replaced the old closed ones, Youth Space moved off the
+//   Billy DeFrank site, and CHAC stopped patient care on 2024-06-30 (entry removed).
 // ─────────────────────────────────────────────────────────────────────────────
 export const resourceLinks = {
   community: [
@@ -249,11 +252,8 @@ export const resourceLinks = {
       { label: 'Crisis Text Line', href: 'https://www.crisistextline.org/' },
       { label: '988 Suicide & Crisis Lifeline', href: 'https://988lifeline.org/' },
     ] },
-    { name: 'Community Counseling (sliding fee scale)', links: [
-      { label: 'Community Health Awareness Council', href: 'http://www.chacmv.org/clinic/' },
-    ] },
     { name: 'LGBTQ Resources', links: [
-      { label: 'LGBTQ Youth Space (Billy DeFrank Center)', href: 'http://youthspace.org/locations/the-billy-defrank-center/' },
+      { label: 'LGBTQ Youth Space', href: 'https://www.youthspace.org/' },
       { label: 'PFLAG San Jose', href: 'http://www.pflagsanjose.org/' },
     ] },
     { name: 'Grief Support', note: 'Center for Living with Dying · (408) 243-0222', links: [
@@ -272,10 +272,10 @@ export const resourceLinks = {
   ],
   wellness: [
     { name: 'Wellness Check-In Form', note: 'Request to speak with a school-based therapist or psychologist.', links: [
-      { label: 'Open the check-in form', href: 'https://forms.gle/LREikhxnf1nQRogP6' },
+      { label: 'Open the check-in form', href: 'https://docs.google.com/forms/d/e/1FAIpQLSdv_yhrmuaiFSkipVLi-0ORQLYlUdGKP1sjgqsp_-lSnx2Mrg/viewform' },
     ] },
     { name: 'FUHSD School Linked Services Referral', note: 'Staff referral to the district specialist for community resources.', links: [
-      { label: 'Referral form', href: 'https://docs.google.com/forms/d/e/1FAIpQLSe0dXD7SLYPcq0aa3I4XOr9r1DxKw-5U97nBxvA9CafF12QOA/viewform' },
+      { label: 'Referral form', href: 'https://docs.google.com/forms/d/e/1FAIpQLSeCgIMZwMkYNSPGWoXSE0uiwhbD_vX3S2uxYflAB47Qi9p5eQ/viewform' },
     ] },
     { name: 'Family Community Support Referral', links: [
       { label: 'Referral form', href: 'https://docs.google.com/forms/d/e/1FAIpQLSe9J4wMxyCWdanv292_306Y6ZW5TvcSkqCWeK0cB43Ggv1Gcw/viewform' },

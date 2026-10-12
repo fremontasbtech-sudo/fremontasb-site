@@ -2,29 +2,45 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/jpeg" href="/favicon.jpg" />
-    <!-- Home hero: start fetching the first drone frame before the app script runs. -->
-    <link rel="preload" as="image" href="/hero-poster.jpg" fetchpriority="high" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/png" href="/icon-192.png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#FFFFFF" />
+    <script>
+      // Runs before the app: canonical URL for this path (src/components/Layout.jsx keeps it in sync
+      // on navigation), and the Home hero's first drone frame preloaded only on Home, not every route.
+      (function () {
+        var p = location.pathname.replace(/\/+$/, '') || '/'
+        var c = document.createElement('link'); c.rel = 'canonical'; c.href = 'https://www.fremontasb.org' + p
+        document.head.appendChild(c)
+        if (p === '/') {
+          var i = document.createElement('link'); i.rel = 'preload'; i.as = 'image'; i.href = '/hero-poster.jpg'
+          i.setAttribute('fetchpriority', 'high'); document.head.appendChild(i)
+        }
+      })()
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Fremont High School ASB: news, spirit points, clubs, FremontTV, photos, and resources for Firebirds." />
     <title>Fremont ASB</title>
-    <link rel="canonical" href="https://fremontasb-site.vercel.app/" />
     <!-- Link preview (Open Graph + Twitter) -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Fremont ASB" />
     <meta property="og:title" content="Fremont ASB" />
     <meta property="og:description" content="Fremont High School ASB: news, spirit points, clubs, FremontTV, photos, and resources for Firebirds." />
-    <meta property="og:url" content="https://fremontasb-site.vercel.app/" />
-    <meta property="og:image" content="https://fremontasb-site.vercel.app/og.jpg" />
+    <meta property="og:url" content="https://www.fremontasb.org/" />
+    <meta property="og:image" content="https://www.fremontasb.org/og.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Fremont ASB" />
     <meta name="twitter:description" content="Fremont High School ASB: news, spirit points, clubs, FremontTV, photos, and resources for Firebirds." />
-    <meta name="twitter:image" content="https://fremontasb-site.vercel.app/og.jpg" />
+    <meta name="twitter:image" content="https://www.fremontasb.org/og.jpg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,500;0,700;0,800;1,700&display=swap" rel="stylesheet" />
+    <!-- Not render-blocking: if Google Fonts is slow or filtered (school Wi-Fi), pages still paint right away
+         in the fallback font and switch to Archivo when it arrives. -->
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,500;0,700;0,800;1,700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,500;0,700;0,800;1,700&display=swap" rel="stylesheet" /></noscript>
   </head>
   <body>
     <div id="root"></div>

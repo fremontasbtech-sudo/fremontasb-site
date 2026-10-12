@@ -91,6 +91,10 @@ link there, save, and redeploy (Part 4).
 - The hero background is the drone video `public/hero.mp4`, with `public/hero-poster.jpg` (a frame
   from that video) as the still. If a phone blocks autoplay (for example iOS Low Power Mode), the
   poster shows cleanly with no stranded play button.
+- Each page's browser-tab title comes from `handle.title` in `src/App.jsx`, and the canonical link
+  always points at https://www.fremontasb.org. When you add a page, also add its URL to
+  `public/sitemap.xml`. `vercel.json` sends a few security headers on every route (no framing by
+  other sites, no camera, microphone or location access).
 
 ### Language toggle
 
@@ -185,7 +189,8 @@ src/
                  use*.js data hooks; albumTitle.js; es.js (Spanish); *.json fallbacks
   i18n.jsx       English/Español context + toggle
   assets/        Logo images
-public/          Favicon, logo, og.jpg (link preview), hero.mp4 + hero-poster.jpg, sample images
+public/          favicon.ico + touch icons, logo, og.jpg (link preview), robots.txt + sitemap.xml,
+                 hero.mp4 + hero-poster.jpg, sample images
 vite.config.js   Dev mirrors of the /api routes
 ```
 

@@ -85,7 +85,8 @@ export function LanguageProvider({ children }) {
   return <LangCtx.Provider value={{ lang, setLang }}>{children}</LangCtx.Provider>
 }
 
-/** Subtle language dropdown used in the navbar: shows the current language, lists both. */
+/** Subtle language dropdown used in the navbar: shows the current language, lists both.
+ *  Below 400 px only the globe shows (the name stays for screen readers) so the menu button keeps its 44 px. */
 export function LangToggle({ className = '' }) {
   const { lang, setLang } = useLang()
   const [open, setOpen] = useState(false)
@@ -104,12 +105,12 @@ export function LangToggle({ className = '' }) {
     <div className={`relative ${className}`} ref={ref}>
       <button type="button" aria-haspopup="true" aria-expanded={open} onClick={() => setOpen((v) => !v)}
         aria-label="Language / Idioma"
-        className="inline-flex min-h-[44px] items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-body/70 transition-colors hover:text-brand">
+        className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-body/70 transition-colors hover:text-brand">
         <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
           <circle cx="10" cy="10" r="7.5" />
           <path d="M2.5 10h15M10 2.5c2.5 2.4 2.5 12.6 0 15M10 2.5c-2.5 2.4-2.5 12.6 0 15" strokeLinecap="round" />
         </svg>
-        {current}
+        <span className="max-[399px]:sr-only">{current}</span>
         <svg className={`h-3.5 w-3.5 transition-transform ${open ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
           <path d="M6 8l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
@@ -119,7 +120,7 @@ export function LangToggle({ className = '' }) {
           {options.map((o) => (
             <li key={o.code}>
               <button type="button" onClick={() => choose(o.code)}
-                className={`flex w-full items-center justify-between px-4 py-2.5 text-left font-display text-[15px] font-bold ${o.code === lang ? 'text-brand' : 'text-ink hover:bg-brand-tint hover:text-brand'}`}>
+                className={`flex min-h-[44px] w-full items-center justify-between px-4 py-2.5 text-left font-display text-[15px] font-bold ${o.code === lang ? 'text-brand' : 'text-ink hover:bg-brand-tint hover:text-brand'}`}>
                 {o.label}
                 {o.code === lang && (
                   <svg className="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">

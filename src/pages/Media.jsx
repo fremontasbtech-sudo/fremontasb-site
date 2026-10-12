@@ -5,6 +5,7 @@ import Button, { ExternalIcon } from '../components/Button'
 import { links } from '../data/sources'
 import overlay from '../data/media.json'
 import { useYouTube } from '../data/useYouTube'
+import { useLang } from '../i18n'
 
 /**
  * Media - Fremont TV + rally/event videos in one place.
@@ -93,7 +94,7 @@ export default function Media() {
         <div className="container-site">
           {/* Title + filters: one render; the filter row drops below the title until lg. */}
           <div className="mb-8 flex flex-wrap items-end justify-between gap-x-8 gap-y-5 sm:mb-10">
-            <SectionHeader title="Archive" eyebrow={`${rest.length} videos`} className="!mb-0" />
+            <SectionHeader title="Archive" eyebrow={<>{rest.length} videos</>} className="!mb-0" />
             <Filters kind={kind} setKind={setKind} counts={counts} className="w-full lg:w-auto" />
           </div>
 
@@ -159,6 +160,7 @@ function FilterChip({ active, onClick, children }) {
  */
 function Player({ episode }) {
   const [playing, setPlaying] = useState(false)
+  const { lang } = useLang()
   return (
     <div className="relative w-full overflow-hidden rounded-lg border border-rule bg-rule" style={{ aspectRatio: '16 / 9' }}>
       {playing ? (
@@ -167,13 +169,12 @@ function Player({ episode }) {
           title={episode.title}
           className="absolute inset-0 h-full w-full"
           allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-          allowFullScreen
         />
       ) : (
         <button
           type="button"
           onClick={() => setPlaying(true)}
-          aria-label={`Play ${episode.title}`}
+          aria-label={`${lang === 'es' ? 'Reproducir' : 'Play'} ${episode.title}`}
           className="group absolute inset-0 flex h-full w-full items-center justify-center text-left"
         >
           <Thumb id={episode.youtubeId} alt="" className="absolute inset-0 h-full w-full object-cover" />
