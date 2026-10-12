@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Every page in src/App.jsx (not the old Wix redirects). Add a line here when you add a page. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://www.fremontasb.org/</loc></url>
+  <url><loc>https://www.fremontasb.org/media</loc></url>
+  <url><loc>https://www.fremontasb.org/photos</loc></url>
+  <url><loc>https://www.fremontasb.org/clubs</loc></url>
+  <url><loc>https://www.fremontasb.org/resources</loc></url>
+  <url><loc>https://www.fremontasb.org/opportunities</loc></url>
+  <url><loc>https://www.fremontasb.org/contact</loc></url>
+  <url><loc>https://www.fremontasb.org/elections</loc></url>
+  <url><loc>https://www.fremontasb.org/download-app</loc></url>
+  <url><loc>https://www.fremontasb.org/homecoming-court</loc></url>
+  <url><loc>https://www.fremontasb.org/privacy</loc></url>
+</urlset>
