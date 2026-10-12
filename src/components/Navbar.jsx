@@ -57,7 +57,9 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-40 border-b border-rule bg-paper" aria-label="Main">
-      <div className="mx-auto flex h-16 w-full max-w-[84rem] items-center justify-between gap-4 lg:gap-3 min-[1150px]:gap-4 px-5 sm:px-8 lg:px-5 min-[1150px]:px-8">
+      {/* Below 400 px the gutter and gaps tighten (and the language switch is icon-only) so the
+          logo, language switch and 44 px menu button fit on a 320 px phone without side scroll. */}
+      <div className="mx-auto flex h-16 w-full max-w-[84rem] items-center justify-between gap-2 min-[400px]:gap-4 lg:gap-3 min-[1150px]:gap-4 px-4 min-[400px]:px-5 sm:px-8 lg:px-5 min-[1150px]:px-8">
         <Link to="/" className="flex min-h-[44px] items-center gap-2.5 shrink-0" aria-label="Fremont ASB home">
           <img src={logo} alt="" className="h-9 w-auto" />
           <span className="font-display text-lg font-extrabold tracking-tight text-ink leading-none">
@@ -84,7 +86,7 @@ export default function Navbar() {
                 <li className="card-surface shadow-lg py-1.5">
                   {more.map((l) => (
                     <NavLink key={l.to} to={l.to}
-                      className={({ isActive }) => `block px-4 py-2.5 font-display text-[15px] font-bold ${isActive ? 'text-brand' : 'text-ink hover:text-brand hover:bg-brand-tint'}`}>
+                      className={({ isActive }) => `flex min-h-[44px] items-center px-4 py-2.5 font-display text-[15px] font-bold ${isActive ? 'text-brand' : 'text-ink hover:text-brand hover:bg-brand-tint'}`}>
                       {l.label}
                     </NavLink>
                   ))}
@@ -94,11 +96,11 @@ export default function Navbar() {
           </li>
         </ul>
 
-        <LangToggle className="ml-2 mr-1 lg:ml-1 min-[1150px]:ml-3" />
+        <LangToggle className="min-[400px]:ml-2 min-[400px]:mr-1 lg:ml-1 min-[1150px]:ml-3" />
 
         {/* Mobile toggle */}
         <button type="button" onClick={() => setOpen((v) => !v)}
-          className="lg:hidden inline-flex h-11 w-11 items-center justify-center rounded-btn text-ink hover:bg-brand-tint"
+          className="lg:hidden inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-btn text-ink hover:bg-brand-tint"
           aria-expanded={open} aria-controls="mobile-menu" aria-label={open ? 'Close menu' : 'Open menu'}>
           <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
             {open ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}

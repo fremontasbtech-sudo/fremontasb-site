@@ -76,7 +76,7 @@ function CatChip({ active, onClick, children }) {
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`inline-flex min-h-[40px] items-center rounded-full border px-4 font-display text-sm font-bold transition-colors ${
+      className={`inline-flex min-h-[44px] items-center rounded-full border px-4 font-display text-sm font-bold transition-colors ${
         active
           ? 'border-brand bg-brand text-white'
           : 'border-rule text-ink [@media(hover:hover)]:hover:border-brand [@media(hover:hover)]:hover:text-brand'
@@ -186,8 +186,8 @@ export default function Clubs() {
             <HelpLinks className="mt-6 hidden lg:block" />
           </aside>
 
-          {/* Results */}
-          <div className="lg:col-span-8">
+          {/* Results. min-w-0 so a long meeting line truncates instead of widening the page on 320 px phones. */}
+          <div className="min-w-0 lg:col-span-8">
             {cats.length > 1 && (
               <div className="mb-6 flex flex-wrap gap-2" role="group" aria-label="Filter clubs by category">
                 <CatChip active={cat === 'all'} onClick={() => setCat('all')}>All</CatChip>
@@ -222,7 +222,8 @@ export default function Clubs() {
                       aria-expanded={showAll}
                       className={`inline-flex min-h-[44px] items-center gap-2 rounded-btn border border-rule px-6 font-display text-sm font-bold text-ink ${HOVER_BRAND} [@media(hover:hover)]:hover:border-brand`}
                     >
-                      {showAll ? 'Show fewer' : `Show all ${results.length} clubs`}
+                      {/* Number in its own text node so the Spanish dictionary can translate the words around it. */}
+                      {showAll ? 'Show fewer' : <>Show all {results.length} clubs</>}
                       <Chevron open={showAll} />
                     </button>
                   </div>
@@ -239,7 +240,7 @@ export default function Clubs() {
                   className={`inline-flex min-h-[44px] items-center gap-2 text-sm font-bold text-body ${HOVER_BRAND}`}
                 >
                   <Chevron open={showDisbanded} />
-                  {showDisbanded ? 'Hide' : 'Show'} {disbanded.length} disbanded {disbanded.length === 1 ? 'club' : 'clubs'}
+                  {showDisbanded ? 'Hide' : 'Show'} {disbanded.length} {disbanded.length === 1 ? 'disbanded club' : 'disbanded clubs'}
                 </button>
                 {showDisbanded && (
                   <ul className="mt-3 border-t border-rule">
@@ -434,9 +435,9 @@ function ClubRow({ club }) {
 
 function Meta({ label, children }) {
   return (
-    <span className="inline-flex gap-1.5">
+    <span className="inline-flex max-w-full gap-1.5">
       <span className="font-bold text-ink">{label}</span>
-      <span className="truncate max-w-[18rem]">{children}</span>
+      <span className="min-w-0 truncate max-w-[18rem]">{children}</span>
     </span>
   )
 }
@@ -481,7 +482,9 @@ function ClubDates() {
   }, [items])
   const datesWith = useMemo(() => new Set(byDate.keys()), [byDate])
   const years = useMemo(() => [...new Set(items.map((it) => +it.iso.slice(0, 4)))], [items])
-  const todayIso = new Date().toISOString().slice(0, 10)
+  // Local date, not toISOString (UTC), so an event-day item doesn't grey out after 5 PM Pacific.
+  const now = new Date()
+  const todayIso = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
   const nextIso = items.find((it) => it.iso >= todayIso)?.iso ?? items[items.length - 1]?.iso
   const [open, setOpen] = useState(true)
   const [selected, setSelected] = useState(nextIso)
@@ -524,7 +527,7 @@ function ClubDates() {
                     return (
                       <li key={i}>
                         <button type="button" onClick={() => pick(it.iso)}
-                          className={`flex w-full items-baseline gap-3 rounded-btn px-2 py-2 text-left transition-colors ${sel ? 'bg-brand-tint' : '[@media(hover:hover)]:hover:bg-brand-tint'} ${past ? 'opacity-45' : ''}`}>
+                          className={`flex min-h-[44px] w-full items-baseline gap-3 rounded-btn px-2 py-2.5 text-left transition-colors ${sel ? 'bg-brand-tint' : '[@media(hover:hover)]:hover:bg-brand-tint'} ${past ? 'opacity-45' : ''}`}>
                           <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${dot[it.type] || 'bg-body/40'}`} />
                           <span className={`w-16 shrink-0 font-display text-sm font-bold tabular-nums ${sel ? 'text-brand' : 'text-ink'}`}>{it.display}</span>
                           <span className="min-w-0">

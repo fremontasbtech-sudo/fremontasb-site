@@ -22,7 +22,7 @@ export default function Embed({ src, title, ratio = '16 / 9', minHeight, fallbac
         </div>
       ) : (
         <iframe src={src} title={title} className="absolute inset-0 h-full w-full" loading="lazy"
-          allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen />
+          allow="autoplay; encrypted-media; picture-in-picture; fullscreen" />
       )}
     </div>
   )

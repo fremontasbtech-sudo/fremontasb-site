@@ -1,6 +1,7 @@
 import PageHero from '../components/PageHero'
 import Button, { ExternalIcon } from '../components/Button'
 import { links, school } from '../data/sources'
+import { useLang } from '../i18n'
 import { cleanAlbumTitle, formatAlbumMonth } from '../data/albumTitle'
 import fallbackAlbums from '../data/photos.json'
 import { useFlickr } from '../data/useFlickr'
@@ -27,7 +28,7 @@ export default function Photos() {
     <>
       <PageHero
         title="Photos"
-        eyebrow={`${events.length} albums`}
+        eyebrow={<>{events.length} albums</>}
         subtext="Click a photo below to see all photos from individual events, or click the button below to be redirected to the Fremont ASB Flickr page."
       >
         <Button href={links.flickr} external className="px-7 text-lg">Flickr</Button>
@@ -62,6 +63,8 @@ export default function Photos() {
 /* ── local card: image fills a fixed-ratio box, caption pinned to the bottom ── */
 
 function AlbumCard({ event, featured, ratio }) {
+  const { lang } = useLang()
+  const title = event.title || cleanAlbumTitle(event.name)
   return (
     <a href={event.flickrUrl} target="_blank" rel="noopener noreferrer"
        className="group card-surface flex h-full flex-col overflow-hidden">
@@ -69,8 +72,10 @@ function AlbumCard({ event, featured, ratio }) {
       <div className={`relative aspect-[4/3] w-full grow overflow-hidden bg-rule ${ratio}`}>
         <img
           src={event.coverImageUrl}
-          alt={`${(event.title || cleanAlbumTitle(event.name))} cover photo`}
+          alt={lang === 'es' ? `Foto de portada: ${title}` : `${title} cover photo`}
           loading={featured ? 'eager' : 'lazy'}
+          // Flickr blocked or down (e.g. a filtered network): hide the broken image, keep the plain tile and title.
+          onError={(e) => { e.currentTarget.style.visibility = 'hidden' }}
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
         />
       </div>
@@ -78,7 +83,7 @@ function AlbumCard({ event, featured, ratio }) {
         <div className="min-w-0">
           {event.date && <p className="eyebrow mb-1 text-[0.6rem]">{formatAlbumMonth(event.date)}</p>}
           <h2 className={`font-display text-lg font-bold leading-snug text-ink transition-colors group-hover:text-brand ${featured ? 'lg:text-2xl' : ''}`}>
-            {(event.title || cleanAlbumTitle(event.name))}
+            {title}
           </h2>
         </div>
         <ExternalIcon className="mb-1 h-4 w-4 shrink-0 text-brand/70" />
