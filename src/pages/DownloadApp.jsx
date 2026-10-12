@@ -16,7 +16,7 @@ const STORES = [
 // What lives where. Only what ASB Tech has said the app does, no extra promises.
 const WEBSITE = [
   'Latest news and spirit points totals',
-  'Club list, handbook and accountability tracker',
+  'Club list and handbook',
   'Fremont TV episodes and event photos',
   'Homecoming Court, Elections, Opportunities',
   'School Store and Contact links',
