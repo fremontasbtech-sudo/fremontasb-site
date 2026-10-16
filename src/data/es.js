@@ -375,7 +375,7 @@ export const ES = {
   'Clubs Day sign-ups': 'Inscripciones para el Día de Clubes',
   'First monthly check-in due': 'Primer registro mensual',
   'Due 11:59 PM, then the last of every month': 'Vence a las 11:59 PM, y después el último día de cada mes',
-  'Multicultural Night': 'Noche Multicultural',
+  'International Fair': 'Feria Internacional',
   '2nd-semester applications open': 'Abren las solicitudes del 2.º semestre',
   'Club Trivia Night': 'Noche de Trivia de Clubes',
   'Club Grub Day': 'Grub Day de clubes',
