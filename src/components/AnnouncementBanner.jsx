@@ -14,7 +14,7 @@ export default function AnnouncementBanner({ heading, body, buttonLabel, href, c
       className={`rounded-lg bg-brand px-5 py-6 text-white sm:flex sm:items-center sm:justify-between sm:gap-8 sm:px-8 sm:py-7 ${className}`}
     >
       <div className="max-w-2xl">
-        <h2 id={headingId} className="font-display text-xl font-extrabold tracking-tight sm:text-2xl">
+        <h2 id={headingId} className="font-display text-xl font-extrabold tracking-tight text-white sm:text-2xl">
           {heading}
         </h2>
         {body && <p className="mt-2 text-base leading-relaxed text-white/90">{body}</p>}
