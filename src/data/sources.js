@@ -94,6 +94,8 @@ export const links = {
     'https://docs.google.com/spreadsheets/d/1ZpDVioKRc0TDzUSYpGspEOOEEM9TXBVjk8Tl6wzirJE/edit',
   clubHandbook:
     'https://docs.google.com/document/d/1fiowHLXAjMT61OVWanui4NadO_apk0Ufc40KnZYiXng/edit',
+  // Club Spotlight (Fremont TV segment) application form, linked from the banner on /clubs.
+  clubSpotlightForm: 'https://forms.gle/eV9qDDJedxBofCcE8',
   // Club Info Meeting deck, normal view link for the "Open the slides" button (embed lives in embeds.clubInfoSlides).
   clubInfoSlides:
     'https://docs.google.com/presentation/d/1GV6dM2eOitIWyesUN5ciMVs3Cq9pqc8a-hBYtz1OmIs/edit?usp=sharing',

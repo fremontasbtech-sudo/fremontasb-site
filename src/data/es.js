@@ -271,6 +271,10 @@ export const ES = {
   "Find every official club for this year, who runs it, and where it meets. If you’re a club officer, the Club Handbook and the key dates below have what you need.": "Encuentra todos los clubes oficiales de este año, quién los dirige y dónde se reúnen. Si eres oficial de un club, el Manual de Clubes y las fechas clave de abajo tienen lo que necesitas.",
   'Club Accountability Tracker': 'Registro de Responsabilidad de Clubes',
   'Club Handbook': 'Manual de Clubes',
+  'Want your club in the spotlight?': '¿Quieres que tu club esté en el centro de atención?',
+  'Apply for Club Spotlight, a Fremont TV segment that highlights your club and the impact it has on our school. Applications are open to every club.':
+    'Postúlate para Club Spotlight, un segmento de Fremont TV que destaca a tu club y el impacto que tiene en nuestra escuela. Las solicitudes están abiertas para todos los clubes.',
+  'Apply Now': 'Postúlate ahora',
   'Browse the club list': 'Ver la lista de clubes',
   'Key dates': 'Fechas clave',
   'How to start a club': 'Cómo iniciar un club',
