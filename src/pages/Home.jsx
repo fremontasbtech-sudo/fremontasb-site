@@ -206,9 +206,11 @@ const quickLinks = [
 ]
 
 function LatestNews({ eventsRecent = [], eventsUpcoming = [], eventsAll = [], eventsFinished = [], eventsLoading = false }) {
-  // At most 5 upcoming items at a time, soonest first. Senior nights don't count toward the 5.
-  let nonSenior = 0
-  const upcomingShown = eventsUpcoming.filter((it) => it.seniorNight || /senior\s*night/i.test(it.title || '') || ++nonSenior <= 5)
+  // At most 5 upcoming items, soonest first; the rest of the next 30 days sit behind "Show more".
+  const [showAllUpcoming, setShowAllUpcoming] = useState(false)
+  const UPCOMING_MAX = 5
+  const upcomingMore = Math.max(0, eventsUpcoming.length - UPCOMING_MAX)
+  const upcomingShown = showAllUpcoming ? eventsUpcoming : eventsUpcoming.slice(0, UPCOMING_MAX)
   const { rows, loading: newsLoading, source } = useSheetData(sheets.news, newsJson)
   const { rows: videos, loading: vLoading } = useYouTube(mediaOverlay)
   const { albums, loading: aLoading } = useFlickr(photoAlbums)
@@ -244,7 +246,7 @@ function LatestNews({ eventsRecent = [], eventsUpcoming = [], eventsAll = [], ev
             <SectionHeader eyebrow="On the calendar" title="Upcoming Events" />
             {eventsLoading && eventsUpcoming.length === 0 && <Loading label="Loading upcoming events…" />}
             {eventsUpcoming.length > 0 && (
-              <ol className="divide-y divide-rule border-t border-rule">
+              <ol id="upcoming-list" className="divide-y divide-rule border-t border-rule">
                 {upcomingShown.map((item) => (
                   <li key={item.key}>
                     <NewsItem item={item} />
@@ -252,7 +254,22 @@ function LatestNews({ eventsRecent = [], eventsUpcoming = [], eventsAll = [], ev
                 ))}
               </ol>
             )}
-            {!eventsLoading && eventsUpcoming.length === 0 && <Notice>There are no events in the next three weeks. Check back soon for updates.</Notice>}
+            {upcomingMore > 0 && (
+              <button
+                type="button"
+                aria-expanded={showAllUpcoming}
+                aria-controls="upcoming-list"
+                onClick={() => setShowAllUpcoming((v) => !v)}
+                className="mt-4 inline-flex min-h-[44px] w-full items-center justify-between gap-3 rounded-btn border border-rule bg-paper px-4 py-2 text-left font-display text-sm font-bold text-ink transition-colors hover:border-brand hover:text-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+              >
+                <span>{showAllUpcoming ? 'Show fewer events' : 'Show more events'}</span>
+                <span className="inline-flex items-center gap-2">
+                  {!showAllUpcoming && <span className="rounded-btn bg-brand-tint px-2 py-0.5 text-xs text-brand">{`+${upcomingMore}`}</span>}
+                  <svg className={`h-4 w-4 transition-transform ${showAllUpcoming ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9" /></svg>
+                </span>
+              </button>
+            )}
+            {!eventsLoading && eventsUpcoming.length === 0 && <Notice>There are no events in the next 30 days. Check back soon for updates.</Notice>}
           </div>
         </div>
 

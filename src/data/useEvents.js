@@ -22,7 +22,7 @@ import eventsSnapshot from './events.json'
  */
 const CACHE_KEY = 'fasb.events.v2'
 const CACHE_TTL = 6 * 60 * 60 * 1000 // ignore a cache older than 6h so it can't flash stale data
-const HORIZON_DAYS = 21   // upcoming window: the next 3 weeks only
+const HORIZON_DAYS = 30   // upcoming window: the next 30 days (Home shows 5, the rest behind "Show more")
 const PAST_DAYS = 14      // how long a finished flagged game lingers
 
 const _cache = makeCache(CACHE_KEY, CACHE_TTL)

@@ -499,7 +499,9 @@ export const ES = {
   // ── shared loading / notices ──
   'Loading the latest…': 'Cargando lo último…',
   'Loading spirit points…': 'Cargando puntos de espíritu…',
-  "There are no events in the next three weeks. Check back soon for updates.": "No hay eventos en las próximas tres semanas. Vuelve pronto para ver novedades.",
+  "There are no events in the next 30 days. Check back soon for updates.": "No hay eventos en los próximos 30 días. Vuelve pronto para ver novedades.",
+  "Show more events": "Ver más eventos",
+  "Show fewer events": "Ver menos eventos",
   "Announcements are read over the PA on Wednesday and Friday mornings. Pick a highlighted day on the calendar to see that morning’s announcements, and click on a headline to read the whole announcement.": "Los anuncios se leen por el altavoz los miércoles y viernes por la mañana. Elige un día marcado en el calendario para ver los anuncios de esa mañana, y haz clic en un titular para leer el anuncio completo.",
   "This page is only for reading candidate statements. Voting happens on the official ballot.": "Esta página es solo para leer las declaraciones de los candidatos. La votación se hace en la boleta oficial.",
   "Download links will be added here when the app is released. Until then, you can still use everything listed under the website.": "Los enlaces de descarga se agregarán aquí cuando se lance la app. Mientras tanto, puedes seguir usando todo lo que aparece en la lista del sitio web.",
