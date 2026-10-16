@@ -6,6 +6,9 @@
 // re-checks everything and rate-limits by email and IP.
 //
 // Body: { name, email, message, website (honeypot, must be empty), elapsed (ms the form was open) }
+//
+// The Firebird Hub app's "Tell ASB anything" form posts here too (cross-origin), so both
+// land in the same Contact tab. Only the app's own origins get CORS headers.
 import { homecomingNominationsApi } from '../src/data/sources.js'
 
 const LIMITS = { name: 100, email: 254, message: 2000 }
@@ -33,8 +36,19 @@ export function validateContact(body) {
   return errors.length ? { errors } : { name, email: email.toLowerCase(), message }
 }
 
+const APP_ORIGINS = ['https://firebirdhub.vercel.app', 'https://app.fremontasb.org']
+const appOrigin = (o) =>
+  !!o && (APP_ORIGINS.includes(o) || /^https:\/\/app-[a-z0-9-]+-fremont-asb-tech\.vercel\.app$/.test(o) || /^http:\/\/localhost:\d+$/.test(o))
+
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store')
+  res.setHeader('Vary', 'Origin')
+  if (appOrigin(req.headers.origin)) {
+    res.setHeader('Access-Control-Allow-Origin', req.headers.origin)
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  }
+  if (req.method === 'OPTIONS') return res.status(204).end()
   if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'method', message: 'POST only.' })
   if (!homecomingNominationsApi) {
     return res.status(503).json({ ok: false, error: 'not-configured', message: 'The contact form isn\u2019t connected yet.' })
