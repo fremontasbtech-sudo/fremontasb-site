@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { useRevalidate, fetchJsonRetry } from './liveData.js'
 
 /**
  * useYouTube(overlayRows)
@@ -16,7 +17,7 @@ import { useEffect, useState } from 'react'
  *
  * Instant load: the last merged result is cached in localStorage and rendered on the
  * first paint (no featured-episode "flash" of the previous episode on reload), then
- * revalidated in the background so a new upload still appears.
+ * revalidated in the background (every 2 min while the page is open) so a new upload appears.
  *
  * Returns { rows, loading, source }  (source: 'youtube' | 'local').
  */
@@ -45,24 +46,13 @@ export function useYouTube(overlayRows = []) {
     return cached ? { rows: cached, loading: false, source: 'youtube' } : { rows: overlayRows, loading: true, source: 'local' }
   })
 
-  useEffect(() => {
-    let cancelled = false
-    const softFallback = () =>
-      // Never downgrade a good render (cached latest episode) to the older bundled overlay;
-      // only use the overlay when we truly have nothing yet.
-      setState((s) => (s.rows && s.rows.length ? { ...s, loading: false, source: s.source } : { rows: overlayRows, loading: false, source: 'local' }))
-    const retry = (attempt) => { if (!cancelled && attempt < 3) setTimeout(() => load(attempt + 1), 1500); else softFallback() }
-    const load = (attempt) => {
-      fetch('/api/youtube')
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`http ${r.status}`))))
+  // Fetch on mount, then keep an open page current (every 2 min while visible, and on return
+  // to the tab), so a new upload appears without a reload. See useRevalidate in liveData.js.
+  useRevalidate(({ onStale, alive }) =>
+    fetchJsonRetry('/api/youtube', { isEmpty: (d) => !(d && Array.isArray(d.videos) && d.videos.length), onStale })
       .then((data) => {
-        if (cancelled) return
-        const live = Array.isArray(data && data.videos) ? data.videos : []
-        if (!live.length) {
-          // Transient empty feed (RSS hiccup): retry a few times, then soft-fallback.
-          retry(attempt)
-          return
-        }
+        if (!alive()) return
+        const live = data.videos
         const overlayById = Object.fromEntries(overlayRows.map((r) => [r.youtubeId, r]))
         const liveIds = new Set(live.map((v) => v.youtubeId))
 
@@ -91,11 +81,13 @@ export function useYouTube(overlayRows = []) {
         writeCache(rows)
         setState({ rows, loading: false, source: 'youtube' })
       })
-      .catch(() => { if (!cancelled) retry(attempt) })
-    }
-    load(0)
-    return () => { cancelled = true }
-  }, [])
+      .catch(() => {
+        if (!alive()) return
+        // Never downgrade a good render (cached latest episode) to the older bundled overlay;
+        // only use the overlay when we truly have nothing yet.
+        setState((s) => (s.rows && s.rows.length ? { ...s, loading: false } : { rows: overlayRows, loading: false, source: 'local' }))
+      }),
+  )
 
   return state
 }

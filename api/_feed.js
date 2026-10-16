@@ -1,5 +1,5 @@
-// Shared server-side helper: fetch a YouTube channel's public RSS feed (no API
-// key, no secrets) and return the newest uploads as plain objects. Used by both
+// Shared server-side helper: fetch a YouTube channel's public RSS feed and its Videos page (no
+// API key, no secrets) and return the newest uploads as plain objects. Used by both
 // api/youtube.js (Vercel serverless function, in production) and the dev middleware
 // in vite.config.js. YouTube's RSS feed returns roughly the 15 most recent uploads.
 //
@@ -55,8 +55,91 @@ async function fetchRawVideos(channelId) {
 }
 
 export async function fetchChannelVideos(channelId) {
-  const videos = await fetchRawVideos(channelId)
-  return applyEpisodeTitles(videos)
+  // The RSS feed is cached by YouTube for about 15 minutes and often lags a new upload by more,
+  // so the channel's own Videos page (live, newest first) is read alongside it. Uploads the page
+  // lists above the feed's newest video are added on top; the feed stays the source for
+  // everything else (exact publish dates). Either source can fail without breaking the other.
+  const [feed, page] = await Promise.allSettled([fetchRawVideos(channelId), fetchPageVideos(channelId)])
+  const videos = feed.status === 'fulfilled' ? feed.value : []
+  const fresh = page.status === 'fulfilled' ? page.value : []
+  const known = new Set(videos.map((v) => v.youtubeId))
+  const newer = []
+  if (videos.length) {
+    for (const v of fresh) { if (known.has(v.youtubeId)) break; newer.push(v) }
+  } else {
+    newer.push(...fresh)
+  }
+  if (!videos.length && !newer.length && feed.status === 'rejected') throw feed.reason
+  return applyEpisodeTitles([...newer, ...videos])
+}
+
+// ── Channel Videos page (no key) ─────────────────────────────────────────────
+// Reads the ytInitialData JSON embedded in youtube.com/channel/<id>/videos. Supports both the
+// current lockupViewModel cards and the older videoRenderer cards. The page gives only a
+// relative age ("31 minutes ago"), which is turned into a PT calendar day.
+async function fetchPageVideos(channelId) {
+  if (!channelId) return []
+  const html = await withTimeout(7000, async (signal) => {
+    const res = await fetch(`https://www.youtube.com/channel/${channelId}/videos`, {
+      signal,
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; FremontASB-site/1.0)', 'Accept-Language': 'en-US,en;q=0.9' },
+    })
+    if (!res.ok) throw new Error(`page ${res.status}`)
+    return res.text()
+  })
+  const start = html.indexOf('var ytInitialData = ')
+  if (start < 0) return []
+  const from = start + 'var ytInitialData = '.length
+  const end = html.indexOf(';</script>', from)
+  if (end < 0) return []
+  let data
+  try { data = JSON.parse(html.slice(from, end)) } catch { return [] }
+
+  const out = []
+  const seen = new Set()
+  const add = (id, title, age) => {
+    if (!id || !title || seen.has(id)) return
+    const date = ageToPtDay(age)
+    if (!date) return // no age: an upcoming premiere or a live stream that hasn't aired
+    seen.add(id)
+    out.push({ youtubeId: id, title: decodeEntities(title), date })
+  }
+  const walk = (o) => {
+    if (!o || typeof o !== 'object') return
+    if (Array.isArray(o)) { for (const x of o) walk(x); return }
+    const l = o.lockupViewModel
+    if (l && l.contentType === 'LOCKUP_CONTENT_TYPE_VIDEO') {
+      const meta = l.metadata && l.metadata.lockupMetadataViewModel
+      const title = meta && meta.title && meta.title.content
+      const rows = (meta && meta.metadata && meta.metadata.contentMetadataViewModel && meta.metadata.contentMetadataViewModel.metadataRows) || []
+      let age = ''
+      for (const r of rows) for (const part of r.metadataParts || []) {
+        const t = part.accessibilityLabel || (part.text && part.text.content) || ''
+        if (/\bago$/i.test(t.trim())) age = t
+      }
+      add(l.contentId, title, age)
+      return
+    }
+    const v = o.videoRenderer
+    if (v && v.videoId) {
+      const title = (v.title && ((v.title.runs && v.title.runs[0] && v.title.runs[0].text) || v.title.simpleText)) || ''
+      add(v.videoId, title, (v.publishedTimeText && v.publishedTimeText.simpleText) || '')
+      return
+    }
+    for (const k in o) walk(o[k])
+  }
+  walk(data)
+  return out
+}
+
+const AGE_UNITS = { second: 1e3, minute: 6e4, hour: 36e5, day: 864e5, week: 6048e5, month: 2592e6, year: 31536e6 }
+function ageToPtDay(age) {
+  const m = String(age || '').replace(/\u00a0/g, ' ').match(/(\d+)\s*(second|sec|minute|min|hour|hr|day|week|wk|month|mo|year|yr)s?\b.*ago/i)
+  if (!m) return ''
+  const u = m[2].toLowerCase()
+  const unit = u.startsWith('sec') ? 'second' : u.startsWith('min') ? 'minute' : u.startsWith('h') ? 'hour'
+    : u.startsWith('d') ? 'day' : u.startsWith('w') ? 'week' : u === 'mo' || u.startsWith('month') ? 'month' : 'year'
+  return ptDay(new Date(Date.now() - Number(m[1]) * AGE_UNITS[unit]).toISOString())
 }
 
 // ── LLM-cleaned display titles ────────────────────────────────────────────────
