@@ -8,7 +8,8 @@ import { useSheetData, isTrue } from '../data/useSheetData'
 import { useSpiritPoints } from '../data/useSpiritPoints'
 import { useYouTube } from '../data/useYouTube'
 import { useFlickr } from '../data/useFlickr'
-import { sheets, embeds, school } from '../data/sources'
+import { sheets, embeds, school, links } from '../data/sources'
+import { ptIsoDate } from '../data/liveData'
 import spiritPointsJson from '../data/spiritPoints.json'
 import newsJson from '../data/news.json'
 import mediaOverlay from '../data/media.json'
@@ -329,7 +330,31 @@ function TypeBadge({ type }) {
  *  - Auto items from the already-live feeds: newest Fremont TV episodes + photo albums.
  * Result: the section is always real and current, even before anyone writes an announcement.
  */
+// Time-limited announcements written here until a news sheet is connected. Each one is pinned
+// to the top of Latest News and disappears after its `until` day (PT).
+const BUILT_IN_NEWS = [
+  {
+    title: 'Sign up for the Multicultural Fair',
+    blurb: 'The Multicultural Fair is on Wednesday, October 28 during lunch, between the A and B buildings. Any student can sign up to represent their culture, no club needed. Sign-ups close Sunday, October 25 at 11:59 PM.',
+    href: links.multiculturalFairForm,
+    date: '2026-10-19',
+    until: '2026-10-25',
+    viewLabel: 'Sign up',
+  },
+]
+
 function buildNews(newsRows, source, videos, albums, eventsRecent = [], curatedEvents = [], finishedGames = []) {
+  const today = ptIsoDate()
+  const builtIn = BUILT_IN_NEWS.filter((n) => today <= n.until).map((n) => ({
+    key: `b-${n.title}`,
+    type: 'Announcement',
+    title: n.title,
+    blurb: n.blurb,
+    href: n.href,
+    when: parseDate(n.date),
+    pinned: true,
+    viewLabel: n.viewLabel,
+  }))
   const manual = source === 'sheet'
     ? newsRows.filter((n) => n.title).map((n) => ({
         key: `a-${n.title}-${n.date || ''}`,
@@ -449,7 +474,7 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = [], curatedE
   // Curated upcoming events + pinned games lead the feed, soonest first; the dated/recent
   // items fill the rest, freshest first. Cap the lead so real news still shows through.
   const dayKey = (d) => (d ? d.getFullYear() * 10000 + d.getMonth() * 100 + d.getDate() : 0)
-  const ranked = [...manual, ...vids, ...albs, ...games, ...finishedCards]
+  const ranked = [...builtIn, ...manual, ...vids, ...albs, ...games, ...finishedCards]
     .filter((it) => it.title && it.when && it.when >= cutoff)
     .sort((x, y) => {
       const p = Number(y.pinned) - Number(x.pinned)
