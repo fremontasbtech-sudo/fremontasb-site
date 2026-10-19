@@ -143,7 +143,7 @@ export default function Clubs() {
         <div className="container-site pt-section-sm">
           <AnnouncementBanner
             heading="Represent your culture at the Multicultural Fair"
-            body="The Multicultural Fair is on Wednesday, October 28 during lunch, between the A and B buildings. It is a great chance to teach others about your culture and recruit members for your club. Sign-ups are open to all students, so you do not need to be in a club. The form closes Sunday, October 25 at 11:59 PM."
+            body="Wednesday, October 28 at lunch, between the A and B buildings. Any student can sign up by Sunday, October 25."
             buttonLabel="Sign Up"
             href={links.multiculturalFairForm}
           />
