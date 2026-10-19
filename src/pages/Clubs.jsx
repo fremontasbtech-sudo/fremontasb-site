@@ -69,6 +69,8 @@ const uniq = (arr) => Array.from(new Set(arr.map((s) => s.toLowerCase())))
 // Hover colour only on devices that actually hover, otherwise the rust "sticks" after a tap on phones.
 // Club Spotlight banner above the club list. Set to false when applications close.
 const SHOW_SPOTLIGHT_BANNER = true
+// Multicultural Fair sign-up banner. Hides itself after the form closes (Sun Oct 25, 11:59 PM PT).
+const FAIR_SIGNUP_LAST_DAY = '2026-10-25'
 
 const HOVER_BRAND = '[@media(hover:hover)]:hover:text-brand'
 
@@ -136,6 +138,17 @@ export default function Clubs() {
         <Button href="#club-dates" variant="secondary">Key dates</Button>
         <Button href="#start-a-club" variant="secondary">How to start a club</Button>
       </PageHero>
+
+      {ptIsoDate() <= FAIR_SIGNUP_LAST_DAY && (
+        <div className="container-site pt-section-sm">
+          <AnnouncementBanner
+            heading="Represent your culture at the Multicultural Fair"
+            body="The Multicultural Fair is on Wednesday, October 28 during lunch, between the A and B buildings. It is a great chance to teach others about your culture and recruit members for your club. Sign-ups are open to all students, so you do not need to be in a club. The form closes Sunday, October 25 at 11:59 PM."
+            buttonLabel="Sign Up"
+            href={links.multiculturalFairForm}
+          />
+        </div>
+      )}
 
       {SHOW_SPOTLIGHT_BANNER && (
         <div className="container-site pt-section-sm">

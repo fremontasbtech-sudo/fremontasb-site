@@ -379,7 +379,17 @@ export const ES = {
   'Clubs Day sign-ups': 'Inscripciones para el Día de Clubes',
   'First monthly check-in due': 'Primer registro mensual',
   'Due 11:59 PM, then the last of every month': 'Vence a las 11:59 PM, y después el último día de cada mes',
-  'International Fair': 'Feria Internacional',
+  'Multicultural Fair': 'Feria Multicultural',
+  'Multicultural Fair sign-ups close': 'Cierran las inscripciones para la Feria Multicultural',
+  'Due 11:59 PM, open to all students': 'Hasta las 11:59 PM, abierto a todos los estudiantes',
+  'Lunch, between the A and B buildings': 'Almuerzo, entre los edificios A y B',
+  'Between the A and B buildings': 'Entre los edificios A y B',
+  'Represent your culture at the Multicultural Fair': 'Representa tu cultura en la Feria Multicultural',
+  'The Multicultural Fair is on Wednesday, October 28 during lunch, between the A and B buildings. It is a great chance to teach others about your culture and recruit members for your club. Sign-ups are open to all students, so you do not need to be in a club. The form closes Sunday, October 25 at 11:59 PM.':
+    'La Feria Multicultural es el miércoles 28 de octubre durante el almuerzo, entre los edificios A y B. Es una gran oportunidad para enseñar a otros sobre tu cultura y reclutar miembros para tu club. Las inscripciones están abiertas a todos los estudiantes, así que no necesitas estar en un club. El formulario cierra el domingo 25 de octubre a las 11:59 PM.',
+  'Sign Up': 'Inscríbete',
+  'Students share their cultures and clubs recruit new members during lunch. Any student can sign up to represent their culture, no club needed. Sign-ups close Sunday, October 25 at 11:59 PM.':
+    'Los estudiantes comparten sus culturas y los clubes reclutan nuevos miembros durante el almuerzo. Cualquier estudiante puede inscribirse para representar su cultura, sin necesidad de estar en un club. Las inscripciones cierran el domingo 25 de octubre a las 11:59 PM.',
   '2nd-semester applications open': 'Abren las solicitudes del 2.º semestre',
   'Club Trivia Night': 'Noche de Trivia de Clubes',
   'Club Grub Day': 'Grub Day de clubes',

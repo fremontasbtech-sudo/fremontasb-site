@@ -96,6 +96,7 @@ export const links = {
     'https://docs.google.com/document/d/1fiowHLXAjMT61OVWanui4NadO_apk0Ufc40KnZYiXng/edit',
   // Club Spotlight (Fremont TV segment) application form, linked from the banner on /clubs.
   clubSpotlightForm: 'https://forms.gle/eV9qDDJedxBofCcE8',
+  multiculturalFairForm: 'https://forms.gle/9b6vJJPCJVnpsv2G8',
   // Club Info Meeting deck, normal view link for the "Open the slides" button (embed lives in embeds.clubInfoSlides).
   clubInfoSlides:
     'https://docs.google.com/presentation/d/1GV6dM2eOitIWyesUN5ciMVs3Cq9pqc8a-hBYtz1OmIs/edit?usp=sharing',
@@ -232,7 +233,8 @@ export const clubDates = {
     { iso: '2026-09-13', display: 'Sep 9–13',  label: 'Clubs Day sign-ups',         type: 'process' },
     { iso: '2026-09-16', display: 'Sep 16',    label: 'Clubs Day',                  type: 'event' },
     { iso: '2026-09-30', display: 'Sep 30',    label: 'First monthly check-in due', detail: 'Due 11:59 PM, then the last of every month', type: 'deadline' },
-    { iso: '2026-10-28', display: 'Oct 28',    label: 'International Fair',         type: 'event' },
+    { iso: '2026-10-25', display: 'Oct 25',    label: 'Multicultural Fair sign-ups close', detail: 'Due 11:59 PM, open to all students', type: 'deadline' },
+    { iso: '2026-10-28', display: 'Oct 28',    label: 'Multicultural Fair',         detail: 'Lunch, between the A and B buildings', type: 'event' },
     { iso: '2027-01-15', display: 'January',   label: '2nd-semester applications open', type: 'process' },
     { iso: '2027-01-27', display: 'Jan 27',    label: 'Club Trivia Night',          type: 'event' },
     { iso: '2027-04-21', display: 'Apr 21',    label: 'Club Grub Day',              type: 'event' },
