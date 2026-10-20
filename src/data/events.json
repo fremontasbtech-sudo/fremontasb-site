@@ -209,14 +209,14 @@
       "date": "2026-10-29",
       "time": "6:00 PM",
       "level": "JV/Varsity",
-      "homeAway": "Home",
-      "opponent": "LYNBROOK INVITE",
-      "location": "Fremont Track",
+      "homeAway": "Away",
+      "opponent": "Lynbrook Invite",
+      "location": "Lynbrook Track",
       "section": "upcoming",
       "score": "",
       "seniorNight": true,
       "push": false,
-      "title": "SENIOR NIGHT - Cross Country JV/Varsity Home vs LYNBROOK INVITE"
+      "title": "SENIOR NIGHT - Cross Country JV/Varsity Away vs Lynbrook Invite"
     },
     {
       "sport": "Field Hockey",
