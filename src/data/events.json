@@ -157,7 +157,7 @@
       "opponent": "Jefferson",
       "location": "Fremont Diesner Football Field",
       "section": "result",
-      "score": "",
+      "score": "3–40",
       "seniorNight": false,
       "push": true,
       "title": "Football Varsity Home vs Jefferson"
@@ -206,17 +206,17 @@
     },
     {
       "sport": "Cross Country",
-      "date": "2026-10-20",
-      "time": "3:30 PM",
+      "date": "2026-10-29",
+      "time": "6:00 PM",
       "level": "JV/Varsity",
-      "homeAway": "Away",
-      "opponent": "SCVAL #3",
-      "location": "Baylands Park",
+      "homeAway": "Home",
+      "opponent": "LYNBROOK INVITE",
+      "location": "Fremont Track",
       "section": "upcoming",
       "score": "",
       "seniorNight": true,
       "push": false,
-      "title": "SENIOR NIGHT - Cross Country JV/Varsity Away vs SCVAL #3"
+      "title": "SENIOR NIGHT - Cross Country JV/Varsity Home vs LYNBROOK INVITE"
     },
     {
       "sport": "Field Hockey",
