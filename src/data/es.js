@@ -275,6 +275,7 @@ export const ES = {
   'Apply for Club Spotlight, a Fremont TV segment that highlights your club and the impact it has on our school. Applications are open to every club.':
     'Postúlate para Club Spotlight, un segmento de Fremont TV que destaca a tu club y el impacto que tiene en nuestra escuela. Las solicitudes están abiertas para todos los clubes.',
   'Apply Now': 'Postúlate ahora',
+  'Learn More': 'Más información',
   'Browse the club list': 'Ver la lista de clubes',
   'Key dates': 'Fechas clave',
   'How to start a club': 'Cómo iniciar un club',

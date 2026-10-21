@@ -1,14 +1,14 @@
 import { useMemo, useState } from 'react'
 import PageHero from '../components/PageHero'
 import Button from '../components/Button'
-import AnnouncementBanner from '../components/AnnouncementBanner'
+import ClubAnnouncements from '../components/ClubAnnouncements'
 import Embed from '../components/Embed'
 import Calendar from '../components/Calendar'
 import SectionHeader from '../components/SectionHeader'
 import { Loading, DevNote } from '../components/DataState'
 import { useClubs } from '../data/useClubs'
 import { ptIsoDate } from '../data/liveData'
-import { links, school, embeds, clubDates } from '../data/sources'
+import { links, school, embeds, clubDates, clubAnnouncementsSheet } from '../data/sources'
 import clubsJson from '../data/clubs.json'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -67,11 +67,6 @@ function normalizeClub(row) {
 const uniq = (arr) => Array.from(new Set(arr.map((s) => s.toLowerCase())))
 
 // Hover colour only on devices that actually hover, otherwise the rust "sticks" after a tap on phones.
-// Club Spotlight banner above the club list. Set to false when applications close.
-const SHOW_SPOTLIGHT_BANNER = true
-// Multicultural Fair sign-up banner. Hides itself after the form closes (Sun Oct 25, 11:59 PM PT).
-const FAIR_SIGNUP_LAST_DAY = '2026-10-25'
-
 const HOVER_BRAND = '[@media(hover:hover)]:hover:text-brand'
 
 // The fixed taxonomy /api/clubs classifies every club into (Gemini, server-side).
@@ -139,27 +134,8 @@ export default function Clubs() {
         <Button href="#start-a-club" variant="secondary">How to start a club</Button>
       </PageHero>
 
-      {ptIsoDate() <= FAIR_SIGNUP_LAST_DAY && (
-        <div className="container-site pt-section-sm">
-          <AnnouncementBanner
-            heading="Represent your culture at the Multicultural Fair"
-            body="Wednesday, October 28 at lunch, between the A and B buildings. Any student can sign up by Sunday, October 25."
-            buttonLabel="Sign Up"
-            href={links.multiculturalFairForm}
-          />
-        </div>
-      )}
-
-      {SHOW_SPOTLIGHT_BANNER && (
-        <div className="container-site pt-section-sm">
-          <AnnouncementBanner
-            heading="Want your club in the spotlight?"
-            body="Apply for Club Spotlight, a Fremont TV segment that highlights your club and the impact it has on our school. Applications are open to every club."
-            buttonLabel="Apply Now"
-            href={links.clubSpotlightForm}
-          />
-        </div>
-      )}
+      {/* Announcement cards from the sheet's "Announcements" tab. Renders nothing when none are active. */}
+      <ClubAnnouncements sheetUrl={clubAnnouncementsSheet} />
 
       {/* ── Club list ──────────────────────────────────────────────────────── */}
       <section id="club-list" className="container-site section-space scroll-mt-20">

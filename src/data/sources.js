@@ -29,6 +29,12 @@ export const sheets = {
   // TODO(26-27): this is the interim 25-26 list. Swap in the 26-27 sheet once it exists.
   clubs: 'https://docs.google.com/spreadsheets/d/1IQo9QG0ubONWAeaZfwPQ2GJH7zpBr_QexsH9o0XTOLg/edit?gid=0#gid=0',
 
+  // Clubs → announcement cards at the top of the page. A tab named "Announcements" in the same
+  // Official Clubs List sheet. Columns: title | description | button_label | button_url | show_from | hide_after | priority
+  // Paste the tab's gid below (open the tab, copy the number after "gid=" in the address bar).
+  // Leave it null to show no cards. When the 26-27 clubs sheet replaces this one, move the tab and update the gid.
+  clubAnnouncementsGid: null,
+
   // Homecoming Court.  Columns: name | photoUrl | bio | active | cycle
   //   The page shows while ANY row has active = TRUE (blank counts as TRUE). Set every row to FALSE after voting.
   //   cycle = e.g. "Homecoming 2026" (read from the first row that has one).
@@ -39,6 +45,11 @@ export const sheets = {
   //   active blank/TRUE = shown, FALSE = archived. To archive a whole section, set its rows to FALSE.
   elections: null,
 }
+
+// The Announcements tab as a sheet link (null until the gid is filled in). Built from sheets.clubs so the two never drift.
+export const clubAnnouncementsSheet = sheets.clubAnnouncementsGid == null
+  ? null
+  : sheets.clubs.replace(/[?#].*$/, `#gid=${sheets.clubAnnouncementsGid}`)
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HOMECOMING COURT NOMINATIONS (peer nomination, seasonal).
