@@ -5,6 +5,7 @@ import { fetchAlbums } from './api/_flickr.js'
 import { fetchAnnouncements } from './api/_announcements.js'
 import { fetchEvents } from './api/_events.js'
 import { fetchClubs } from './api/_clubs.js'
+import { publicTabUrl, PUBLIC_TABS } from './api/_sheet.js'
 import { youtubeFeed, flickrFeed, announcementsSheet, eventsSheet, sheets } from './src/data/sources.js'
 
 // Dev-only: serve the same /api/* endpoints the Vercel functions serve in
@@ -51,6 +52,18 @@ function devApi(flickrKey) {
           res.end(JSON.stringify({ clubs: await fetchClubs(sheets.clubs) }))
         } catch (err) {
           res.end(JSON.stringify({ clubs: [], error: String(err && err.message || err) }))
+        }
+      })
+      server.middlewares.use('/api/sheet', async (req, res) => {
+        const tab = new URL(req.url, 'http://localhost').searchParams.get('tab') || ''
+        if (!PUBLIC_TABS.includes(tab)) { res.statusCode = 404; return res.end('unknown tab') }
+        try {
+          const r = await fetch(publicTabUrl(tab), { redirect: 'follow' })
+          res.setHeader('Content-Type', 'text/csv; charset=utf-8')
+          res.end(await r.text())
+        } catch {
+          res.statusCode = 502
+          res.end('')
         }
       })
     },
