@@ -1,0 +1,67 @@
+/* Clubs page announcement cards. Tokens first so values are easy to tweak; colors and radii
+   come from tailwind.config.js through theme(), so they follow the site's brand tokens. */
+.ann {
+  --ann-tray-bg: theme('colors.brand.tint');
+  --ann-tray-border: color-mix(in srgb, theme('colors.brand.DEFAULT') 12%, theme('colors.brand.tint'));
+  --ann-card-bg: theme('colors.paper');
+  --ann-card-border: theme('colors.rule');
+  --ann-accent: theme('colors.brand.DEFAULT');
+  --ann-accent-width: 4px;
+  --ann-btn-min-width: 160px;                                /* fits "Apply Here" and "Learn More", so buttons share a left edge */
+  --ann-pad: 12px;                                          /* tray padding on phones */
+  --ann-card-radius: theme('borderRadius.lg');              /* same 8px as .card-surface */
+  --ann-tray-radius: calc(var(--ann-card-radius) + var(--ann-pad)); /* concentric with the cards */
+}
+@media (min-width: theme('screens.sm')) {
+  .ann { --ann-pad: 16px; }
+}
+
+.ann-tray {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: var(--ann-pad);
+  border: 1px solid var(--ann-tray-border);
+  border-radius: var(--ann-tray-radius);
+  background: var(--ann-tray-bg);
+}
+
+/* overflow: hidden clips the accent bar to the card's rounded corners. */
+.ann-card {
+  position: relative;
+  overflow: hidden;
+  padding: 20px 20px 20px calc(20px + var(--ann-accent-width));
+  border: 1px solid var(--ann-card-border);
+  border-radius: var(--ann-card-radius);
+  background: var(--ann-card-bg);
+}
+.ann-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--ann-accent-width);
+  background: var(--ann-accent);
+}
+
+.ann-text { min-width: 0; }
+.ann-text p { max-width: 65ch; }
+
+.ann-btn { margin-top: 16px; width: 100%; }
+
+@media (min-width: theme('screens.sm')) {
+  .ann-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 24px 24px 24px calc(24px + var(--ann-accent-width));
+  }
+  .ann-text { flex: 1; }
+  .ann-btn {
+    margin-top: 0;
+    margin-left: auto;
+    width: auto;
+    flex-shrink: 0;
+    min-width: var(--ann-btn-min-width);
+  }
+}

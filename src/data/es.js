@@ -280,6 +280,7 @@ export const ES = {
   'Key dates': 'Fechas clave',
   'How to start a club': 'Cómo iniciar un club',
   'Club list': 'Lista de clubes',
+  'Announcements': 'Anuncios',
   'Find a club': 'Busca un club',
   'Search by name, purpose, advisor, or room': 'Busca por nombre, propósito, asesor o salón',
   'active clubs': 'clubes activos',
