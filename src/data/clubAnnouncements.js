@@ -2,7 +2,7 @@ import { toCsvUrl, parseCsv } from './useSheetData'
 import { ptIsoDate } from './liveData'
 
 /**
- * Clubs page announcement cards, read from the "Announcements" tab of the Official Clubs List.
+ * Clubs page announcement cards, read from the "Clubs Announcements" tab of the Events sheet (/api/sheet).
  * One row per card. Columns are read by header name (extra columns are ignored):
  *   title | description | button_label | button_url | show_from | hide_after | priority
  * A row shows from show_from through hide_after (inclusive, Pacific time). Rows missing a

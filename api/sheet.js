@@ -1,5 +1,5 @@
 // Vercel serverless function: GET /api/sheet?tab=Spirit%20Points → CSV
-// The Events spreadsheet is private, so its PUBLIC tabs (Spirit Points, Events, Sports) are read
+// The Events spreadsheet is private, so its PUBLIC tabs (Spirit Points, Events, Sports, Clubs Announcements) are read
 // through the Apps Script (runs as the sheet owner; it refuses every other tab) and cached at
 // Vercel's edge: fresh for 60 s, then served stale for up to 10 more minutes while one background
 // request refreshes it, so visitors rarely wait on Apps Script and a sheet edit shows within a

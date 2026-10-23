@@ -8,7 +8,7 @@ import SectionHeader from '../components/SectionHeader'
 import { Loading, DevNote } from '../components/DataState'
 import { useClubs } from '../data/useClubs'
 import { ptIsoDate } from '../data/liveData'
-import { links, school, embeds, clubDates, clubAnnouncementsSheet } from '../data/sources'
+import { links, school, embeds, clubDates, sheets } from '../data/sources'
 import clubsJson from '../data/clubs.json'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -134,8 +134,8 @@ export default function Clubs() {
         <Button href="#start-a-club" variant="secondary">How to start a club</Button>
       </PageHero>
 
-      {/* Announcement cards from the sheet's "Announcements" tab. Renders nothing when none are active. */}
-      <ClubAnnouncements sheetUrl={clubAnnouncementsSheet} />
+      {/* Announcement cards from the Events sheet's "Clubs Announcements" tab. Renders nothing when none are active. */}
+      <ClubAnnouncements sheetUrl={sheets.clubAnnouncements} />
 
       {/* ── Club list ──────────────────────────────────────────────────────── */}
       <section id="club-list" className="container-site section-space scroll-mt-20">

@@ -183,7 +183,7 @@ function doGet(e) {
 // tabs that are meant to be public through here (GET ?view=sheet&tab=Spirit%20Points), as CSV.
 // ONLY the tabs listed below can ever be read; Nominations, Test Submissions and Config cannot.
 // ---------------------------------------------------------------------
-var PUBLIC_TABS_ = ['Spirit Points', 'Events', 'Sports'];
+var PUBLIC_TABS_ = ['Spirit Points', 'Events', 'Sports', 'Clubs Announcements'];
 
 function publicTabCsv_(tab) {
   if (PUBLIC_TABS_.indexOf(tab) < 0) return '';
