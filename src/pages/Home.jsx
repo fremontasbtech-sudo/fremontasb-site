@@ -386,7 +386,20 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = [], curatedE
   const albumIsGame = (al, g, gi) => {
     const ai = normGame(al.title)
     if (ai && gi.length >= 6 && (ai === gi || ai.includes(gi) || (ai.length >= 6 && gi.includes(ai)))) return true
-    return !!al.date && al.date === g.date && namesSport(al.title, g.sport, sportNames)
+    if (al.date && al.date === g.date && namesSport(al.title, g.sport, sportNames)) return true
+    return seniorAlbumIsGame(al, g)
+  }
+  // Senior night photos always fold into that senior night's card, never a separate Photos row.
+  // An album that says "Senior Night" matches a senior-night game within a day of it that it
+  // names by sport (short names count: "XC" is Cross Country), or the only senior night that day.
+  const seniorGames = [...eventsRecent, ...finishedGames].filter((g) => g.seniorNight)
+  const nearDay = (a, b) => !!a && !!b && Math.abs(new Date(`${a}T12:00:00`) - new Date(`${b}T12:00:00`)) <= 86400000
+  const seniorAlbumIsGame = (al, g) => {
+    if (!g.seniorNight || !/senior\s*night/i.test(al.title) || !nearDay(al.date, g.date)) return false
+    if (namesCoreSport(al.title, g.sport, sportNames)) return true
+    const named = seniorGames.some((o) => nearDay(al.date, o.date) && namesCoreSport(al.title, o.sport, sportNames))
+    const sameDay = new Set(seniorGames.filter((o) => nearDay(al.date, o.date)).map((o) => o.sport))
+    return !named && sameDay.size === 1
   }
 
   // Recent finished games. If a photo album matches the game, show its photos link right on the
@@ -488,6 +501,26 @@ function namesSport(albumTitle, sport, sportNames = []) {
     if (longer !== s && ` ${longer} `.includes(` ${s} `)) a = a.split(` ${longer} `).join(' | ')
   }
   return a.includes(` ${s} `)
+}
+
+// Short names in album titles, spelled out so they match the sport ("XC Senior Night").
+const SPORT_SHORT = { xc: 'cross country', wp: 'water polo', bball: 'basketball', vball: 'volleyball', fh: 'field hockey' }
+// True when an album names this sport's core ("Volleyball" for Girls Volleyball). If the album
+// names a gender, it must be this sport's. A longer, different sport name ("Flag Football") in
+// the album doesn't count as the shorter one ("Football").
+function namesCoreSport(albumTitle, sport, sportNames = []) {
+  const gender = (x) => (/\b(girls?|womens?)\b/.test(x) ? 'g' : /\b(boys?|mens?)\b/.test(x) ? 'b' : '')
+  const core = (x) => phrase(x).replace(/\b(girls?|boys?|womens?|mens?|varsity|jv)\b/g, ' ').replace(/\s+/g, ' ').trim()
+  const c = core(sport)
+  let a = ` ${phrase(albumTitle).split(' ').map((w) => SPORT_SHORT[w] || w).join(' ')} `
+  if (!c) return false
+  for (const longer of [...sportNames, ...OTHER_NAMES]) {
+    const lc = core(longer)
+    if (lc !== c && ` ${lc} `.includes(` ${c} `)) a = a.split(` ${lc} `).join(' | ')
+  }
+  if (!a.includes(` ${c} `)) return false
+  const ag = gender(a), sg = gender(phrase(sport))
+  return !ag || !sg || ag === sg
 }
 
 function NewsItem({ item, featured }) {

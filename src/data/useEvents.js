@@ -13,7 +13,8 @@ import eventsSnapshot from './events.json'
  * load and every minute while the page is open. For pinned games we show only the SOONEST
  * upcoming game per sport (one football, one volleyball…), so a flagged full season shows
  * one row at a time; when that game's day passes it drops out and that sport's next y-game
- * takes its place automatically. Senior nights always show, outside that rule.
+ * takes its place automatically. Senior nights always show, outside that rule and outside
+ * the 30-day window.
  *
  * Instant load: the last response is cached in localStorage and rendered on the spot
  * (no spinner for repeat visitors), then revalidated in the background, and again while the
@@ -121,7 +122,9 @@ export function shape(data) {
       }
       continue
     }
-    if (d > horizon) continue
+    // Senior nights always show in Upcoming, however far ahead (the special rule); everything
+    // else stays inside the 30-day window.
+    if (d > horizon && !isSenior) continue
     const item = { key: `gm-${g.date}-${g.sport}`, type: 'Sports', title, href: null, when: d, seniorNight: isSenior, blurb: dashJoin([isSenior ? 'Senior Night' : '', g.level, g.time, g.location]), meta: dashJoin([isSenior ? 'Senior Night' : '', g.level, g.time, g.location]) }
     if (isSenior) {
       // Straight in: a pinned game earlier in the window can never hide a senior night. One card
