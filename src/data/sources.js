@@ -97,7 +97,7 @@ export const homecomingNominationsPage = 'https://docs.google.com/forms/d/e/1FAI
 
 export const links = {
   clubAccountabilityTracker:
-    'https://docs.google.com/spreadsheets/d/1ZpDVioKRc0TDzUSYpGspEOOEEM9TXBVjk8Tl6wzirJE/edit',
+    'https://docs.google.com/spreadsheets/d/1ZpDVioKRc0TDzUSYpGspEOOEEM9TXBVjk8Tl6wzirJE/edit?gid=0#gid=0',
   clubHandbook:
     'https://docs.google.com/document/d/1fiowHLXAjMT61OVWanui4NadO_apk0Ufc40KnZYiXng/edit',
   // Club Spotlight (Fremont TV segment) application form, linked from the banner on /clubs.
@@ -111,7 +111,7 @@ export const links = {
     'https://docs.google.com/spreadsheets/d/1IQo9QG0ubONWAeaZfwPQ2GJH7zpBr_QexsH9o0XTOLg/edit?gid=0#gid=0',
 
   schoolStore: 'https://fremonths.myschoolcentral.com/',
-  flickr: 'https://flickr.com/people/fremonthighschoolasb/',
+  flickr: 'https://flickr.com/photos/fremonthighschoolasb/albums/',
   youtube: 'https://www.youtube.com/@fremonthighschoolasb',
   instagram: 'https://www.instagram.com/firebirdfelipe/',
   tiktok: 'https://www.tiktok.com/@felipethefirebird',

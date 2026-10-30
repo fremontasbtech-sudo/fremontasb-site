@@ -127,9 +127,11 @@ export default function Clubs() {
       <PageHero
         title="Clubs"
         eyebrow={school.year}
+        narrow={false}
         subtext="Find every official club for this year, who runs it, and where it meets. If you’re a club officer, the Club Handbook and the key dates below have what you need."
       >
         <Button href={links.clubHandbook} variant="primary" external onClick={trackOutbound('Club Handbook', links.clubHandbook)}>Club Handbook</Button>
+        <Button href={links.clubAccountabilityTracker} variant="primary" external onClick={trackOutbound('Accountability Tracker', links.clubAccountabilityTracker)}>Accountability Tracker</Button>
         <Button href="#club-list" variant="secondary">Browse the club list</Button>
         <Button href="#club-dates" variant="secondary">Key dates</Button>
         <Button href="#start-a-club" variant="secondary">How to start a club</Button>
