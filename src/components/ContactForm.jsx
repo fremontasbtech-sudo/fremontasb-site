@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { school } from '../data/sources'
 import { Notice } from './DataState'
+import { trackEvent } from '../lib/analytics'
 
 /**
  * ContactForm - the Contact page form. Same 3 questions as the old Google Form.
@@ -57,6 +58,7 @@ export default function ContactForm() {
   const headRef = useRef(null)
   const firstRender = useRef(true)
 
+  useEffect(() => { trackEvent('contact_form_view') }, [])
   useEffect(() => { if (phase === 'form') writeDraft(values) }, [values, phase])
   useEffect(() => {
     if (firstRender.current) { firstRender.current = false; return }

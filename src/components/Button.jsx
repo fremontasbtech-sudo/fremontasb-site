@@ -14,12 +14,12 @@ export default function Button({ text, children, href, to, onClick, variant = 'p
     return <span className={cls} aria-disabled="true" {...rest}>{label}</span>
   }
   if (to) {
-    return <Link to={to} className={cls} {...rest}>{label}</Link>
+    return <Link to={to} className={cls} onClick={onClick} {...rest}>{label}</Link>
   }
   if (href) {
     const ext = external ?? /^https?:/.test(href)
     return (
-      <a href={href} className={cls} target={ext ? '_blank' : undefined} rel={ext ? 'noopener noreferrer' : undefined} {...rest}>
+      <a href={href} className={cls} onClick={onClick} target={ext ? '_blank' : undefined} rel={ext ? 'noopener noreferrer' : undefined} {...rest}>
         {label}{ext && icon}
       </a>
     )

@@ -31,8 +31,8 @@ const router = createBrowserRouter([
       { path: '/download-app', element: <DownloadApp />, handle: { title: 'Download the App' } },
       { path: '/privacy', element: <Privacy />, handle: { title: 'Privacy' } },
       // old Wix URLs
-      { path: '/fremonttv', element: <Navigate to="/media" replace /> },
-      { path: '/videos', element: <Navigate to="/media" replace /> },
+      { path: '/fremonttv', element: <Navigate to="/media" replace />, handle: { redirect: true } },
+      { path: '/videos', element: <Navigate to="/media" replace />, handle: { redirect: true } },
       // notFound: Layout drops the canonical link and adds noindex (the server still answers 200).
       { path: '*', element: <NotFound />, handle: { title: 'Page not found', notFound: true } },
     ],

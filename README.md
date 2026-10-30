@@ -153,8 +153,33 @@ are always reasonable.
 |---|---|---|
 | `GEMINI_API_KEY` | announcement + album titles | Google AI Studio key made on the ASB Gmail. Optional; without it the site uses the heuristic. `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` also work. |
 | `FLICKR_API_KEY` | Photos | Read-only, non-commercial Flickr key. A default is baked into `api/_flickr.js`, so this is only an override. |
+| `VITE_GA_MEASUREMENT_ID` | Google Analytics (browser) | The GA4 measurement ID, `G-…`. See **Analytics** below. |
 
-Keys are read server-side only and never ship to the browser. Never commit a key.
+Keys are read server-side only and never ship to the browser. Never commit a key. (`VITE_GA_MEASUREMENT_ID` is the
+one exception: it's built into the browser bundle, which is fine because a measurement ID isn't a secret.)
+
+### Analytics
+
+The site uses Google Analytics 4 to count visits. All of it lives in `src/lib/analytics.js`.
+
+- **Where the ID lives:** only in the Vercel env var `VITE_GA_MEASUREMENT_ID`. It's never in the repo. With the
+  variable missing or empty, or in `npm run dev`, analytics does nothing: no script, no errors, no console output.
+- **Set it in Vercel:** Project Settings > Environment Variables > add `VITE_GA_MEASUREMENT_ID` with the `G-…` ID,
+  scope **Production** only (so previews don't count as real traffic). Vite bakes it in at build time, so
+  **redeploy** afterwards (Deployments > latest > Redeploy).
+- **Check it works:** open www.fremontasb.org, click between a few pages, then look at GA4 > Reports > Realtime.
+  You should see `page_view` for each page within a minute. For event-by-event detail, turn on the Google Analytics
+  Debugger Chrome extension, reload the site, and open Admin > DebugView. In the
+  browser's Network tab, hits go to `google-analytics.com/g/collect`.
+- **What is tracked:** a `page_view` on every route change (sent from `usePageViews` in `Layout.jsx`, with
+  `page_path` and `page_title`; GA's automatic page view is off), `outbound_click` (`link_label`, `link_url`) on the
+  School Store, Flickr, Club Handbook and Resources links, `contact_form_view` when the Contact form shows, and
+  `nomination_submit` (no params) after a nomination saves. Google signals and ad personalization are off.
+- **Privacy rule:** events carry labels and URLs only. Never send names, emails, nominees, student IDs or anything
+  typed into a form. If you track something new, update the Privacy page too.
+- **Add an event:** `import { trackEvent } from '../lib/analytics'`, then call `trackEvent('event_name', { label: 'x' })`
+  where it happens (for a link that leaves the site: `onClick={trackOutbound('Label', url)}`). Use snake_case names.
+  To report on a custom param, register it in GA4 under Admin > Custom definitions.
 
 The athletics results feed (public, no key) is a Google Apps Script URL hardcoded in
 `api/_events.js`. If athletics changes it, update that constant.

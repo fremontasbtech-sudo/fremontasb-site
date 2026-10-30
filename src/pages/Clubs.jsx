@@ -10,6 +10,7 @@ import { useClubs } from '../data/useClubs'
 import { ptIsoDate } from '../data/liveData'
 import { links, school, embeds, clubDates, sheets } from '../data/sources'
 import clubsJson from '../data/clubs.json'
+import { trackOutbound } from '../lib/analytics'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Data shape. The live "Official Clubs List" sheet has headers like
@@ -128,7 +129,7 @@ export default function Clubs() {
         eyebrow={school.year}
         subtext="Find every official club for this year, who runs it, and where it meets. If you’re a club officer, the Club Handbook and the key dates below have what you need."
       >
-        <Button href={links.clubHandbook} variant="primary" external>Club Handbook</Button>
+        <Button href={links.clubHandbook} variant="primary" external onClick={trackOutbound('Club Handbook', links.clubHandbook)}>Club Handbook</Button>
         <Button href="#club-list" variant="secondary">Browse the club list</Button>
         <Button href="#club-dates" variant="secondary">Key dates</Button>
         <Button href="#start-a-club" variant="secondary">How to start a club</Button>
@@ -308,7 +309,7 @@ export default function Clubs() {
                 There are 3 steps to get your club on the Official Clubs List. After that, every club has a few things to do during the year to stay on the list. The Club Handbook has all of the rules.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Button href={links.clubHandbook} variant="primary" external>Read the Club Handbook</Button>
+                <Button href={links.clubHandbook} variant="primary" external onClick={trackOutbound('Club Handbook', links.clubHandbook)}>Read the Club Handbook</Button>
               </div>
             </div>
 

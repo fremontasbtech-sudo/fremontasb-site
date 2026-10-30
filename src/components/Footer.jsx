@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { school, links } from '../data/sources'
 import logo from '../assets/fremont-tower.png'
+import { trackOutbound } from '../lib/analytics'
 
 const item = 'inline-flex min-h-[44px] items-center hover:text-brand'
 
@@ -19,6 +20,9 @@ export default function Footer() {
           <p className="mt-3 text-sm text-body max-w-sm">
             Website designed and maintained by ASB Tech.
           </p>
+          <p className="mt-3 text-sm text-body max-w-sm">
+            We use anonymous analytics to see how many people visit and which pages they use.
+          </p>
         </div>
         <div className="text-sm">
           <p className="eyebrow mb-2">Find us</p>
@@ -36,7 +40,7 @@ export default function Footer() {
             <li><a className={item} href={links.instagram} target="_blank" rel="noopener noreferrer">Instagram: @firebirdfelipe</a></li>
             <li><a className={item} href={links.tiktok} target="_blank" rel="noopener noreferrer">TikTok: @felipethefirebird</a></li>
             <li><a className={item} href={links.youtube} target="_blank" rel="noopener noreferrer">YouTube: Fremont High School ASB</a></li>
-            <li><a className={item} href={links.flickr} target="_blank" rel="noopener noreferrer">Flickr: event photos</a></li>
+            <li><a className={item} href={links.flickr} target="_blank" rel="noopener noreferrer" onClick={trackOutbound('Flickr', links.flickr)}>Flickr: event photos</a></li>
           </ul>
         </div>
       </div>

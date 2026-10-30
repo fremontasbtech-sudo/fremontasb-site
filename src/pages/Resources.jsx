@@ -1,6 +1,7 @@
 import PageHero from '../components/PageHero'
 import Button from '../components/Button'
 import { links, resourceLinks } from '../data/sources'
+import { trackOutbound } from '../lib/analytics'
 
 // Six resources, two groups. Links live in src/data/sources.js, a '#' means
 // ASB Tech hasn't confirmed the real URL yet, and the block says so instead of pretending.
@@ -109,7 +110,7 @@ function LinkListSection({ eyebrow, title, blurb, groups }) {
               <ul className="mt-1">
                 {g.links.map((l) => (
                   <li key={l.href}>
-                    <a href={l.href} target="_blank" rel="noopener noreferrer"
+                    <a href={l.href} target="_blank" rel="noopener noreferrer" onClick={trackOutbound(l.label, l.href)}
                       className="link-brand inline-flex min-h-[44px] min-w-[44px] items-center font-display text-sm font-bold">
                       {l.label}
                     </a>
@@ -142,7 +143,7 @@ function ResourceBlock({ title, body, href, cta, featured }) {
             Link coming soon
           </span>
         ) : (
-          <Button href={href} variant="primary" external>{cta}</Button>
+          <Button href={href} variant="primary" external onClick={trackOutbound(title, href)}>{cta}</Button>
         )}
       </div>
     </article>
