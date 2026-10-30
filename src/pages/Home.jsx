@@ -432,11 +432,32 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = [], curatedE
       href: al.href,
       when: sameDayLater(fg.when, al.when),
       seniorNight: fg.seniorNight,
+      sport: fg.sport,
+      date: fg.date,
       blurb: [fg.seniorNight ? 'Senior Night' : '', scoreNote(fg.score, fg.when, undefined, fg.sport), fg.level].filter(Boolean).join(' · '),
       viewLabel: al.count ? `View ${al.count} photos` : 'View photos',
       pinned: false,
     })
   }
+
+  // Every senior night of the current sports season gets its own card in Latest News, so each
+  // team is shown equally, not only the newest few (Abir 2026-10-30). Cards already built above
+  // (recent games, album score cards) are kept; the rest come straight from the finished games.
+  const seasonOf = (d) => { const m = d.getMonth() + 1; return m >= 8 && m <= 11 ? `F${d.getFullYear()}` : m === 12 ? `W${d.getFullYear()}` : m <= 2 ? `W${d.getFullYear() - 1}` : `S${d.getFullYear()}` }
+  const thisSeason = seasonOf(new Date())
+  const covered = new Set([...games, ...finishedCards].map((c) => `${c.sport}|${c.date}`))
+  const seniorCards = (finishedGames || [])
+    .filter((fg) => fg.seniorNight && fg.when && seasonOf(fg.when) === thisSeason && !covered.has(`${fg.sport}|${fg.date}`))
+    .map((fg) => ({
+      key: `gm-${fg.date}-${fg.sport}`,
+      type: 'Sports',
+      title: fg.title,
+      href: null,
+      when: fg.when,
+      seniorNight: true,
+      blurb: ['Senior Night', scoreNote(fg.score, fg.when, undefined, fg.sport), fg.level].filter(Boolean).join(' · '),
+      pinned: false,
+    }))
 
   const albs = albumList.filter((al) => !consumed.has(al)).slice(0, 3).map((al) => {
     // A photo album for a curated EVENT (e.g. "Clubs Day") is dated by the EVENT itself, not
@@ -462,7 +483,7 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = [], curatedE
   // Curated upcoming events + pinned games lead the feed, soonest first; the dated/recent
   // items fill the rest, freshest first. Cap the lead so real news still shows through.
   const dayKey = (d) => (d ? d.getFullYear() * 10000 + d.getMonth() * 100 + d.getDate() : 0)
-  const ranked = [...manual, ...vids, ...albs, ...games, ...finishedCards]
+  const ranked = [...manual, ...vids, ...albs, ...games, ...finishedCards, ...seniorCards]
     .filter((it) => it.title && it.when && it.when >= cutoff)
     .sort((x, y) => {
       const p = Number(y.pinned) - Number(x.pinned)
@@ -480,13 +501,15 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = [], curatedE
     })
   // At most ONE Fremont TV item in Latest News (the newest). 'kind' is classified by the LLM
   // server-side (api/_feed.js), so a future episode is caught even if it's titled differently.
+  // The 5 newest other items, plus every senior night this season (they don't use up the 5).
   let fremontTVShown = false
+  let others = 0
   return ranked
     .filter((it) => {
       if (it.type === 'Fremont TV') { if (fremontTVShown) return false; fremontTVShown = true }
-      return true
+      if (it.seniorNight) return seasonOf(it.when) === thisSeason
+      return others++ < 5
     })
-    .slice(0, 5)
 }
 
 // True when an album title names this exact sport as a whole phrase, and not only inside a
