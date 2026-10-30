@@ -26,6 +26,13 @@ const CACHE_TTL = 6 * 60 * 60 * 1000 // ignore a cache older than 6h so it can't
 const HORIZON_DAYS = 30   // upcoming window: the next 30 days (Home shows 5, the rest behind "Show more")
 const PAST_DAYS = 14      // how long a finished flagged game lingers
 const SENIOR_DAYS = 14    // senior nights join Upcoming once they are this close (Abir 2026-10-30)
+const SENIOR_LINGER = 10  // a season's senior nights leave Latest News together, 10 days after its last one
+
+// Sports season of a date: fall Aug-Nov, winter Dec-Feb, spring Mar-Jul.
+export function seasonOf(d) {
+  const m = d.getMonth() + 1, y = d.getFullYear()
+  return m >= 8 && m <= 11 ? `F${y}` : m === 12 ? `W${y}` : m <= 2 ? `W${y - 1}` : `S${y}`
+}
 
 const _cache = makeCache(CACHE_KEY, CACHE_TTL)
 function readCache() {
@@ -144,11 +151,24 @@ export function shape(data) {
   }
   for (const v of recentBy.values()) recent.push(v.item)
 
+  // Latest News lists every senior night of one season. That season is the one with the most
+  // recent finished senior night; all of its cards stay until 10 days after the season's LAST
+  // senior night, then leave together (Abir 2026-10-30).
+  let seniorSeason = null
+  const seniorDates = (data.games || []).filter(isSeniorGame).map((g) => parseIso(g.date)).filter(Boolean)
+  const lastDone = seniorDates.filter((d) => d < start || (d.getTime() === start.getTime())).sort((a, b) => b - a)[0]
+  if (lastDone) {
+    const key = seasonOf(lastDone)
+    const last = seniorDates.filter((d) => seasonOf(d) === key).sort((a, b) => b - a)[0]
+    const until = new Date(last); until.setDate(until.getDate() + SENIOR_LINGER)
+    if (start <= until) seniorSeason = key
+  }
+
   const upcoming = [...evItems, ...[...seniorBy.values(), ...nextBySport.values()].map((v) => v.item)].sort((a, b) => a.when - b.when) // soonest first
   recent.sort((a, b) => b.when - a.when)                                                                        // most recent first
   const events = (data.events || []).map((e) => ({ name: e.name, date: e.date })).filter((e) => e.name && e.date)
   const finishedGames = [...finishedBy.values()].map((v) => v.game)
-  return { upcoming, recent, events, finishedGames }
+  return { upcoming, recent, events, finishedGames, seniorSeason }
 }
 
 // Keep the current state object when a re-shape changed nothing, so an open page doesn't

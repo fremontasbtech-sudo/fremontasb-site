@@ -14,7 +14,7 @@ import newsJson from '../data/news.json'
 import mediaOverlay from '../data/media.json'
 import photoAlbums from '../data/photos.json'
 import { useAnnouncements } from '../data/useAnnouncements'
-import { useEvents, scoreNote } from '../data/useEvents'
+import { useEvents, scoreNote, seasonOf } from '../data/useEvents'
 import { cleanAlbumTitle } from '../data/albumTitle'
 
 /**
@@ -26,12 +26,12 @@ import { cleanAlbumTitle } from '../data/albumTitle'
  * not image tiles, so a card grid would flatten the hierarchy this page depends on.
  */
 export default function Home() {
-  const { upcoming, recent, events: curatedEvents, finishedGames, loading: eventsLoading } = useEvents()
+  const { upcoming, recent, events: curatedEvents, finishedGames, seniorSeason, loading: eventsLoading } = useEvents()
   return (
     <>
       <Hero />
       <SpiritPoints />
-      <LatestNews eventsRecent={recent} eventsUpcoming={upcoming} eventsAll={curatedEvents} eventsFinished={finishedGames} eventsLoading={eventsLoading} />
+      <LatestNews eventsRecent={recent} eventsUpcoming={upcoming} eventsAll={curatedEvents} eventsFinished={finishedGames} seniorSeason={seniorSeason} eventsLoading={eventsLoading} />
       <MorningAnnouncements />
       <AppBanner />
     </>
@@ -205,7 +205,7 @@ const quickLinks = [
   { to: '/resources', label: 'School Store', note: 'ASB cards, dance tickets, and spirit wear' },
 ]
 
-function LatestNews({ eventsRecent = [], eventsUpcoming = [], eventsAll = [], eventsFinished = [], eventsLoading = false }) {
+function LatestNews({ eventsRecent = [], eventsUpcoming = [], eventsAll = [], eventsFinished = [], seniorSeason = null, eventsLoading = false }) {
   // At most 5 upcoming items, soonest first; the rest of the next 30 days sit behind "Show more".
   const [showAllUpcoming, setShowAllUpcoming] = useState(false)
   const UPCOMING_MAX = 5
@@ -215,7 +215,7 @@ function LatestNews({ eventsRecent = [], eventsUpcoming = [], eventsAll = [], ev
   const { rows: videos, loading: vLoading } = useYouTube(mediaOverlay)
   const { albums, loading: aLoading } = useFlickr(photoAlbums)
 
-  const items = buildNews(rows, source, videos, albums, eventsRecent, eventsAll, eventsFinished)
+  const items = buildNews(rows, source, videos, albums, eventsRecent, eventsAll, eventsFinished, seniorSeason)
   const loading = (newsLoading || vLoading || aLoading) && items.length === 0
 
   return (
@@ -329,7 +329,7 @@ function TypeBadge({ type }) {
  *  - Auto items from the already-live feeds: newest Fremont TV episodes + photo albums.
  * Result: the section is always real and current, even before anyone writes an announcement.
  */
-function buildNews(newsRows, source, videos, albums, eventsRecent = [], curatedEvents = [], finishedGames = []) {
+function buildNews(newsRows, source, videos, albums, eventsRecent = [], curatedEvents = [], finishedGames = [], seniorSeason = null) {
   const manual = source === 'sheet'
     ? newsRows.filter((n) => n.title).map((n) => ({
         key: `a-${n.title}-${n.date || ''}`,
@@ -440,11 +440,11 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = [], curatedE
     })
   }
 
-  // Every senior night of the current sports season gets its own card in Latest News, so each
-  // team is shown equally, not only the newest few (Abir 2026-10-30). Cards already built above
+  // Every senior night of the season gets its own card in Latest News, so each team is shown
+  // equally, not only the newest few; the whole set leaves together 10 days after the season's
+  // last senior night (seniorSeason, from useEvents; Abir 2026-10-30). Cards already built above
   // (recent games, album score cards) are kept; the rest come straight from the finished games.
-  const seasonOf = (d) => { const m = d.getMonth() + 1; return m >= 8 && m <= 11 ? `F${d.getFullYear()}` : m === 12 ? `W${d.getFullYear()}` : m <= 2 ? `W${d.getFullYear() - 1}` : `S${d.getFullYear()}` }
-  const thisSeason = seasonOf(new Date())
+  const thisSeason = seniorSeason
   const covered = new Set([...games, ...finishedCards].map((c) => `${c.sport}|${c.date}`))
   const seniorCards = (finishedGames || [])
     .filter((fg) => fg.seniorNight && fg.when && seasonOf(fg.when) === thisSeason && !covered.has(`${fg.sport}|${fg.date}`))
