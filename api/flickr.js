@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   try {
     const albums = await fetchAlbums(process.env.FLICKR_API_KEY, flickrFeed.nsid)
     if (albums && albums.length) {
-      res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400')
+      res.setHeader('Cache-Control', 's-maxage=120, stale-while-revalidate=600, stale-if-error=86400')
     } else {
       res.setHeader('Cache-Control', 'no-store') // don't cache an empty/failed Flickr pull
     }

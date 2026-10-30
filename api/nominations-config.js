@@ -11,7 +11,7 @@ const CLOSES_AT = Date.parse(homecomingNominationsClosesAt)
 export default async function handler(req, res) {
   if (!homecomingNominationsApi) return res.status(200).json({ open: false })
   if (Number.isFinite(CLOSES_AT) && Date.now() >= CLOSES_AT) {
-    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=86400')
+    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600, stale-if-error=86400')
     return res.status(200).json({ open: false, mode: 'live', cycle: '', deadline: '', closesAt: homecomingNominationsClosesAt })
   }
   const url = `${homecomingNominationsApi}${homecomingNominationsApi.includes('?') ? '&' : '?'}view=config`
@@ -27,7 +27,7 @@ export default async function handler(req, res) {
     // On closing day, keep the edge copy short so a Config change (the emergency switch) shows fast.
     const closingDay = Number.isFinite(CLOSES_AT) && !past && CLOSES_AT - Date.now() < 24 * 60 * 60 * 1000
     const soon = Number.isFinite(CLOSES_AT) && !past && CLOSES_AT - Date.now() < 10 * 60 * 1000
-    res.setHeader('Cache-Control', soon ? 'no-store' : closingDay ? 's-maxage=10, stale-while-revalidate=60' : 's-maxage=60, stale-while-revalidate=86400')
+    res.setHeader('Cache-Control', soon ? 'no-store' : closingDay ? 's-maxage=10, stale-while-revalidate=60' : 's-maxage=60, stale-while-revalidate=600, stale-if-error=86400')
     return res.status(200).json({ open: past ? false : d.open, mode: d.mode, cycle: d.cycle || '', deadline: d.deadline || '', closesAt: homecomingNominationsClosesAt })
   } catch (err) {
     // Never cache a failure; the client keeps its own cached copy and retries.

@@ -16,7 +16,7 @@ export default async function handler(req, res) {
       res.setHeader('Cache-Control', 's-maxage=120, stale-while-revalidate=120')
     } else if (announcements && announcements.length) {
       // Short CDN cache so sheet edits show within a few minutes; SWR keeps it instant.
-      res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=1800')
+      res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600, stale-if-error=86400')
     } else {
       res.setHeader('Cache-Control', 'no-store') // don't cache an empty parse
     }

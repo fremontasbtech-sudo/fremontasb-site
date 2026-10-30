@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react'
-import { makeCache, fetchJsonRetry } from './liveData'
+import { useState } from 'react'
+import { makeCache, fetchJsonRetry, useRevalidate } from './liveData'
 
 /**
  * useClubs(fallbackRows) — /api/clubs (LLM-cleaned + categorized club rows).
  * Robust like the other live-data hooks: a TTL'd cache seeds the first paint so repeat
  * visits show the list instantly (no "Loading…" flash), a flaky API is retried, and a good
- * render is never downgraded to the bundled sample. Returns { rows, loading, error, source }.
+ * render is never downgraded to the bundled sample. An open page re-checks every 5 min and
+ * re-fetches an edge stale copy (useRevalidate). Returns { rows, loading, error, source }.
  */
 const CACHE_KEY = 'fasb.clubs.v1'
 const CACHE_TTL = 6 * 60 * 60 * 1000
@@ -22,23 +23,21 @@ export function useClubs(fallbackRows = []) {
     return { rows: [], loading: true, error: null, source: 'sheet' }
   })
 
-  useEffect(() => {
-    let cancelled = false
-    fetchJsonRetry('/api/clubs', { isEmpty: (d) => !(Array.isArray(d && d.clubs) && d.clubs.length) })
+  useRevalidate(({ onStale, alive }) =>
+    fetchJsonRetry('/api/clubs', { onStale, isEmpty: (d) => !(Array.isArray(d && d.clubs) && d.clubs.length) })
       .then((data) => {
-        if (cancelled) return
+        if (!alive()) return
         const rows = data.clubs
         cache.write(rows)
         setState({ rows, loading: false, error: null, source: 'sheet' })
       })
       .catch((err) => {
-        if (cancelled) return
+        if (!alive()) return
         setState((s) => (s.rows.length
           ? { ...s, loading: false }
           : { rows: fallbackRows, loading: false, error: String((err && err.message) || err), source: 'local' }))
-      })
-    return () => { cancelled = true }
-  }, [])
+      }),
+  { pollMs: 5 * 60 * 1000 })
 
   return state
 }

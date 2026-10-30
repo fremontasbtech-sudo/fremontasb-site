@@ -12,7 +12,7 @@ export default async function handler(req, res) {
       // Serve a good result from the edge for 10 min, and keep serving it (stale) for up to a
       // week while revalidating in the BACKGROUND — so the slow LLM recompute never blocks a
       // visitor; at worst one background request pays for it. Sheet edits still land in ~10 min.
-      res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=604800')
+      res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=600, stale-if-error=604800')
     } else {
       res.setHeader('Cache-Control', 'no-store') // don't cache an empty clubs pull
     }
