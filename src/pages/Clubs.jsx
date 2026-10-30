@@ -296,9 +296,10 @@ export default function Clubs() {
       {/* ── How to start a club ──────────────────── */}
       {/*
         Copy below is limited to what the old site and the Club Accountability Tracker
-        columns confirm: teacher advisor, constitution, submit to ASB, Clubs Day (both
-        semesters), the three check-ins, Grub Day, and strikes on the tracker. Do NOT add
-        a strike limit, months, or deadlines here, ASB Tech confirms those in the Handbook.
+        columns confirm: teacher advisor, constitution, submit to ASB, the nine monthly
+        check-ins (September to May), and one eligible event per semester (2026-27
+        requirements, Abir 2026-10-30). Do NOT add a strike limit or deadlines here,
+        ASB Tech confirms those in the Handbook.
       */}
       <section id="start-a-club" className="border-t border-rule bg-paper scroll-mt-20">
         <div className="container-site section-space">
@@ -306,7 +307,7 @@ export default function Clubs() {
             <div className="lg:col-span-4">
               <SectionHeader eyebrow="Start a club" title="How to start a club" className="mb-4 sm:mb-5" />
               <p className="text-body leading-relaxed">
-                There are 3 steps to get your club on the Official Clubs List. After that, every club has a few things to do during the year to stay on the list. The Club Handbook has all of the rules.
+                There are 3 steps to get your club on the Official Clubs List. Club applications open at the beginning of each semester, and new clubs can only be submitted during these application windows. Once your club is approved, there are a few things you’ll need to do throughout the year to stay on the list. The Club Handbook has all the rules.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Button href={links.clubHandbook} variant="primary" external onClick={trackOutbound('Club Handbook', links.clubHandbook)}>Read the Club Handbook</Button>
@@ -332,7 +333,7 @@ export default function Clubs() {
                 <h3 className="font-display text-xl font-extrabold tracking-tight text-ink sm:text-2xl">Staying active</h3>
                 <div className="rule-accent-left" />
                 <p className="mt-4 text-body leading-relaxed">
-                  Once your club is on the list, ASB keeps track of these on the Club Accountability Tracker. Anything your club misses is recorded as a strike, so make sure to check your club’s row.
+                  Once your club is officially registered, ASB tracks its activity through the Club Accountability Tracker. All clubs must complete the mandatory requirements and participate in at least one event per semester. Missing mandatory requirements or failing to meet the event participation requirement will result in strikes. Make sure to check your club’s row regularly.
                 </p>
                 <dl className="mt-6 border-t border-rule">
                   {ACTIVE_REQUIREMENTS.map((r) => (
@@ -571,17 +572,21 @@ const START_STEPS = [
   },
   {
     title: 'Submit it to ASB.',
-    body: 'Turn in your constitution to ASB. Once it’s approved, your club will be added to the Official Clubs List above and the Club Accountability Tracker.',
+    body: 'Submit your constitution to ASB during an open club application period. Once it’s approved, your club will be added to the Official Clubs List above and the Club Accountability Tracker.',
   },
 ]
 
 // Row labels match the tracker columns. No dates here on purpose, the Handbook owns them.
 const ACTIVE_REQUIREMENTS = [
-  { label: 'Club Constitution', body: 'On file with ASB.' },
-  { label: 'Clubs Day', body: 'Have a table at Clubs Day both semesters. This is where most clubs get their members.' },
-  { label: 'October Check-In', body: 'First check-in of the year with ASB.' },
-  { label: 'Dec/Jan Check-In', body: 'Second check-in.' },
-  { label: 'Feb/March Check-In', body: 'Third check-in.' },
-  { label: 'Grub Day', body: 'Take part in Grub Day. Selling food needs Fundraiser Approval first, which you can find on the Resources page.' },
-  { label: 'Strikes', body: 'Missed items are recorded as strikes on the Club Accountability Tracker.' },
+  { label: 'Club Constitution', body: 'A current club constitution must be on file with ASB.' },
+  { label: 'September Check-In', body: 'Complete the monthly check-in with ASB.' },
+  { label: 'October Check-In', body: 'Complete the monthly check-in with ASB.' },
+  { label: 'November Check-In', body: 'Complete the monthly check-in with ASB.' },
+  { label: 'December Check-In', body: 'Complete the monthly check-in with ASB.' },
+  { label: 'January Check-In', body: 'Complete the monthly check-in with ASB.' },
+  { label: 'February Check-In', body: 'Complete the monthly check-in with ASB.' },
+  { label: 'March Check-In', body: 'Complete the monthly check-in with ASB.' },
+  { label: 'April Check-In', body: 'Complete the monthly check-in with ASB.' },
+  { label: 'May Check-In', body: 'Complete the monthly check-in with ASB.' },
+  { label: 'Event Participation', body: 'Clubs must participate in at least one event each semester. Eligible events include Firebird Fiesta, 1st Semester Clubs Day, Multicultural Fair, Grub Day, Club Trivia Night, and 2nd Semester Clubs Day.' },
 ]
