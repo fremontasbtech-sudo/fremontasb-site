@@ -150,6 +150,7 @@ export const ES = {
   'Email': 'Correo electrónico',
   'Open in Google Maps': 'Abrir en Google Maps',
   'Website designed and maintained by ASB Tech.': 'Sitio web diseñado y mantenido por ASB Tech.',
+  'We use anonymous analytics to see how many people visit and which pages they use.': 'Usamos estadísticas anónimas para ver cuántas personas nos visitan y qué páginas usan.',
   'Created and maintained by Fremont ASB Tech': 'Creado y mantenido por Fremont ASB Tech',
   'Flickr: event photos': 'Flickr: fotos de eventos',
 
@@ -493,8 +494,10 @@ export const ES = {
   // ── Privacy page ──
   'What this website collects, and what it doesn’t.': 'Lo que este sitio web recopila y lo que no.',
   'Browsing the site': 'Navegar por el sitio',
-  'You can read everything on fremontasb.org without an account. We don’t sell data, run ads, or use tracking cookies. Your browser may save small settings on your own device (like the language you picked, or a copy of the latest news so pages load faster).':
-    'Puedes leer todo en fremontasb.org sin una cuenta. No vendemos datos, no mostramos anuncios ni usamos cookies de seguimiento. Tu navegador puede guardar pequeñas configuraciones en tu propio dispositivo (como el idioma que elegiste, o una copia de las últimas noticias para que las páginas carguen más rápido).',
+  'You can read everything on fremontasb.org without an account. We don’t sell data or run ads. Your browser may save small settings on your own device (like the language you picked, or a copy of the latest news so pages load faster).':
+    'Puedes leer todo en fremontasb.org sin una cuenta. No vendemos datos ni mostramos anuncios. Tu navegador puede guardar pequeñas configuraciones en tu propio dispositivo (como el idioma que elegiste, o una copia de las últimas noticias para que las páginas carguen más rápido).',
+  'We use Google Analytics to count visits and see which pages and links people use. It sets a cookie that tells one visit from another, but it never receives your name, your email, or anything you type into a form. Google’s advertising and ad personalization features are turned off.':
+    'Usamos Google Analytics para contar las visitas y ver qué páginas y enlaces se usan. Guarda una cookie que distingue una visita de otra, pero nunca recibe tu nombre, tu correo electrónico ni nada de lo que escribes en un formulario. Las funciones de publicidad y de anuncios personalizados de Google están desactivadas.',
   'Sign in with Google (nominations and voting)': 'Iniciar sesión con Google (nominaciones y votaciones)',
   'Some ASB forms, like Homecoming Court nominations, ask you to sign in with your school Google account so each student gets exactly one say. When you sign in, Google tells us only your name and school email address. We never see your password and get no access to your Google Drive, Gmail, or anything else in your account.':
     'Algunos formularios de ASB, como las nominaciones para la Corte de Homecoming, te piden iniciar sesión con tu cuenta escolar de Google para que cada estudiante participe exactamente una vez. Cuando inicias sesión, Google solo nos da tu nombre y tu correo escolar. Nunca vemos tu contraseña y no tenemos acceso a tu Google Drive, tu Gmail ni nada más de tu cuenta.',

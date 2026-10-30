@@ -4,6 +4,7 @@ import Navbar from './Navbar'
 import Footer from './Footer'
 import { useLang } from '../i18n'
 import { ES } from '../data/es'
+import { trackPageView } from '../lib/analytics'
 
 const SITE_URL = 'https://www.fremontasb.org'
 
@@ -31,10 +32,18 @@ function useHeadTags(pathname) {
   }, [pathname, lang, title, notFound])
 }
 
+// One GA page_view per route change, including the first load. Declared after useHeadTags so
+// document.title is already this page's title. Redirect routes (old Wix URLs) are skipped.
+function usePageViews(pathname) {
+  const redirect = useMatches().some((m) => m.handle?.redirect)
+  useEffect(() => { if (!redirect) trackPageView(pathname, document.title) }, [pathname, redirect])
+}
+
 export default function Layout() {
   const { pathname } = useLocation()
   useEffect(() => { window.scrollTo({ top: 0, left: 0, behavior: 'instant' }) }, [pathname])
   useHeadTags(pathname)
+  usePageViews(pathname)
   return (
     <div className="flex min-h-screen flex-col">
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-btn focus:bg-brand focus:px-4 focus:py-2 focus:text-white">Skip to content</a>

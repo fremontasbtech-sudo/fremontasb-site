@@ -5,6 +5,7 @@ import { useLang } from '../i18n'
 import { cleanAlbumTitle, formatAlbumMonth } from '../data/albumTitle'
 import fallbackAlbums from '../data/photos.json'
 import { useFlickr } from '../data/useFlickr'
+import { trackOutbound } from '../lib/analytics'
 
 /**
  * Photos - event albums on Flickr.
@@ -31,7 +32,7 @@ export default function Photos() {
         eyebrow={<>{events.length} albums</>}
         subtext="Click a photo below to see all photos from individual events, or click the button below to be redirected to the Fremont ASB Flickr page."
       >
-        <Button href={links.flickr} external className="px-7 text-lg">Flickr</Button>
+        <Button href={links.flickr} external className="px-7 text-lg" onClick={trackOutbound('Flickr', links.flickr)}>Flickr</Button>
       </PageHero>
 
       <section className="section-space">
@@ -52,7 +53,7 @@ export default function Photos() {
               All of our albums, including rallies, dances, and spirit weeks, are on the ASB Flickr. If you took photos at an event, you can email them to{' '}
               <a href={`mailto:${school.email}`} className="link-brand">{school.email}</a>.
             </p>
-            <Button variant="secondary" href={links.flickr} external>All albums on Flickr</Button>
+            <Button variant="secondary" href={links.flickr} external onClick={trackOutbound('Flickr', links.flickr)}>All albums on Flickr</Button>
           </div>
         </div>
       </section>
@@ -66,7 +67,7 @@ function AlbumCard({ event, featured, ratio }) {
   const { lang } = useLang()
   const title = event.title || cleanAlbumTitle(event.name)
   return (
-    <a href={event.flickrUrl} target="_blank" rel="noopener noreferrer"
+    <a href={event.flickrUrl} target="_blank" rel="noopener noreferrer" onClick={trackOutbound('Flickr album', event.flickrUrl)}
        className="group card-surface flex h-full flex-col overflow-hidden">
       {/* grow: if a neighbour's title wraps, the cover absorbs the extra height (object-cover), no dead white */}
       <div className={`relative aspect-[4/3] w-full grow overflow-hidden bg-rule ${ratio}`}>

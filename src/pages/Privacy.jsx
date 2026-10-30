@@ -10,9 +10,14 @@ export default function Privacy() {
         <div className="mx-auto max-w-xl space-y-5 leading-relaxed text-body">
           <h2 className="font-display text-xl font-extrabold tracking-tight text-ink">Browsing the site</h2>
           <p>
-            You can read everything on fremontasb.org without an account. We don&rsquo;t sell data, run ads, or use
-            tracking cookies. Your browser may save small settings on your own device (like the language you picked, or
-            a copy of the latest news so pages load faster).
+            You can read everything on fremontasb.org without an account. We don&rsquo;t sell data or run ads. Your
+            browser may save small settings on your own device (like the language you picked, or a copy of the latest
+            news so pages load faster).
+          </p>
+          <p>
+            We use Google Analytics to count visits and see which pages and links people use. It sets a cookie that
+            tells one visit from another, but it never receives your name, your email, or anything you type into a form.
+            Google&rsquo;s advertising and ad personalization features are turned off.
           </p>
 
           <h2 className="font-display text-xl font-extrabold tracking-tight text-ink">Sign in with Google (nominations and voting)</h2>

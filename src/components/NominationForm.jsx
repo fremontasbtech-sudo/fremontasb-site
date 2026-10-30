@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { googleClientId } from '../data/sources'
 import { Loading, Notice } from './DataState'
+import { trackEvent } from '../lib/analytics'
 
 /**
  * NominationForm - Homecoming Court peer nominations, right on the page. ONE set of picks per
@@ -319,6 +320,7 @@ export default function NominationForm({ mode = 'test', deadline = '' }) {
     }
     submitGen.current += 1
     if (d.ok === true) {
+      trackEvent('nomination_submit') // no params: never send nominee names or emails
       saveDraft('', null)
       savePicks(em, picksNow)
       showDone(picksNow, editing || d.replaced ? 'updated' : 'just')
