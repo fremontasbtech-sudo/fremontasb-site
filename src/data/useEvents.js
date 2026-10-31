@@ -51,6 +51,9 @@ const startOfToday = () => { const d = new Date(); d.setHours(0, 0, 0, 0); retur
 // Meets (and games with no home/away yet, like league finals) name the event alone, the same
 // rule the app uses: "Cross Country: SCVAL #3", "Football vs Los Altos", "Football at Homestead".
 const isMeetSport = (sport) => /cross country|track|swim|dive|wrestl/i.test(String(sport || ''))
+// The yearly Bell Game against Homestead: the sheet's title says "Bell Game".
+export const isBellGame = (g) => /bell\s*game/i.test(String((g && g.title) || ''))
+
 export function gameTitle(g) {
   const sport = String(g.sport || '').trim()
   const opp = String(g.opponent || '').trim().replace(/^(vs\.?|at)\s+/i, '')
@@ -106,7 +109,10 @@ export function shape(data) {
   for (const g of data.games || []) {
     const d = parseIso(g.date); if (!d) continue
     const isSenior = isSeniorGame(g)
-    const title = gameTitle(g)
+    // The Bell Game (Football vs Homestead) is named in the sheet's title; it gets its own badge
+    // and look on the site and the app.
+    const isBell = isBellGame(g)
+    const title = isBell ? `Bell Game: ${gameTitle(g)}` : gameTitle(g)
     // A game is finished once athletics marks it a result, a score is in, OR its day has
     // passed. Finished games move to Latest News (with the score if we have it yet, else a
     // "score soon" note so it never just vanishes) and out of Upcoming.
@@ -119,14 +125,14 @@ export function shape(data) {
       const fk = `${g.sport}|${g.date}`
       const fprev = finishedBy.get(fk)
       if (!fprev || prioOf(g) > fprev.prio) {
-        finishedBy.set(fk, { prio: prioOf(g), game: { title, sport: g.sport, date: g.date, when: d, score: hasScore ? g.score : '', level: g.level || '', seniorNight: isSenior } })
+        finishedBy.set(fk, { prio: prioOf(g), game: { title, sport: g.sport, date: g.date, when: d, score: hasScore ? g.score : '', level: g.level || '', seniorNight: isSenior, bellGame: isBell } })
       }
       if (d >= floor && d <= start) { // within the last PAST_DAYS, through today
         const k = `${g.sport}|${g.date}`
         const prev = recentBy.get(k)
         if (!prev || prioOf(g) > prev.prio) {
           const scoreBit = scoreNote(hasScore ? g.score : '', d, start, g.sport)
-          recentBy.set(k, { prio: prioOf(g), item: { key: `gm-${g.date}-${g.sport}`, type: 'Sports', title, sport: g.sport, date: g.date, href: null, when: d, seniorNight: isSenior, blurb: dashJoin([isSenior ? 'Senior Night' : '', scoreBit, g.level]) } })
+          recentBy.set(k, { prio: prioOf(g), item: { key: `gm-${g.date}-${g.sport}`, type: 'Sports', title, sport: g.sport, date: g.date, href: null, when: d, seniorNight: isSenior, bellGame: isBell, blurb: dashJoin([isSenior ? 'Senior Night' : '', scoreBit, g.level]) } })
         }
       }
       continue
@@ -134,7 +140,7 @@ export function shape(data) {
     // Senior nights show in Upcoming once they are within 14 days; everything else stays
     // inside the 30-day window.
     if (d > (isSenior ? seniorHorizon : horizon)) continue
-    const item = { key: `gm-${g.date}-${g.sport}`, type: 'Sports', title, href: null, when: d, seniorNight: isSenior, blurb: dashJoin([isSenior ? 'Senior Night' : '', g.level, g.time, g.location]), meta: dashJoin([isSenior ? 'Senior Night' : '', g.level, g.time, g.location]) }
+    const item = { key: `gm-${g.date}-${g.sport}`, type: 'Sports', title, href: null, when: d, seniorNight: isSenior, bellGame: isBell, blurb: dashJoin([isSenior ? 'Senior Night' : '', g.level, g.time, g.location]), meta: dashJoin([isSenior ? 'Senior Night' : '', g.level, g.time, g.location]) }
     if (isSenior) {
       // Straight in: a pinned game earlier in the window can never hide a senior night. One card
       // per sport and day, preferring the pinned / Varsity row if a day has two senior rows.

@@ -5,6 +5,8 @@ import { useLang } from '../i18n'
 import { cleanAlbumTitle, formatAlbumMonth } from '../data/albumTitle'
 import fallbackAlbums from '../data/photos.json'
 import { useFlickr } from '../data/useFlickr'
+import { useEvents } from '../data/useEvents'
+import { seniorGameForAlbum } from '../data/albumMatch'
 import { trackOutbound } from '../lib/analytics'
 
 /**
@@ -23,8 +25,22 @@ function slot(i) {
   return { col: 'md:col-span-1 lg:col-span-6', ratio: 'lg:aspect-[16/10]' }
 }
 
+// Albums newest event first. A senior night album takes its senior night's date from the
+// site's game list, so senior nights sit in game order however late their photos were uploaded.
+function orderAlbums(albums, games) {
+  const sportNames = [...new Set(games.map((g) => g.sport).filter(Boolean))]
+  return albums
+    .map((a, i) => {
+      const sg = seniorGameForAlbum({ title: a.title || cleanAlbumTitle(a.name), name: a.name, date: a.date }, games, sportNames)
+      return { ...a, date: sg ? sg.date : a.date, i }
+    })
+    .sort((x, y) => (x.date && y.date && x.date !== y.date ? (x.date < y.date ? 1 : -1) : (y.takenAt || '').localeCompare(x.takenAt || '') || x.i - y.i))
+}
+
 export default function Photos() {
-  const { albums: events } = useFlickr(fallbackAlbums)
+  const { albums } = useFlickr(fallbackAlbums)
+  const { finishedGames = [] } = useEvents()
+  const events = orderAlbums(albums, finishedGames)
   return (
     <>
       <PageHero

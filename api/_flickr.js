@@ -89,9 +89,10 @@ async function applyEventDates(albums, key) {
       }
       let best = '', bestN = 0
       for (const [day, n] of counts) if (n > bestN) { bestN = n; best = day }
-      // Every camera clock wrong (e.g. all photos say 2019)? Use the date typed in the album
-      // title instead ("Homecoming '26 Rally - 10/9/26", "Clubs Day - 9/16 '26").
-      if (!best) {
+      // The date typed in the album title ("Homecoming '26 Rally - 10/9/26", "Clubs Day - 9/16 '26")
+      // wins over the cameras: a clock can be wrong, or the photos re-exported on upload day
+      // (the "Volleyball Senior Night - 10/19/26" photos all say 10/30).
+      {
         const m = /(\d{1,2})\/(\d{1,2})(?:\/|\s*')(\d{2}|\d{4})\b/.exec(a.name || '')
         if (m) {
           const y = m[3].length === 2 ? 2000 + Number(m[3]) : Number(m[3])
