@@ -501,13 +501,18 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = [], curatedE
     })
   // At most ONE Fremont TV item in Latest News (the newest). 'kind' is classified by the LLM
   // server-side (api/_feed.js), so a future episode is caught even if it's titled differently.
-  // The 5 newest other items, plus every senior night this season (they don't use up the 5).
+  // Every senior night this season, plus up to 5 other items. While the season's senior nights
+  // are showing, the feed ends at the oldest of them: nothing older than that senior night is
+  // listed (e.g. it starts at Girls Volleyball vs Gunn and stops there, Abir 2026-10-30).
+  const seasonSenior = ranked.filter((it) => it.seniorNight && seasonOf(it.when) === thisSeason)
+  const oldestSenior = seasonSenior.length ? Math.min(...seasonSenior.map((it) => dayKey(it.when))) : 0
   let fremontTVShown = false
   let others = 0
   return ranked
     .filter((it) => {
       if (it.type === 'Fremont TV') { if (fremontTVShown) return false; fremontTVShown = true }
       if (it.seniorNight) return seasonOf(it.when) === thisSeason
+      if (dayKey(it.when) < oldestSenior) return false
       return others++ < 5
     })
 }
