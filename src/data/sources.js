@@ -178,6 +178,13 @@ export const youtubeFeed = {
 // ─────────────────────────────────────────────────────────────────────────────
 export const flickrFeed = {
   nsid: '199104771@N02',   // flickr.com/people/fremonthighschoolasb
+  // Cover photo picked for an album on the site, instead of the album's Flickr cover:
+  // album id -> photo id (both are the numbers in the Flickr URLs). Remove a line to go back.
+  covers: {
+    '72177720336410675': '55621323872', // Halloween Costume Contest: group of costumes by the A building
+    '72177720336416721': '55621310187', // Field Hockey Senior Night: seniors in front of the poster
+    '72177720336440794': '55622746640', // Girls Tennis Senior Night: seniors with their baskets
+  },
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -7,7 +7,7 @@ import { flickrFeed } from '../src/data/sources.js'
 
 export default async function handler(req, res) {
   try {
-    const albums = await fetchAlbums(process.env.FLICKR_API_KEY, flickrFeed.nsid)
+    const albums = await fetchAlbums(process.env.FLICKR_API_KEY, flickrFeed.nsid, flickrFeed.covers)
     if (albums && albums.length) {
       res.setHeader('Cache-Control', 's-maxage=120, stale-while-revalidate=600, stale-if-error=86400')
     } else {

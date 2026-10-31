@@ -115,7 +115,26 @@ function ptDay(ms) {
   return `${p.year}-${p.month}-${p.day}`
 }
 
-export async function fetchAlbums(apiKey, userId) {
+// Covers picked on the site (flickrFeed.covers): photo id -> its 1024 px URL, from photos.getInfo.
+// Cached per photo; a photo that can't be read keeps the album's own Flickr cover.
+const coverCache = new Map()
+async function applyCovers(albums, key, covers = {}) {
+  await Promise.all(albums.filter((a) => covers[a.id]).map(async (a) => {
+    const pid = covers[a.id]
+    try {
+      if (!coverCache.has(pid)) {
+        const u = `https://api.flickr.com/services/rest/?method=flickr.photos.getInfo&api_key=${encodeURIComponent(key)}&photo_id=${pid}&format=json&nojsoncallback=1`
+        const j = await withTimeout(8000, async (signal) => { const r = await fetch(u, { signal }); return r.ok ? r.json() : null })
+        const p = j && j.stat === 'ok' && j.photo
+        if (!p) return
+        coverCache.set(pid, `https://live.staticflickr.com/${p.server}/${p.id}_${p.secret}_b.jpg`)
+      }
+      a.coverImageUrl = coverCache.get(pid)
+    } catch { /* keep the Flickr cover */ }
+  }))
+}
+
+export async function fetchAlbums(apiKey, userId, covers) {
   const key = apiKey || DEFAULT_API_KEY
   if (!userId) throw new Error('no flickr nsid')
   const params = new URLSearchParams({
@@ -152,6 +171,6 @@ export async function fetchAlbums(apiKey, userId) {
       date: createEpoch ? ptDay(createEpoch * 1000) : '',
     }
   })
-  await applyEventDates(albums, key)
+  await Promise.all([applyEventDates(albums, key), applyCovers(albums, key, covers)])
   return applyAlbumTitles(albums)
 }

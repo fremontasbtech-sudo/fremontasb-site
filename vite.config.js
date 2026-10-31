@@ -25,7 +25,7 @@ function devApi(flickrKey) {
       server.middlewares.use('/api/flickr', async (_req, res) => {
         res.setHeader('Content-Type', 'application/json')
         try {
-          res.end(JSON.stringify({ albums: await fetchAlbums(flickrKey, flickrFeed.nsid) }))
+          res.end(JSON.stringify({ albums: await fetchAlbums(flickrKey, flickrFeed.nsid, flickrFeed.covers) }))
         } catch (err) {
           res.end(JSON.stringify({ albums: [], error: String(err && err.message || err) }))
         }
