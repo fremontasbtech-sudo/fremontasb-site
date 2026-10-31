@@ -66,6 +66,13 @@ export function seniorGameForAlbum(album, games = [], sportNames = []) {
   if (named.length) return named.sort((a, b) => near(a) - near(b))[0]
   const anyNamed = seniors.some((g) => namesCoreSport(album.title || album.name, g.sport, sportNames))
   if (anyNamed) return null
+  // Part of a sport's name ("Hockey Senior Night" for Field Hockey) counts when exactly one
+  // senior night this season has that word.
+  const words = ` ${phrase(album.title || album.name)} `
+  const GENERIC = new Set(['girls', 'girl', 'boys', 'boy', 'womens', 'mens', 'varsity', 'jv', 'senior', 'night'])
+  const partial = seniors.filter((g) => seasonOf(new Date(`${g.date}T12:00:00`)) === season &&
+    phrase(g.sport).split(' ').some((w) => w.length >= 4 && !GENERIC.has(w) && words.includes(` ${w} `)))
+  if (new Set(partial.map((g) => g.sport)).size === 1) return partial[0]
   const close = seniors.filter((g) => near(g) <= 86400000)
   return new Set(close.map((g) => g.sport)).size === 1 ? close[0] : null
 }
