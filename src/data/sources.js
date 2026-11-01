@@ -146,9 +146,11 @@ export const embeds = {
   clubInfoSlides:
     'https://docs.google.com/presentation/d/1GV6dM2eOitIWyesUN5ciMVs3Cq9pqc8a-hBYtz1OmIs/embed?start=false&loop=false&delayms=5000',
 
-  // Home hero video. Put a file in /public and reference it as "/hero.mp4", or keep the current Wix-hosted URL.
-  heroVideo: '/hero.mp4',
-  heroPoster: '/hero-poster.jpg',   // a frame from the drone video (no crowd photo flash before/without autoplay)
+  // Home hero video: the 2026-10-16 drone shoot (4K, two straight passes at the camera's own speed, hard cut),
+  // 1080p for desktop and 720p for phones. New files get new names so no browser keeps the old cut.
+  heroVideo: '/hero-2026-1080.mp4',
+  heroVideoSmall: '/hero-2026-720.mp4',
+  heroPoster: '/hero-2026-poster.jpg',   // the video's first frame (no crowd photo flash before/without autoplay)
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

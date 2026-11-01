@@ -42,12 +42,12 @@ export default function Home() {
 /* ───────────────────────── 1. Hero video ───────────────────────── */
 
 function Hero() {
-  // The poster IS the video's first frame (public/hero-poster.jpg is extracted from hero.mp4), so
+  // The poster IS the video's first frame (embeds.heroPoster is extracted from it), so
   // the instant the video starts playing it continues seamlessly from the still: no cross-fade, no
   // jump from a different photo. The video is only hidden until it actually plays so a phone that
   // blocks autoplay (e.g. iOS Low Power Mode) shows the still frame, not a play-button overlay.
-  // If hero.mp4 is ever replaced, regenerate the poster from its first frame:
-  //   ffmpeg -i public/hero.mp4 -frames:v 1 -q:v 7 public/hero-poster.jpg
+  // If the video is ever replaced, regenerate the poster from its first frame:
+  //   ffmpeg -i <video> -frames:v 1 -vf scale=1600:-1 -q:v 4 public/<poster>.jpg
   const videoRef = useRef(null)
   const [playing, setPlaying] = useState(false)
   useEffect(() => {
@@ -74,7 +74,6 @@ function Hero() {
       <video
         ref={videoRef}
         className={`absolute inset-0 h-full w-full object-cover ${playing ? 'opacity-100' : 'opacity-0'}`}
-        src={embeds.heroVideo}
         poster={embeds.heroPoster}
         autoPlay
         muted
@@ -83,9 +82,13 @@ function Hero() {
         preload="auto"
         aria-hidden="true"
         tabIndex={-1}
-      />
+      >
+        {/* Phones get the 720p cut (a third of the size); larger screens the 1080p one. */}
+        <source src={embeds.heroVideoSmall} type="video/mp4" media="(max-width: 767px)" />
+        <source src={embeds.heroVideo} type="video/mp4" />
+      </video>
       {/* Flat scrim so white text stays readable over any frame. */}
-      <div className="absolute inset-0 bg-ink/70" aria-hidden="true" />
+      <div className="absolute inset-0 bg-ink/50" aria-hidden="true" />
 
       <div className="container-site relative flex min-h-[72vh] flex-col justify-end pb-12 pt-20 sm:min-h-[76vh] sm:pb-16 sm:pt-32 lg:min-h-[80vh]">
         <div className="max-w-3xl">
