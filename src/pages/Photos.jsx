@@ -5,6 +5,7 @@ import { useLang } from '../i18n'
 import { cleanAlbumTitle, formatAlbumMonth } from '../data/albumTitle'
 import fallbackAlbums from '../data/photos.json'
 import { useFlickr } from '../data/useFlickr'
+import { fadeRef, markLoaded } from '../lib/imgLoad'
 import { useEvents } from '../data/useEvents'
 import { seniorGameForAlbum } from '../data/albumMatch'
 import { trackOutbound } from '../lib/analytics'
@@ -58,7 +59,7 @@ export default function Photos() {
               const s = slot(i)
               return (
                 <li key={ev.flickrUrl} className={s.col}>
-                  <AlbumCard event={ev} featured={i === 0} ratio={s.ratio} />
+                  <AlbumCard event={ev} featured={i === 0} eager={i < 4} ratio={s.ratio} />
                 </li>
               )
             })}
@@ -79,7 +80,7 @@ export default function Photos() {
 
 /* ── local card: image fills a fixed-ratio box, caption pinned to the bottom ── */
 
-function AlbumCard({ event, featured, ratio }) {
+function AlbumCard({ event, featured, eager, ratio }) {
   const { lang } = useLang()
   const title = event.title || cleanAlbumTitle(event.name)
   return (
@@ -90,11 +91,14 @@ function AlbumCard({ event, featured, ratio }) {
         <img
           src={event.coverImageUrl}
           alt={lang === 'es' ? `Foto de portada: ${title}` : `${title} cover photo`}
-          loading={featured ? 'eager' : 'lazy'}
-          // Flickr blocked or down (e.g. a filtered network): hide the broken image, keep the plain tile and title.
-          onError={(e) => { e.currentTarget.style.visibility = 'hidden' }}
-          onLoad={(e) => { e.currentTarget.style.visibility = '' }}
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+          // The first row loads right away (the featured cover first); the rest as they near the screen.
+          loading={eager ? 'eager' : 'lazy'}
+          fetchpriority={featured ? 'high' : undefined}
+          decoding="async"
+          // Flickr blocked or down (e.g. a filtered network): the image stays hidden, keeping the plain tile and title.
+          ref={fadeRef}
+          onLoad={markLoaded}
+          className="img-fade absolute inset-0 h-full w-full object-cover group-hover:scale-[1.03]"
         />
       </div>
       <div className="mt-auto flex items-end justify-between gap-3 p-4 sm:p-5">

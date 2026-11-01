@@ -1,0 +1,29 @@
+[
+  {
+    "title": "Represent your culture at the Multicultural Fair",
+    "description": "Wednesday, October 28 at lunch, between the A and B buildings. Any student can sign up by Sunday, October 25.",
+    "buttonLabel": "Sign Up",
+    "buttonUrl": "https://forms.gle/9b6vJJPCJVnpsv2G8",
+    "showFrom": "10/20/2026",
+    "hideAfter": "10/29/2026",
+    "priority": "3"
+  },
+  {
+    "title": "Want your club in the spotlight?",
+    "description": "Apply for Club Spotlight, a Fremont TV segment that highlights your club and the impact it has on our school. Applications are open to every club.",
+    "buttonLabel": "Apply Here",
+    "buttonUrl": "https://forms.gle/eV9qDDJedxBofCcE8",
+    "showFrom": "10/20/2026",
+    "hideAfter": "2/28/2027",
+    "priority": "2"
+  },
+  {
+    "title": "October Check-Ins Due",
+    "description": "October Check-Ins are due on Sunday October 31st at 11:59PM. Complete this form as soon as possible to ensure your club does not recieve a strike!!!",
+    "buttonLabel": "Check-In",
+    "buttonUrl": "https://forms.gle/iDDjainL2SKTcQAXA",
+    "showFrom": "10/01/2026",
+    "hideAfter": "10/31/2026",
+    "priority": "1"
+  }
+]

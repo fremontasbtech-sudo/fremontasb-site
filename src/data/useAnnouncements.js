@@ -10,7 +10,9 @@ import { makeCache, fetchJsonRetry, useRevalidate } from './liveData'
  * way back to the first week of the year (that cap is what hid August).
  */
 const CACHE_KEY = 'fasb.announcements.v2'
-const CACHE_TTL = 6 * 60 * 60 * 1000
+// Items are revealed by date on every render, so an older list is still right, only missing the
+// newest morning for a moment. A week keeps a returning visitor off the "Loading" state.
+const CACHE_TTL = 7 * 24 * 60 * 60 * 1000
 const cache = makeCache(CACHE_KEY, CACHE_TTL)
 
 function parseLocal(iso) {

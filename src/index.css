@@ -35,3 +35,10 @@
   .card-surface { @apply rounded-lg border border-rule bg-paper; }
   .link-brand { @apply text-brand underline underline-offset-4 decoration-brand/40 hover:decoration-brand; }
 }
+
+/* Remote photos (Flickr covers, YouTube thumbnails) fade in over their tinted box when they
+   arrive instead of popping in. Set data-loaded in onLoad (see src/lib/imgLoad.js). Kept out of
+   the layers so it combines with a utility's hover zoom instead of replacing it. */
+.img-fade { opacity: 0; transition: opacity 200ms ease-out, transform 300ms; }
+.img-fade[data-loaded] { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .img-fade { transition: none; } }

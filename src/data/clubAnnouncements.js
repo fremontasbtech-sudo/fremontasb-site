@@ -1,23 +1,38 @@
 import { toCsvUrl, parseCsv } from './useSheetData'
-import { ptIsoDate } from './liveData'
+import { ptIsoDate, makeCache } from './liveData'
+import snapshot from './clubAnnouncements.json'
 
 /**
  * Clubs page announcement cards, read from the "Clubs Announcements" tab of the Events sheet (/api/sheet).
  * One row per card. Columns are read by header name (extra columns are ignored):
  *   title | description | button_label | button_url | show_from | hide_after | priority
  * A row shows from show_from through hide_after (inclusive, Pacific time). Rows missing a
- * title, description or a valid date are skipped. Any failure resolves to [] (no cards).
+ * title, description or a valid date are skipped.
+ *
+ * The cards paint at once from the last rows this browser saw, else the rows bundled at deploy
+ * time (scripts/snapshot.mjs), then the sheet replaces them. A failed fetch keeps what is shown.
  */
+const cache = makeCache('fasb.clubann.v1', 14 * 24 * 60 * 60 * 1000, { yieldToBuild: true })
 
-// One request per page load, shared by every mount of the component.
+/** The cards to show on the first paint, with no network. */
+export function initialClubAnnouncements() {
+  const rows = cache.read()
+  return activeAnnouncements(Array.isArray(rows) ? rows : Array.isArray(snapshot) ? snapshot : [])
+}
+
+// One request per page load, shared by every mount of the component. Resolves to null on failure.
 let pending = null
 export function loadClubAnnouncements(sheetUrl) {
-  if (!sheetUrl) return Promise.resolve([])
+  if (!sheetUrl) return Promise.resolve(null)
   if (!pending) {
     pending = fetch(toCsvUrl(sheetUrl))
       .then((r) => (r.ok ? r.text() : Promise.reject(new Error(`Sheet returned ${r.status}`))))
-      .then((text) => activeAnnouncements(parseCsv(text)))
-      .catch(() => [])
+      .then((text) => {
+        const rows = parseCsv(text)
+        cache.write(rows)
+        return activeAnnouncements(rows)
+      })
+      .catch(() => { pending = null; return null })
   }
   return pending
 }

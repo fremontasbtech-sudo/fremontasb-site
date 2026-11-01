@@ -1,16 +1,17 @@
 import { ExternalIcon } from './Button'
+import { fadeRef, markLoaded } from '../lib/imgLoad'
 
 /**
  * Card - image + title + optional caption. Wraps itself in a link if href/to is given.
- * props: image (url), alt, title, caption, href (external), children (extra body), ratio ('16/9' default), imageFit
+ * props: image (url), alt, title, caption, href (external), children (extra body), ratio ('16/9' default), eager (load the image right away, for cards near the top)
  */
-export default function Card({ image, alt = '', title, caption, href, children, ratio = '16 / 9', className = '', placeholder }) {
+export default function Card({ image, alt = '', title, caption, href, children, ratio = '16 / 9', className = '', placeholder, eager = false }) {
   const body = (
     <>
       {(image || placeholder) && (
         <div className="overflow-hidden bg-rule" style={{ aspectRatio: ratio }}>
           {image ? (
-            <img src={image} alt={alt} loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+            <img src={image} alt={alt} loading={eager ? 'eager' : 'lazy'} decoding="async" ref={fadeRef} onLoad={markLoaded} className="img-fade h-full w-full object-cover group-hover:scale-[1.03]" />
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-brand-tint text-brand">{placeholder}</div>
           )}

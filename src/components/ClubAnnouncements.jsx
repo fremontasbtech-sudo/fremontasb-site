@@ -1,21 +1,23 @@
 import { useEffect, useState } from 'react'
 import Button from './Button'
-import { loadClubAnnouncements } from '../data/clubAnnouncements'
+import { initialClubAnnouncements, loadClubAnnouncements } from '../data/clubAnnouncements'
 
 import './ClubAnnouncements.css'
 
 /**
  * ClubAnnouncements - an "Announcements" eyebrow over a pale rust tray holding one white card per
  * active announcement from the sheet (maroon accent bar on the left; text left / primary button
- * right on sm+, button stacked full width on phones). Renders nothing while loading, on any error,
- * or when no row is active. Styles and tokens live in ClubAnnouncements.css.
+ * right on sm+, button stacked full width on phones). Paints at once from the cached or bundled
+ * rows, then the sheet refreshes them; renders nothing when no row is active. Styles and tokens live in ClubAnnouncements.css.
  */
 export default function ClubAnnouncements({ sheetUrl }) {
-  const [items, setItems] = useState([])
+  const [items, setItems] = useState(initialClubAnnouncements)
 
   useEffect(() => {
     let cancelled = false
-    loadClubAnnouncements(sheetUrl).then((list) => { if (!cancelled) setItems(list) })
+    loadClubAnnouncements(sheetUrl).then((list) => {
+      if (!cancelled && list) setItems((prev) => (JSON.stringify(prev) === JSON.stringify(list) ? prev : list))
+    })
     return () => { cancelled = true }
   }, [sheetUrl])
 

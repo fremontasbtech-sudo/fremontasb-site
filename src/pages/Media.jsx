@@ -177,7 +177,7 @@ function Player({ episode }) {
           aria-label={`${lang === 'es' ? 'Reproducir' : 'Play'} ${episode.title}`}
           className="group absolute inset-0 flex h-full w-full items-center justify-center text-left"
         >
-          <Thumb id={episode.youtubeId} alt="" className="absolute inset-0 h-full w-full object-cover" />
+          <Thumb id={episode.youtubeId} alt="" priority className="absolute inset-0 h-full w-full object-cover" />
           <span className="relative z-10 flex items-center gap-3 rounded-btn bg-brand px-5 py-3 font-display font-bold text-white transition-colors group-hover:bg-brand-dark">
             <PlayIcon /> Play episode
           </span>
@@ -192,7 +192,7 @@ function ArchiveCard({ episode }) {
     <a href={watchUrl(episode.youtubeId)} target="_blank" rel="noopener noreferrer"
        className="group block">
       <div className="relative overflow-hidden rounded-lg border border-rule bg-rule" style={{ aspectRatio: '16 / 9' }}>
-        <Thumb id={episode.youtubeId} alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+        <Thumb id={episode.youtubeId} alt="" className="absolute inset-0 h-full w-full object-cover group-hover:scale-[1.03]" />
         <span className="absolute left-3 top-3 z-10 rounded-btn bg-paper px-2 py-1 text-xs font-display font-bold uppercase tracking-wider text-brand">
           {episode.kind}
         </span>
@@ -212,21 +212,28 @@ function ArchiveCard({ episode }) {
   )
 }
 
-/** YouTube thumbnail; hides itself if the image can't load so the gray box stays clean. */
-function Thumb({ id, alt, className }) {
+/** YouTube thumbnail; fades in once loaded, and stays hidden if it can't load so the gray box stays clean. */
+function Thumb({ id, alt, className, priority = false }) {
+  // A missing maxres thumbnail can come back as YouTube's 120x90 gray placeholder: step down a
+  // size. Only the final image fades in, never the gray placeholder.
+  const settle = (img) => {
+    const i = Number(img.dataset.size)
+    if (img.naturalWidth <= 120 && i < THUMB_SIZES.length - 1) { img.dataset.size = String(i + 1); img.src = thumbUrl(id, i + 1) }
+    else img.dataset.loaded = ''
+  }
   return (
     <img
       src={thumbUrl(id)}
       alt={alt}
-      loading="lazy"
-      className={className}
+      // The featured episode's thumbnail is above the fold: fetch it first.
+      loading={priority ? 'eager' : 'lazy'}
+      fetchpriority={priority ? 'high' : undefined}
+      decoding="async"
+      className={`img-fade ${className}`}
       data-size="0"
-      onLoad={(e) => {
-        // A missing maxres thumbnail can come back as YouTube's 120x90 gray placeholder.
-        const img = e.currentTarget
-        const i = Number(img.dataset.size)
-        if (img.naturalWidth <= 120 && i < THUMB_SIZES.length - 1) { img.dataset.size = String(i + 1); img.src = thumbUrl(id, i + 1) }
-      }}
+      // Already loaded from the browser cache before React listened: settle it now.
+      ref={(img) => { if (img && img.complete && img.naturalWidth && !('loaded' in img.dataset)) settle(img) }}
+      onLoad={(e) => settle(e.currentTarget)}
       onError={(e) => {
         const img = e.currentTarget
         const i = Number(img.dataset.size)

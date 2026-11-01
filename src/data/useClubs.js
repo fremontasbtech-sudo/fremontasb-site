@@ -9,8 +9,8 @@ import { makeCache, fetchJsonRetry, useRevalidate } from './liveData'
  * re-fetches an edge stale copy (useRevalidate). Returns { rows, loading, error, source }.
  */
 const CACHE_KEY = 'fasb.clubs.v1'
-const CACHE_TTL = 6 * 60 * 60 * 1000
-const cache = makeCache(CACHE_KEY, CACHE_TTL)
+const CACHE_TTL = 14 * 24 * 60 * 60 * 1000
+const cache = makeCache(CACHE_KEY, CACHE_TTL, { yieldToBuild: true })
 
 export function useClubs(fallbackRows = []) {
   const [state, setState] = useState(() => {

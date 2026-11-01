@@ -22,7 +22,7 @@ import eventsSnapshot from './events.json'
  * Returns { upcoming: [items asc], recent: [items desc], events, finishedGames, loading }.
  */
 const CACHE_KEY = 'fasb.events.v2'
-const CACHE_TTL = 6 * 60 * 60 * 1000 // ignore a cache older than 6h so it can't flash stale data
+const CACHE_TTL = 14 * 24 * 60 * 60 * 1000 // a cache older than this deploy's snapshot is skipped too (makeCache)
 const HORIZON_DAYS = 30   // upcoming window: the next 30 days (Home shows 5, the rest behind "Show more")
 const PAST_DAYS = 14      // how long a finished flagged game lingers
 const SENIOR_DAYS = 14    // senior nights join Upcoming once they are this close (Abir 2026-10-30)
@@ -34,7 +34,7 @@ export function seasonOf(d) {
   return m >= 8 && m <= 11 ? `F${y}` : m === 12 ? `W${y}` : m <= 2 ? `W${y - 1}` : `S${y}`
 }
 
-const _cache = makeCache(CACHE_KEY, CACHE_TTL)
+const _cache = makeCache(CACHE_KEY, CACHE_TTL, { yieldToBuild: true })
 function readCache() {
   const d = _cache.read()
   return d && Array.isArray(d.events) && Array.isArray(d.games) ? d : null

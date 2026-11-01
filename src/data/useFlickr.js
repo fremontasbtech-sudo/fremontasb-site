@@ -10,8 +10,8 @@ import { makeCache, fetchJsonRetry, useRevalidate } from './liveData'
  * minutes of the upload. Returns { albums, loading, source }.
  */
 const CACHE_KEY = 'fasb.flickr.v1'
-const CACHE_TTL = 6 * 60 * 60 * 1000
-const cache = makeCache(CACHE_KEY, CACHE_TTL)
+const CACHE_TTL = 14 * 24 * 60 * 60 * 1000
+const cache = makeCache(CACHE_KEY, CACHE_TTL, { yieldToBuild: true })
 // Covers at 1024px (_b) instead of 640px (_z); the same photo secret works for both sizes.
 const sharp = (u) => String(u).replace(/(live\.staticflickr\.com\/.+)_[zcm]\.jpg$/, '$1_b.jpg')
 const clean = (arr) => (Array.isArray(arr) ? arr.filter((a) => a && a.coverImageUrl).map((a) => ({ ...a, coverImageUrl: sharp(a.coverImageUrl) })) : [])
@@ -21,7 +21,8 @@ export function useFlickr(fallbackAlbums = []) {
     const cached = clean(cache.read())
     return cached.length
       ? { albums: cached, loading: false, source: 'flickr' }
-      : { albums: fallbackAlbums, loading: true, source: 'local' }
+      // The bundled snapshot, at the same cover size as the live feed so no cover reloads.
+      : { albums: clean(fallbackAlbums), loading: false, source: 'local' }
   })
 
   useRevalidate(({ onStale, alive }) =>
@@ -36,7 +37,7 @@ export function useFlickr(fallbackAlbums = []) {
         if (!alive()) return
         setState((s) => (s.source === 'flickr' && s.albums.length
           ? { ...s, loading: false }
-          : { albums: fallbackAlbums, loading: false, source: 'local' }))
+          : { albums: clean(fallbackAlbums), loading: false, source: 'local' }))
       }),
   )
 

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useRevalidate, fetchJsonRetry } from './liveData.js'
+import { useRevalidate, fetchJsonRetry, makeCache } from './liveData.js'
 
 /**
  * useYouTube(overlayRows)
@@ -21,29 +21,19 @@ import { useRevalidate, fetchJsonRetry } from './liveData.js'
  *
  * Returns { rows, loading, source }  (source: 'youtube' | 'local').
  */
-const CACHE_KEY = 'fasb.media.v4'
-// A cache older than this is ignored, so a stale snapshot left by an old session or a
-// previous deploy (e.g. a title from before the "Fremont TV" rename) can never flash as
-// the "latest episode" on reload. Within the window it still gives an instant first paint.
-const CACHE_TTL = 6 * 60 * 60 * 1000 // 6 hours
-function readCache() {
-  try {
-    const obj = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null')
-    if (!obj || !Array.isArray(obj.rows) || !obj.rows.length) return null
-    if (!obj.t || Date.now() - obj.t > CACHE_TTL) return null
-    return obj.rows
-  } catch { return null }
-}
-function writeCache(rows) {
-  try { localStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), rows })) } catch { /* private mode / full: ignore */ }
-}
+const CACHE_KEY = 'fasb.media.v5'
+// A cache from before this deploy is skipped (the bundled media.json is newer), so an old
+// snapshot can never flash as the "latest episode" on reload.
+const cache = makeCache(CACHE_KEY, 14 * 24 * 60 * 60 * 1000, { yieldToBuild: true })
+const readCache = () => { const d = cache.read(); return Array.isArray(d) && d.length ? d : null }
+const writeCache = (rows) => cache.write(rows)
 
 export function useYouTube(overlayRows = []) {
   // Seed from cache so the featured episode is correct on the first paint (no flash of the
   // previous one). No cache yet ⇒ seed from the overlay while the feed loads.
   const [state, setState] = useState(() => {
     const cached = readCache()
-    return cached ? { rows: cached, loading: false, source: 'youtube' } : { rows: overlayRows, loading: true, source: 'local' }
+    return cached ? { rows: cached, loading: false, source: 'youtube' } : { rows: overlayRows, loading: !overlayRows.length, source: 'local' }
   })
 
   // Fetch on mount, then keep an open page current (every 2 min while visible, and on return

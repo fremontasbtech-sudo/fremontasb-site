@@ -1,6 +1,6 @@
 // Build-time snapshot refresh (runs before `vite build`, see package.json).
 //
-// The home page paints INSTANTLY from three bundled JSON snapshots and then revalidates
+// The pages paint INSTANTLY from bundled JSON snapshots and then revalidates
 // against the live feeds in the background. On a slow or flaky connection (typically a
 // phone), the live feeds lag, so what the visitor actually sees for the first second+ is
 // the bundled snapshot. If those snapshots are stale, Latest News shows old/half-missing
@@ -85,7 +85,6 @@ async function refreshPhotos() {
     const d = await getJson('/api/flickr')
     const albums = (Array.isArray(d.albums) ? d.albums : [])
       .filter((a) => a && a.coverImageUrl)
-      .slice(0, 8)
       .map((a) => ({ name: a.name, coverImageUrl: a.coverImageUrl, flickrUrl: a.flickrUrl, count: a.count || 0, date: a.date, title: a.title }))
     commit('photos.json', albums, (v) => Array.isArray(v) && v.length >= 3)
   } catch (e) { keep('photos.json', e.message) }
@@ -122,9 +121,19 @@ async function refreshSpirit() {
   } catch (e) { keep('spiritPoints.json', e.message) }
 }
 
-await Promise.all([refreshEvents(), refreshPhotos(), refreshMedia(), refreshSpirit()])
+// Clubs page announcement cards: the sheet rows, parsed the same way the page parses them.
+async function refreshClubAnnouncements() {
+  try {
+    const { parseCsv } = await import('../src/data/useSheetData.js')
+    const rows = parseCsv(await getText('/api/sheet?tab=Clubs%20Announcements'))
+      .map(({ title, description, buttonLabel, buttonUrl, showFrom, hideAfter, priority }) => ({ title, description, buttonLabel, buttonUrl, showFrom, hideAfter, priority }))
+    commit('clubAnnouncements.json', rows, (v) => Array.isArray(v) && v.some((r) => r.title))
+  } catch (e) { keep('clubAnnouncements.json', e.message) }
+}
+
+await Promise.all([refreshEvents(), refreshPhotos(), refreshMedia(), refreshSpirit(), refreshClubAnnouncements()])
 if (kept.length) {
-  console.warn(`[snapshot] WARNING: ${kept.length} of 4 snapshots NOT refreshed; this deploy ships the committed copies of: ${kept.join('; ')}`)
+  console.warn(`[snapshot] WARNING: ${kept.length} of 5 snapshots NOT refreshed; this deploy ships the committed copies of: ${kept.join('; ')}`)
 } else {
-  console.log('[snapshot] done: all 4 snapshots refreshed from the live site')
+  console.log('[snapshot] done: all 5 snapshots refreshed from the live site')
 }

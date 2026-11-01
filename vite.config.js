@@ -73,5 +73,6 @@ function devApi(flickrKey) {
 export default defineConfig(({ mode }) => {
   // loadEnv reads .env (incl. FLICKR_API_KEY) for the dev server. Not exposed to the client.
   const env = loadEnv(mode, process.cwd(), '')
-  return { plugins: [react(), devApi(env.FLICKR_API_KEY)] }
+  // __BUILD_TIME__ lets the live-data caches tell whether this deploy's bundled snapshots are newer.
+  return { plugins: [react(), devApi(env.FLICKR_API_KEY)], define: { __BUILD_TIME__: JSON.stringify(Date.now()) } }
 })

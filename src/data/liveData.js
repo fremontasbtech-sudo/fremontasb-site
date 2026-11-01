@@ -1,20 +1,28 @@
 // Shared robustness for the site's live-data hooks. Four guarantees, applied uniformly so
 // no section flashes, disappears, or reorders on reload even when an upstream feed is flaky:
-//   • TTL cache — seed the first paint from the last good response (instant AND stable), and
-//     never seed from a snapshot older than ttlMs (so it can't flash something stale).
+//   • Cache — seed the first paint from the last good response (instant AND stable); a feed
+//     with a bundled snapshot uses whichever of the two is newer (see makeCache).
 //   • Retry — a transient empty/failed upstream (YouTube RSS, Flickr, gviz sheets) is retried.
 //   • No downgrade — the caller keeps a good render instead of reverting to an empty fallback.
 //   • Revalidate — an open page keeps itself current (useRevalidate below), so a phone tab
 //     restored from memory or a screen left on during a rally shows the sheet's latest numbers.
 import { useEffect, useRef } from 'react'
 
-export function makeCache(key, ttlMs) {
+// When this bundle was built (vite.config.js). The build refreshes the bundled snapshots, so a
+// cache written before it is older than the snapshot it would replace.
+export const BUILD_TIME = typeof __BUILD_TIME__ === 'number' ? __BUILD_TIME__ : 0
+
+// yieldToBuild: the feed has a bundled snapshot, so a cache from before this deploy is skipped
+// and the (newer) snapshot paints instead. Either way the first paint is the freshest copy we
+// have, never a blank or "Loading" state, and the live feed replaces it a moment later.
+export function makeCache(key, ttlMs, { yieldToBuild = false } = {}) {
   return {
     read() {
       try {
         const obj = JSON.parse(localStorage.getItem(key) || 'null')
         if (!obj || obj.t == null) return null
         if (ttlMs && Date.now() - obj.t > ttlMs) return null
+        if (yieldToBuild && obj.t < BUILD_TIME) return null
         return obj.d
       } catch { return null }
     },
