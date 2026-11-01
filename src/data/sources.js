@@ -146,7 +146,7 @@ export const embeds = {
   clubInfoSlides:
     'https://docs.google.com/presentation/d/1GV6dM2eOitIWyesUN5ciMVs3Cq9pqc8a-hBYtz1OmIs/embed?start=false&loop=false&delayms=5000',
 
-  // Home hero video: the 2026-10-16 drone shoot (4K, two straight passes at the camera's own speed, hard cut),
+  // Home hero video: the 2026-10-16 drone shoot (4K, five straight passes at the camera's own speed, hard cuts),
   // 1080p for desktop and 720p for phones. New files get new names so no browser keeps the old cut.
   heroVideo: '/hero-2026-1080.mp4',
   heroVideoSmall: '/hero-2026-720.mp4',
