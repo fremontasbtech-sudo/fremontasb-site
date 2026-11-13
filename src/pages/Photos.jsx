@@ -7,7 +7,7 @@ import fallbackAlbums from '../data/photos.json'
 import { useFlickr } from '../data/useFlickr'
 import { fadeRef, markLoaded } from '../lib/imgLoad'
 import { useEvents } from '../data/useEvents'
-import { seniorGameForAlbum } from '../data/albumMatch'
+import { seniorGameForAlbum, genderedAlbumTitle } from '../data/albumMatch'
 import { trackOutbound } from '../lib/analytics'
 
 /**
@@ -32,8 +32,9 @@ function orderAlbums(albums, games) {
   const sportNames = [...new Set(games.map((g) => g.sport).filter(Boolean))]
   return albums
     .map((a, i) => {
-      const sg = seniorGameForAlbum({ title: a.title || cleanAlbumTitle(a.name), name: a.name, date: a.date }, games, sportNames)
-      return { ...a, date: sg ? sg.date : a.date, i }
+      const title = a.title || cleanAlbumTitle(a.name)
+      const sg = seniorGameForAlbum({ title, name: a.name, date: a.date }, games, sportNames)
+      return { ...a, title: sg ? genderedAlbumTitle(title, sg, games) : a.title, date: sg ? sg.date : a.date, i }
     })
     .sort((x, y) => (x.date && y.date && x.date !== y.date ? (x.date < y.date ? 1 : -1) : (y.takenAt || '').localeCompare(x.takenAt || '') || x.i - y.i))
 }

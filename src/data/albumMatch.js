@@ -76,3 +76,22 @@ export function seniorGameForAlbum(album, games = [], sportNames = []) {
   const close = seniors.filter((g) => near(g) <= 86400000)
   return new Set(close.map((g) => g.sport)).size === 1 ? close[0] : null
 }
+
+// Senior night album titles often drop the team's gender ("Volleyball Senior Night"). When the
+// album belongs to a Boys or Girls team's senior night, the title gets that gender ("Girls
+// Volleyball Senior Night"), or "Boys and Girls" when both teams had theirs that day. Sports
+// with one team (Football, Field Hockey, Cross Country) keep the album's own name
+// (Abir 2026-11-12).
+export function genderedAlbumTitle(title, game, games = []) {
+  const t = String(title || '')
+  if (!t || !game || /\b(girls?|boys?|womens?|mens?)\b/i.test(t)) return t
+  const m = /^(boys|girls)\s+(.+)$/i.exec(String(game.sport || '').trim())
+  if (!m) return t
+  const core = phrase(m[2])
+  const both = games.some((g) => g && g.seniorNight && g.date === game.date && g.sport !== game.sport &&
+    phrase(g.sport).replace(/^(boys|girls)\s+/, '') === core)
+  const label = both ? 'Boys and Girls' : m[1][0].toUpperCase() + m[1].slice(1).toLowerCase()
+  const names = [core.split(' ').join('\\s+'), ...Object.keys(SPORT_SHORT).filter((k) => SPORT_SHORT[k] === core)]
+  const re = new RegExp(`\\b(${names.join('|')})\\b`, 'i')
+  return re.test(t) ? t.replace(re, (w) => `${label} ${w}`) : t
+}
