@@ -8,7 +8,9 @@ import { useSheetData, isTrue } from '../data/useSheetData'
 import { useSpiritPoints } from '../data/useSpiritPoints'
 import { useYouTube } from '../data/useYouTube'
 import { useFlickr } from '../data/useFlickr'
-import { sheets, embeds, school } from '../data/sources'
+import { sheets, embeds, school, links } from '../data/sources'
+import { useLang } from '../i18n'
+import { trackOutbound } from '../lib/analytics'
 import spiritPointsJson from '../data/spiritPoints.json'
 import newsJson from '../data/news.json'
 import mediaOverlay from '../data/media.json'
@@ -27,12 +29,12 @@ import { cleanAlbumTitle } from '../data/albumTitle'
  * not image tiles, so a card grid would flatten the hierarchy this page depends on.
  */
 export default function Home() {
-  const { upcoming, recent, events: curatedEvents, finishedGames, seniorSeason, loading: eventsLoading } = useEvents()
+  const { upcoming, recent, events: curatedEvents, finishedGames, seniorSeason, nextLater, loading: eventsLoading } = useEvents()
   return (
     <>
       <Hero />
       <SpiritPoints />
-      <LatestNews eventsRecent={recent} eventsUpcoming={upcoming} eventsAll={curatedEvents} eventsFinished={finishedGames} seniorSeason={seniorSeason} eventsLoading={eventsLoading} />
+      <LatestNews eventsRecent={recent} eventsUpcoming={upcoming} eventsAll={curatedEvents} eventsFinished={finishedGames} seniorSeason={seniorSeason} eventsNextLater={nextLater} eventsLoading={eventsLoading} />
       <MorningAnnouncements />
       <AppBanner />
     </>
@@ -209,7 +211,7 @@ const quickLinks = [
   { to: '/resources', label: 'School Store', note: 'ASB cards, dance tickets, and spirit wear' },
 ]
 
-function LatestNews({ eventsRecent = [], eventsUpcoming = [], eventsAll = [], eventsFinished = [], seniorSeason = null, eventsLoading = false }) {
+function LatestNews({ eventsRecent = [], eventsUpcoming = [], eventsAll = [], eventsFinished = [], seniorSeason = null, eventsNextLater = null, eventsLoading = false }) {
   // At most 5 upcoming items, soonest first; the rest of the next 30 days sit behind "Show more".
   const [showAllUpcoming, setShowAllUpcoming] = useState(false)
   const UPCOMING_MAX = 5
@@ -273,7 +275,11 @@ function LatestNews({ eventsRecent = [], eventsUpcoming = [], eventsAll = [], ev
                 </span>
               </button>
             )}
-            {!eventsLoading && eventsUpcoming.length === 0 && <Notice>There are no events in the next 30 days. Check back soon for updates.</Notice>}
+            {!eventsLoading && eventsUpcoming.length === 0 && <UpcomingEmpty next={eventsNextLater} />}
+            {/* A short list (or none) leaves room, so it also shows the next thing after the
+                30 days and says where game dates live. */}
+            {!eventsLoading && eventsUpcoming.length > 0 && eventsUpcoming.length < 3 && <NextLater next={eventsNextLater} />}
+            {!eventsLoading && eventsUpcoming.length < 3 && <GameDates />}
           </div>
         </div>
 
@@ -314,6 +320,7 @@ const TYPE_STYLES = {
   Sports: 'bg-brand-tint text-brand',
   'Fremont TV': 'bg-ink/5 text-ink',
   Photos: 'bg-ink/5 text-ink',
+  'No school': 'bg-ink/5 text-ink',
 }
 
 function TypeBadge({ type }) {
@@ -457,6 +464,7 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = [], curatedE
       href: null,
       when: fg.when,
       seniorNight: true,
+      bellGame: fg.bellGame,
       blurb: ['Senior Night', scoreNote(fg.score, fg.when, undefined, fg.sport), fg.level].filter(Boolean).join(' · '),
       pinned: false,
     }))
@@ -519,7 +527,81 @@ function buildNews(newsRows, source, videos, albums, eventsRecent = [], curatedE
     })
 }
 
+// Upcoming Events with nothing in the next 30 days: a calm note (not a tinted box), the next
+// thing we know about after that, and where to find game dates, so the column never looks
+// abandoned. Game times live on the athletics site and in the app's Sports tab.
+function UpcomingEmpty({ next }) {
+  return (
+    <div className="border-t border-rule pt-6">
+      <p className="leading-relaxed text-body">Nothing is on the ASB calendar for the next 30 days yet.</p>
+      <NextLater next={next} />
+    </div>
+  )
+}
+
+// The soonest known thing past the 30-day window (useEvents' nextLater), as one row.
+function NextLater({ next }) {
+  if (!next) return null
+  return (
+    <>
+      <p className="eyebrow mt-8">Next on the calendar</p>
+      <ol className="mt-3 border-t border-rule">
+        <li><NewsItem item={next} /></li>
+      </ol>
+    </>
+  )
+}
+
+function GameDates() {
+  const gameLinks = [
+    { href: links.athletics, label: 'Fremont Athletics', note: 'Schedules and scores for every team' },
+    { href: links.appSports, label: 'Firebird Hub sports', note: 'Game times in the Fremont ASB app' },
+  ]
+  return (
+    <div>
+      <p className="eyebrow mt-10">Game dates</p>
+      <p className="mt-2 text-sm leading-relaxed text-body">Every team&rsquo;s schedule is on the Fremont Athletics website and in the Sports tab of the Firebird Hub app.</p>
+      <ul className="mt-4 border-t border-rule">
+        {gameLinks.map((l) => (
+          <li key={l.href} className="border-b border-rule">
+            <a href={l.href} target="_blank" rel="noopener noreferrer" onClick={trackOutbound(l.label, l.href)}
+              className="group flex min-h-[44px] items-center justify-between gap-4 py-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
+              <span>
+                <span className="block font-display text-lg font-bold text-ink transition-colors group-hover:text-brand">{l.label}</span>
+                <span className="block text-sm text-body">{l.note}</span>
+              </span>
+              <Arrow />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+// "Wednesday, Nov 25 to Friday, Nov 27". In Spanish the months are written out and the line
+// starts with a capital: "Del miércoles 25 al viernes 27 de noviembre", "Del lunes 21 de
+// diciembre al viernes 1 de enero", "Lunes, 31 de mayo".
+function dayRange(fromIso, toIso, lang) {
+  if (lang === 'es') {
+    const parts = (iso) => {
+      const d = parseDate(iso)
+      return { wd: d.toLocaleDateString('es-US', { weekday: 'long' }), day: d.getDate(), month: d.toLocaleDateString('es-US', { month: 'long' }), m: d.getMonth() }
+    }
+    const cap = (t) => t.charAt(0).toUpperCase() + t.slice(1)
+    const a = parts(fromIso)
+    if (fromIso === toIso) return `${cap(a.wd)}, ${a.day} de ${a.month}`
+    const b = parts(toIso)
+    return a.m === b.m
+      ? `Del ${a.wd} ${a.day} al ${b.wd} ${b.day} de ${b.month}`
+      : `Del ${a.wd} ${a.day} de ${a.month} al ${b.wd} ${b.day} de ${b.month}`
+  }
+  const fmt = (iso) => parseDate(iso).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })
+  return fromIso === toIso ? fmt(fromIso) : `${fmt(fromIso)} to ${fmt(toIso)}`
+}
+
 function NewsItem({ item, featured }) {
+  const { lang } = useLang()
   // The Bell Game stands out: a tinted row with a brand rule on the left.
   const bell = item.bellGame ? ' -mx-3 border-l-4 border-brand bg-brand-tint px-3 sm:-mx-4 sm:px-4' : ''
   const rowCls = `grid grid-cols-[4.25rem_1fr] gap-x-5 py-6 sm:grid-cols-[6rem_1fr] sm:gap-x-8 sm:py-7${bell}${item.href ? ' group' : ''}`
@@ -539,6 +621,11 @@ function NewsItem({ item, featured }) {
         <h3 className={`mt-2 font-display font-bold leading-snug text-ink ${featured ? 'text-2xl sm:text-3xl' : 'text-lg sm:text-xl'}${item.href ? ' transition-colors group-hover:text-brand' : ''}`}>
           {item.title}
         </h3>
+        {item.noSchool && (
+          <p className={`mt-2 leading-relaxed text-body ${featured ? 'text-base sm:text-lg' : 'text-sm sm:text-base'}`} translate="no">
+            {dayRange(item.noSchool.from, item.noSchool.to, lang)}
+          </p>
+        )}
         {item.blurb && (
           <p className={`mt-2 leading-relaxed text-body ${featured ? 'text-base sm:text-lg' : 'text-sm sm:text-base'}`}>
             {blurbParts(item.blurb)}
@@ -576,8 +663,10 @@ function blurbParts(blurb) {
 }
 
 function DateRail({ date, raw, featured }) {
+  const { lang } = useLang()
   if (!date) return <span className="pt-1 text-sm text-body">{raw}</span>
-  const month = date.toLocaleDateString('en-US', { month: 'short' })
+  // Month follows the language (NOV / NOV., DIC.), so it matches the Spanish date line beside it.
+  const month = date.toLocaleDateString(lang === 'es' ? 'es-US' : 'en-US', { month: 'short' }).replace(/\.$/, '')
   const day = date.toLocaleDateString('en-US', { day: 'numeric' })
   const year = date.getFullYear()
   return (

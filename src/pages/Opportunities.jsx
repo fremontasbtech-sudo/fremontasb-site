@@ -33,6 +33,8 @@ export default function Opportunities() {
                 title="Opportunities document"
                 ratio="16 / 9"
                 fallback="The opportunities deck isn't posted yet. Check with the College & Career Center."
+                openHref={links.opportunitiesDeck}
+                openLabel="Open the document in Google Docs"
               />
             </div>
           )}
@@ -43,13 +45,15 @@ export default function Opportunities() {
             <p className="text-sm leading-relaxed text-body">
               These postings are shared by the college and career counselors, and the document is updated whenever they add something new. If you have questions about a posting, ask the College &amp; Career Center.
             </p>
-            {links.opportunitiesDeck ? (
+            {/* Wider screens get this link right above the document (Embed's openHref), so it
+                comes before the frame for keyboard users; phones have no frame, so it sits here. */}
+            {links.opportunitiesDeck ? (!wide && (
               <div className="mt-6">
                 <Button href={links.opportunitiesDeck} variant="primary" external>
                   Open the document in Google Docs
                 </Button>
               </div>
-            ) : (
+            )) : (
               <DevNote>Set links.opportunitiesDeck in sources.js to show the &ldquo;Open the deck&rdquo; button.</DevNote>
             )}
           </aside>

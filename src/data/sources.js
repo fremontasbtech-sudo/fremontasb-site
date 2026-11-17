@@ -111,6 +111,9 @@ export const links = {
     'https://docs.google.com/spreadsheets/d/1IQo9QG0ubONWAeaZfwPQ2GJH7zpBr_QexsH9o0XTOLg/edit?gid=0#gid=0',
 
   schoolStore: 'https://fremonths.myschoolcentral.com/',
+  // Game dates: the athletics department's site, and the Sports tab of the Firebird Hub app.
+  athletics: 'https://fremontathletics.org',
+  appSports: 'https://firebirdhub.vercel.app/#sports',
   flickr: 'https://flickr.com/photos/fremonthighschoolasb/albums/',
   youtube: 'https://www.youtube.com/@fremonthighschoolasb',
   instagram: 'https://www.instagram.com/firebirdfelipe/',

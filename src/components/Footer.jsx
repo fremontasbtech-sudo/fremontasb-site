@@ -41,6 +41,7 @@ export default function Footer() {
             <li><a className={item} href={links.tiktok} target="_blank" rel="noopener noreferrer">TikTok: @felipethefirebird</a></li>
             <li><a className={item} href={links.youtube} target="_blank" rel="noopener noreferrer">YouTube: Fremont High School ASB</a></li>
             <li><a className={item} href={links.flickr} target="_blank" rel="noopener noreferrer" onClick={trackOutbound('Flickr', links.flickr)}>Flickr: event photos</a></li>
+            <li><a className={item} href={links.athletics} target="_blank" rel="noopener noreferrer" onClick={trackOutbound('Athletics', links.athletics)}>Athletics: game schedules and scores</a></li>
           </ul>
         </div>
       </div>

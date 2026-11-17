@@ -2,7 +2,11 @@
 // appears on the site (trimmed). Anything not listed stays in its source language
 // - that's intentional for dynamic feed content (video titles, album names, club
 // names, announcements, people, dates). Edit/extend here; the switch is in the navbar.
+import { NO_SCHOOL } from './noSchool'
+
 export const ES = {
+  // Days with no school in Upcoming Events: their Spanish names live next to the dates.
+  ...Object.fromEntries(NO_SCHOOL.map((r) => [r[2], r[3]])),
   // ── Homecoming Court: nominations window (hero + intro + hand-off card) ──
   'Nominations': 'Nominaciones',
   'Test preview': 'Vista de prueba',
@@ -448,8 +452,20 @@ export const ES = {
   'Books on Mental Health & Wellness (Gale)': 'Libros sobre salud mental y bienestar (Gale)',
   'FUHSD Mental Health Resources': 'Recursos de salud mental de FUHSD',
   'MayView Community Health (now Ravenswood Family Health Network)': 'MayView Community Health (ahora Ravenswood Family Health Network)',
-  'Deirdre Louie, LMFT, School-Based Therapist · (408) 522-2487 · A-Building (downstairs).':
-    'Deirdre Louie, LMFT, terapeuta escolar · (408) 522-2487 · Edificio A (planta baja).',
+  // Resource notes are split at " · " into separate text nodes (NoteText), and phone numbers
+  // become tel: links, so each part is translated on its own.
+  'Deirdre Louie, LMFT, School-Based Therapist': 'Deirdre Louie, LMFT, terapeuta escolar',
+  'A-Building (downstairs).': 'Edificio A (planta baja).',
+  'If you need help right now': 'Si necesitas ayuda ahora mismo',
+  // The crisis line's Spanish text and buttons (AYUDA, not HOME) are rendered in CrisisLine itself.
+  'Spirit wear and game dates': 'Ropa escolar y fechas de partidos',
+  'The School Store is what students ask the ASB office about the most, and the athletics website has every team’s games. Community and wellness resources are listed below.':
+    'La Tienda Escolar es lo que más preguntan los estudiantes en la oficina de ASB, y el sitio web de deportes tiene los partidos de cada equipo. Los recursos comunitarios y de bienestar están más abajo.',
+  'Athletics': 'Deportes',
+  'Game schedules, scores, and team pages for every Fremont sport, on the athletics department’s website.':
+    'Calendarios de partidos, resultados y páginas de equipo de todos los deportes de Fremont, en el sitio web del departamento de deportes.',
+  'Open Fremont Athletics': 'Abrir Fremont Athletics',
+  'Athletics: game schedules and scores': 'Deportes: calendarios y resultados de partidos',
 
   // ── Opportunities page ──
   'Internships, programs, and scholarships': 'Pasantías, programas y becas',
@@ -458,6 +474,8 @@ export const ES = {
   'About these postings': 'Sobre estas publicaciones',
   "These postings are shared by the college and career counselors, and the document is updated whenever they add something new. If you have questions about a posting, ask the College & Career Center.": "Estas publicaciones las comparten los consejeros universitarios y de carrera, y el documento se actualiza cada vez que agregan algo nuevo. Si tienes preguntas sobre una publicación, pregunta en el College & Career Center.",
   'Open the document in Google Docs': 'Abrir el documento en Google Docs',
+  'Skip past the document': 'Saltar el documento',
+  'Skip past the slides': 'Saltar las diapositivas',
   'Opportunities document': 'Documento de oportunidades',
   'The opportunities deck isn’t posted yet. Check with the College & Career Center.': 'El documento de oportunidades aún no está publicado. Consulta en el College & Career Center.',
 
@@ -502,11 +520,11 @@ export const ES = {
   'Sign in with Google (nominations and voting)': 'Iniciar sesión con Google (nominaciones y votaciones)',
   'Some ASB forms, like Homecoming Court nominations, ask you to sign in with your school Google account so each student gets exactly one say. When you sign in, Google tells us only your name and school email address. We never see your password and get no access to your Google Drive, Gmail, or anything else in your account.':
     'Algunos formularios de ASB, como las nominaciones para la Corte de Homecoming, te piden iniciar sesión con tu cuenta escolar de Google para que cada estudiante participe exactamente una vez. Cuando inicias sesión, Google solo nos da tu nombre y tu correo escolar. Nunca vemos tu contraseña y no tenemos acceso a tu Google Drive, tu Gmail ni nada más de tu cuenta.',
-  'We store your school email next to what you submitted (for example, your nominees) in an ASB Google Sheet. Only ASB advisors and ASB Tech can see it, it’s used only to count one entry per student, and it is deleted after that event’s results are final. Your name and email are never shown publicly.':
-    'Guardamos tu correo escolar junto con lo que enviaste (por ejemplo, tus nominados) en una hoja de Google de ASB. Solo los asesores de ASB y ASB Tech pueden verla, se usa únicamente para contar una participación por estudiante y se elimina cuando los resultados de ese evento son definitivos. Tu nombre y tu correo nunca se muestran públicamente.',
+  'We store your school email next to what you submitted (for example, your nominees) in a private ASB Google Sheet. Only ASB officers (the student leaders in ASB) and ASB advisors can open it. We use it only to count one entry per student and to tally the results, and your name and email are never shown publicly.':
+    'Guardamos tu correo escolar junto con lo que enviaste (por ejemplo, tus nominados) en una hoja de Google privada de ASB. Solo los representantes de ASB (los líderes estudiantiles de ASB) y los asesores de ASB pueden abrirla. La usamos únicamente para contar una participación por estudiante y para hacer el conteo de los resultados, y tu nombre y tu correo nunca se muestran públicamente.',
   'The contact form': 'El formulario de contacto',
-  'You don’t need to sign in to send us a message. When you use the form on the Contact page, we save your name, the email you give us, and your message in an ASB Google Sheet. Only ASB advisors and ASB Tech can see it. We use it only to read your message and reply to you, and we never share it or show it publicly.':
-    'No necesitas iniciar sesión para enviarnos un mensaje. Cuando usas el formulario de la página de Contacto, guardamos tu nombre, el correo que nos das y tu mensaje en una hoja de Google de ASB. Solo los asesores de ASB y ASB Tech pueden verla. La usamos únicamente para leer tu mensaje y responderte, y nunca la compartimos ni la mostramos públicamente.',
+  'You don’t need to sign in to send us a message. When you use the form on the Contact page, we save your name, the email you give us, and your message in a private ASB Google Sheet. Only ASB officers and ASB advisors can open it. We use it only to read your message and reply to you, and we never share it or show it publicly.':
+    'No necesitas iniciar sesión para enviarnos un mensaje. Cuando usas el formulario de la página de Contacto, guardamos tu nombre, el correo que nos das y tu mensaje en una hoja de Google privada de ASB. Solo los representantes de ASB y los asesores de ASB pueden abrirla. La usamos únicamente para leer tu mensaje y responderte, y nunca la compartimos ni la mostramos públicamente.',
   'Questions': 'Preguntas',
   'Email us at': 'Escríbenos a',
   'and we’ll answer, or remove something you submitted.': 'y te responderemos, o eliminaremos algo que hayas enviado.',
@@ -519,7 +537,15 @@ export const ES = {
   // ── shared loading / notices ──
   'Loading the latest…': 'Cargando lo último…',
   'Loading spirit points…': 'Cargando puntos de espíritu…',
-  "There are no events in the next 30 days. Check back soon for updates.": "No hay eventos en los próximos 30 días. Vuelve pronto para ver novedades.",
+  'Nothing is on the ASB calendar for the next 30 days yet.': 'Todavía no hay nada en el calendario de ASB para los próximos 30 días.',
+  'Next on the calendar': 'Lo próximo en el calendario',
+  'Game dates': 'Fechas de partidos',
+  'Every team’s schedule is on the Fremont Athletics website and in the Sports tab of the Firebird Hub app.':
+    'El calendario de cada equipo está en el sitio web de Fremont Athletics y en la pestaña de Deportes de la app Firebird Hub.',
+  'Schedules and scores for every team': 'Calendarios y resultados de todos los equipos',
+  'Firebird Hub sports': 'Deportes en Firebird Hub',
+  'Game times in the Fremont ASB app': 'Horarios de partidos en la app de Fremont ASB',
+  'No school': 'Sin clases',
   "Show more events": "Ver más eventos",
   "Show fewer events": "Ver menos eventos",
   "Announcements are read over the PA on Wednesday and Friday mornings. Pick a highlighted day on the calendar to see that morning’s announcements, and click on a headline to read the whole announcement.": "Los anuncios se leen por el altavoz los miércoles y viernes por la mañana. Elige un día marcado en el calendario para ver los anuncios de esa mañana, y haz clic en un titular para leer el anuncio completo.",
@@ -550,13 +576,13 @@ export const ES = {
     'Enviaste varios mensajes seguidos. Espera unos minutos e inténtalo de nuevo.',
   'Couldn’t send your message right now. Please try again in a moment, or email us at':
     'No pudimos enviar tu mensaje en este momento. Inténtalo de nuevo en un momento, o escríbenos a',
-  'Your name, email, and message are saved in an ASB Google Sheet that only ASB advisors and ASB Tech can see. We use them only to read and answer your message.':
-    'Tu nombre, correo y mensaje se guardan en una hoja de Google de ASB que solo pueden ver los asesores de ASB y ASB Tech. Solo los usamos para leer y responder tu mensaje.',
+  'Your name, email, and message are saved in a private ASB Google Sheet that only ASB officers and ASB advisors can open. We use them only to read and answer your message.':
+    'Tu nombre, correo y mensaje se guardan en una hoja de Google privada de ASB que solo pueden abrir los representantes de ASB y los asesores de ASB. Solo los usamos para leer y responder tu mensaje.',
   'Read our privacy policy': 'Lee nuestra política de privacidad',
   'Message sent': 'Mensaje enviado',
   'Thanks for reaching out': 'Gracias por escribirnos',
-  'Your message is with the ASB officers now. If you asked a question, we’ll reply to the email you gave us.':
-    'Tu mensaje ya lo tienen los representantes de ASB. Si hiciste una pregunta, te responderemos al correo que nos diste.',
+  'Your message is with the ASB officers and advisors now. If you asked a question, we’ll reply to the email you gave us.':
+    'Tu mensaje ya lo tienen los representantes y los asesores de ASB. Si hiciste una pregunta, te responderemos al correo que nos diste.',
   'What you sent': 'Lo que enviaste',
   'From': 'De',
   'Message': 'Mensaje',

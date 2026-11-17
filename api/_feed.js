@@ -70,7 +70,16 @@ export async function fetchChannelVideos(channelId) {
     newer.push(...fresh)
   }
   if (!videos.length && !newer.length && feed.status === 'rejected') throw feed.reason
-  return applyEpisodeTitles([...newer, ...videos])
+  const all = [...newer, ...videos]
+  for (const v of all) { const fix = TITLE_FIXES[v.youtubeId]; if (fix) v.title = fix(v.title) }
+  return applyEpisodeTitles(all)
+}
+
+// Uploads whose YouTube title has a mistake we can't edit on YouTube, fixed here by video id so
+// the site, the snapshot and the archive all agree. The 10/2/2026 show (Salma & Allen) is
+// Episode 5 (Fremont TV pipeline state for 2026-10-02), but it was uploaded as "Episode 6".
+const TITLE_FIXES = {
+  n8iLVFQdJsM: (t) => t.replace(/Episode\s*6\b/i, 'Episode 5'),
 }
 
 // ── Channel Videos page (no key) ─────────────────────────────────────────────
@@ -102,7 +111,9 @@ async function fetchPageVideos(channelId) {
     const date = ageToPtDay(age)
     if (!date) return // no age: an upcoming premiere or a live stream that hasn't aired
     seen.add(id)
-    out.push({ youtubeId: id, title: decodeEntities(title), date })
+    // The page only says "3 weeks ago" or "1 year ago", so this day is a rough guess (off by up to
+    // a month or a year). It's marked, so the snapshot and the site never let it replace a real date.
+    out.push({ youtubeId: id, title: decodeEntities(title), date, dateApprox: true })
   }
   const walk = (o) => {
     if (!o || typeof o !== 'object') return

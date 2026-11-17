@@ -90,17 +90,54 @@ async function refreshPhotos() {
   } catch (e) { keep('photos.json', e.message) }
 }
 
+// The real publish day of one video (PT), read from its public watch page ("publishDate" or
+// "uploadDate", e.g. 2026-10-23T08:01:53-07:00). '' when the page can't be read.
+async function publishDay(id) {
+  const ctrl = new AbortController()
+  const t = setTimeout(() => ctrl.abort(), 10000)
+  try {
+    const r = await fetch(`https://www.youtube.com/watch?v=${encodeURIComponent(id)}`, { signal: ctrl.signal, headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36', 'Accept-Language': 'en-US,en;q=0.9' } })
+    const html = await r.text()
+    const m = html.match(/"publishDate":"([^"]+)"/) || html.match(/"uploadDate":"([^"]+)"/)
+    if (!m) return ''
+    const iso = m[1]
+    // Already in local (PT) time with an offset: the date part is the PT day.
+    if (/^\d{4}-\d{2}-\d{2}T.*[+-]\d{2}:\d{2}$/.test(iso) || /^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso.slice(0, 10)
+    const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles', year: 'numeric', month: '2-digit', day: '2-digit' })
+      .formatToParts(new Date(iso)).map((x) => [x.type, x.value]))
+    return p.year ? `${p.year}-${p.month}-${p.day}` : ''
+  } catch { return '' } finally { clearTimeout(t) }
+}
+
+// Why media.json once shipped wrong dates (the 2026-11-12 local build): YouTube's RSS feed failed,
+// so /api/youtube listed the channel's Videos page instead, whose dates are only "2 weeks ago" or
+// "1 year ago" turned into a day. Episode 8 (10/23) became 10/29 and every 2025 video became
+// 2025-11-12, and the old merge let those guesses overwrite the correct committed dates.
+// Now a rough date (dateApprox) never replaces a date we already have, and a new video with a
+// rough date gets its real publish day from its watch page.
 async function refreshMedia() {
   try {
     const d = await getJson('/api/youtube')
     const live = (Array.isArray(d.videos) ? d.videos : [])
-      .map((v) => ({ title: v.cleanTitle || v.title, date: v.date, youtubeId: v.youtubeId, hosts: v.hosts || '', kind: v.kind || 'Fremont TV' }))
+      .map((v) => ({ title: v.cleanTitle || v.title, date: v.date, youtubeId: v.youtubeId, hosts: v.hosts || '', kind: v.kind || 'Fremont TV', approx: !!v.dateApprox }))
     if (!live.length) throw new Error('empty feed')
     // Merge with the committed overlay so episodes that have aged out of the RSS window are
-    // never lost from the archive; the live copy wins for any id it still carries.
+    // never lost from the archive. For a video the overlay already has, its curated title, hosts
+    // and kind stay (the site itself lets media.json win, see useYouTube.js), and the feed's
+    // publish date wins unless it is only a rough date.
     const byId = new Map()
     for (const r of (readLocal('media.json') || [])) if (r && r.youtubeId) byId.set(r.youtubeId, r)
-    for (const r of live) byId.set(r.youtubeId, r)
+    let fixed = 0, guessed = 0
+    for (const { approx, ...r } of live) {
+      const prev = byId.get(r.youtubeId)
+      if (approx) {
+        if (prev && prev.date) r.date = prev.date
+        else { const real = await publishDay(r.youtubeId); if (real) { r.date = real; fixed++ } else guessed++ }
+      }
+      byId.set(r.youtubeId, prev ? { ...r, title: prev.title || r.title, hosts: prev.hosts || r.hosts, kind: prev.kind || r.kind } : r)
+    }
+    if (fixed || guessed) console.log(`[snapshot] media.json: ${fixed} new video date(s) read from the watch page${guessed ? `, ${guessed} left as a rough guess` : ''}`)
+    // Newest first. Same-day rows keep their order (the feed lists newer uploads first).
     const merged = [...byId.values()].sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0))
     commit('media.json', merged, (v) => Array.isArray(v) && v.length >= 3)
   } catch (e) { keep('media.json', e.message) }

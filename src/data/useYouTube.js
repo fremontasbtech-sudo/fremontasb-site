@@ -21,7 +21,7 @@ import { useRevalidate, fetchJsonRetry, makeCache } from './liveData.js'
  *
  * Returns { rows, loading, source }  (source: 'youtube' | 'local').
  */
-const CACHE_KEY = 'fasb.media.v5'
+const CACHE_KEY = 'fasb.media.v6' // v6: drops caches saved with the wrong overlay dates (2026-11-16)
 // A cache from before this deploy is skipped (the bundled media.json is newer), so an old
 // snapshot can never flash as the "latest episode" on reload.
 const cache = makeCache(CACHE_KEY, 14 * 24 * 60 * 60 * 1000, { yieldToBuild: true })
@@ -55,7 +55,10 @@ export function useYouTube(overlayRows = []) {
           return {
             youtubeId: v.youtubeId,
             title,
-            date: o.date || v.date,
+            // The feed's publish date is the real one, so it wins over media.json. When the RSS
+            // feed was down, /api/youtube falls back to the Videos page, whose dates are rough
+            // ("2 weeks ago", dateApprox); then the date we already have is kept.
+            date: v.dateApprox ? (o.date || v.date) : (v.date || o.date),
             hosts: (o.hosts ?? '') || v.hosts || p.hosts,
             kind: o.kind || v.kind || guessKind(title),
           }
@@ -65,6 +68,8 @@ export function useYouTube(overlayRows = []) {
           .filter((r) => !liveIds.has(r.youtubeId))
           .map((r) => ({ hosts: '', kind: guessKind(r.title), ...r }))
 
+        // Newest first by real date. Same-day rows keep their order (the feed lists newer uploads
+        // first, and media.json is kept in upload order).
         const rows = [...merged, ...older].sort((a, b) =>
           a.date < b.date ? 1 : a.date > b.date ? -1 : 0,
         )

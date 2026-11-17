@@ -2,6 +2,8 @@ import PageHero from '../components/PageHero'
 import Button from '../components/Button'
 import { links, resourceLinks } from '../data/sources'
 import { trackOutbound } from '../lib/analytics'
+import PhoneText, { NoteText } from '../components/PhoneText'
+import { useLang } from '../i18n'
 
 // Six resources, two groups. Links live in src/data/sources.js, a '#' means
 // ASB Tech hasn't confirmed the real URL yet, and the block says so instead of pretending.
@@ -9,8 +11,8 @@ import { trackOutbound } from '../lib/analytics'
 const GROUPS = [
   {
     eyebrow: 'For students',
-    title: 'Help, support, and spirit wear',
-    blurb: 'This is the store students ask the ASB office about the most. Community and wellness resources are listed below.',
+    title: 'Spirit wear and game dates',
+    blurb: 'The School Store is what students ask the ASB office about the most, and the athletics website has every team\u2019s games. Community and wellness resources are listed below.',
     items: [
       {
         title: 'School Store',
@@ -18,6 +20,13 @@ const GROUPS = [
         body: 'The online store for Fremont spirit wear and ASB purchases, run through MySchoolCentral.',
         href: links.schoolStore,
         cta: 'Open the School Store',
+      },
+      {
+        title: 'Athletics',
+        featured: true,
+        body: 'Game schedules, scores, and team pages for every Fremont sport, on the athletics department\u2019s website.',
+        href: links.athletics,
+        cta: 'Open Fremont Athletics',
       },
     ],
   },
@@ -80,6 +89,7 @@ export default function Resources() {
         title="Community Resources"
         blurb="These are local and national support resources for Firebirds and their families. If you or someone you know is in crisis, please reach out. These lines are free and confidential."
         groups={resourceLinks.community}
+        top={<CrisisLine />}
       />
 
       <LinkListSection
@@ -92,7 +102,49 @@ export default function Resources() {
   )
 }
 
-function LinkListSection({ eyebrow, title, blurb, groups }) {
+// The first thing in Community Resources: the two crisis lines as tap-to-call and tap-to-text
+// buttons, so a student on a phone reaches a person in one tap. sms:741741?&body=HOME fills in
+// "HOME" on both iPhone and Android. In Spanish the buttons send AYUDA instead, which both
+// services route to Spanish-speaking counselors (988lifeline.org "What to Expect";
+// crisistextline.org, 2021-10-15), and calling 988 then pressing 2 reaches Spanish help.
+// The Spanish copy is rendered here (not through es.js) because the links themselves change.
+function CrisisLine() {
+  const { lang } = useLang()
+  const es = lang === 'es'
+  const btn = 'btn-primary whitespace-nowrap'
+  const lines = es
+    ? [
+        { href: 'tel:988', label: 'Llamar al 988' },
+        { href: 'sms:988?&body=AYUDA', label: 'Enviar AYUDA al 988' },
+        { href: 'sms:741741?&body=AYUDA', label: 'Enviar AYUDA al 741741' },
+      ]
+    : [
+        { href: 'tel:988', label: 'Call 988' },
+        { href: 'sms:988', label: 'Text 988' },
+        { href: 'sms:741741?&body=HOME', label: 'Text HOME to 741741' },
+      ]
+  return (
+    <div className="border-l-4 border-brand bg-brand-tint/40 px-5 py-5 sm:col-span-2" role="region" aria-labelledby="crisis-line-title">
+      <h3 id="crisis-line-title" className="font-display text-lg font-extrabold tracking-tight text-ink">If you need help right now</h3>
+      {es ? (
+        <p className="mt-1 text-sm leading-relaxed text-body" translate="no">
+          Puedes llamar al 988 y marcar 2 para hablar en español, o enviar AYUDA por mensaje de texto al 988 o al 741741. Ambas líneas son gratuitas, confidenciales y atienden las 24 horas del día.
+        </p>
+      ) : (
+        <p className="mt-1 text-sm leading-relaxed text-body">
+          You can call or text 988, or text HOME to 741741. Both are free, confidential, and open 24 hours a day.
+        </p>
+      )}
+      <div className="mt-4 flex flex-wrap gap-3" translate={es ? 'no' : undefined}>
+        {lines.map((l) => (
+          <a key={l.href} href={l.href} className={btn} onClick={trackOutbound(l.label, l.href)}>{l.label}</a>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function LinkListSection({ eyebrow, title, blurb, groups, top = null }) {
   return (
     <section className="container-site section-space border-t border-rule">
       <div className="grid gap-8 lg:grid-cols-12 lg:gap-14">
@@ -103,17 +155,25 @@ function LinkListSection({ eyebrow, title, blurb, groups }) {
           <p className="mt-5 text-body leading-relaxed">{blurb}</p>
         </div>
         <div className="grid gap-x-10 gap-y-6 lg:col-span-8 sm:grid-cols-2">
+          {top}
           {groups.map((g) => (
             <div key={g.name}>
               <h3 className="font-display text-lg font-extrabold tracking-tight text-ink">{g.name}</h3>
-              {g.note && <p className="mt-1 text-sm leading-relaxed text-body">{g.note}</p>}
+              {g.note && <p className="mt-1 text-sm leading-relaxed text-body"><NoteText text={g.note} /></p>}
               <ul className="mt-1">
                 {g.links.map((l) => (
                   <li key={l.href}>
-                    <a href={l.href} target="_blank" rel="noopener noreferrer" onClick={trackOutbound(l.label, l.href)}
-                      className="link-brand inline-flex min-h-[44px] min-w-[44px] items-center font-display text-sm font-bold">
-                      {l.label}
-                    </a>
+                    {/^(tel|sms):/.test(l.href) ? (
+                      <a href={l.href} onClick={trackOutbound(l.label, l.href)}
+                        className="link-brand inline-flex min-h-[44px] min-w-[44px] items-center font-display text-sm font-bold">
+                        <PhoneText text={l.label} link={false} />
+                      </a>
+                    ) : (
+                      <a href={l.href} target="_blank" rel="noopener noreferrer" onClick={trackOutbound(l.label, l.href)}
+                        className="link-brand inline-flex min-h-[44px] min-w-[44px] items-center font-display text-sm font-bold">
+                        {l.label}
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>

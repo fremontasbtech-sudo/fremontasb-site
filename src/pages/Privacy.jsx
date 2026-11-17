@@ -27,16 +27,17 @@ export default function Privacy() {
             never see your password and get no access to your Google Drive, Gmail, or anything else in your account.
           </p>
           <p>
-            We store your school email next to what you submitted (for example, your nominees) in an ASB Google Sheet.
-            Only ASB advisors and ASB Tech can see it, it&rsquo;s used only to count one entry per student, and it is
-            deleted after that event&rsquo;s results are final. Your name and email are never shown publicly.
+            We store your school email next to what you submitted (for example, your nominees) in a private ASB Google
+            Sheet. Only ASB officers (the student leaders in ASB) and ASB advisors can open it. We use it only to count
+            one entry per student and to tally the results, and your name and email are never shown publicly.
           </p>
 
           <h2 className="font-display text-xl font-extrabold tracking-tight text-ink">The contact form</h2>
           <p>
             You don&rsquo;t need to sign in to send us a message. When you use the form on the Contact page, we save your
-            name, the email you give us, and your message in an ASB Google Sheet. Only ASB advisors and ASB Tech can see
-            it. We use it only to read your message and reply to you, and we never share it or show it publicly.
+            name, the email you give us, and your message in a private ASB Google Sheet. Only ASB officers and ASB
+            advisors can open it. We use it only to read your message and reply to you, and we never share it or show it
+            publicly.
           </p>
 
           <h2 className="font-display text-xl font-extrabold tracking-tight text-ink">Questions</h2>

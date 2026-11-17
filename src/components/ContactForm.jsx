@@ -139,7 +139,7 @@ export default function ContactForm() {
           Thanks for reaching out
         </h2>
         <p className="mt-4 leading-relaxed text-body">
-          Your message is with the ASB officers now. If you asked a question, we&rsquo;ll reply to the email you gave us.
+          Your message is with the ASB officers and advisors now. If you asked a question, we&rsquo;ll reply to the email you gave us.
         </p>
         <div className="mt-6 rounded-lg border border-rule bg-[#F6F4F2] p-4 sm:p-5">
           <p className="font-display text-xs font-bold uppercase tracking-[0.14em] text-ink">What you sent</p>
@@ -255,7 +255,7 @@ export default function ContactForm() {
 
       <div className="mt-7 border-t border-rule pt-5 text-sm leading-relaxed text-body">
         <p>
-          <span>Your name, email, and message are saved in an ASB Google Sheet that only ASB advisors and ASB Tech can see. We use them only to read and answer your message. </span>
+          <span>Your name, email, and message are saved in a private ASB Google Sheet that only ASB officers and ASB advisors can open. We use them only to read and answer your message. </span>
           <a href="/privacy" className={linkCls}>Read our privacy policy</a>.
         </p>
       </div>

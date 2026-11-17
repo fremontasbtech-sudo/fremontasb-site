@@ -275,8 +275,11 @@ export default function Clubs() {
               <Embed
                 src={embeds.clubInfoSlides}
                 title="Club Info Meeting slides"
+                skipLabel="Skip past the slides"
                 ratio="16 / 9"
                 fallback="The club info slides aren't posted yet. Check back soon."
+                openHref={links.clubInfoSlides}
+                openLabel="Open the slides"
               />
             </div>
           </div>
