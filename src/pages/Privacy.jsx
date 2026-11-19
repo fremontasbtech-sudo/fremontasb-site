@@ -48,7 +48,13 @@ export default function Privacy() {
             Other questions are sent to Google&rsquo;s Gemini AI service so it can write an answer. We send your question, your last few messages in that chat, and the language you picked. If you have connected Schoology and your question is about your assignments, we also send the title, type, due date and short description of the matching assignments, up to 12 of them. We never send your name, your email, or your Schoology calendar link.
           </p>
           <p>
-            We don&rsquo;t save your questions, Felipe&rsquo;s answers or your assignments, and no one at ASB reads them. Google handles them under its Gemini API terms and may use them to improve its services. Please don&rsquo;t type private information, like passwords, grades or other students&rsquo; details, into Ask Felipe.
+            Answers to general questions, like when the fall play is or when a club meets, are kept on the app&rsquo;s server for up to 6 hours, so other students who ask the same thing get the answer faster. They are kept without your earlier messages, without your assignments and without anything that says who asked. Answers to questions about your assignments, or to follow-ups on earlier messages, are never kept.
+          </p>
+          <p>
+            To keep Felipe working for everyone, the server also counts how many questions each browser and each network asks in a day. It keeps those counts under a scrambled code instead of your network address, and they are deleted after about a day.
+          </p>
+          <p>
+            We don&rsquo;t save your questions or your assignments, and no one at ASB reads them. Google handles them under its Gemini API terms and may use them to improve its services. Please don&rsquo;t type private information, like passwords, grades or other students&rsquo; details, into Ask Felipe.
           </p>
 
           <h2 className="font-display text-xl font-extrabold tracking-tight text-ink">Questions</h2>

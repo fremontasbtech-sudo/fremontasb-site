@@ -10,7 +10,7 @@
 // Override it anytime (e.g. to rotate) by setting the FLICKR_API_KEY env var — no code change.
 const DEFAULT_API_KEY = '50ce36c804dbe7a0ee3942cb833f460c'
 
-import { llmTitles, llmError, llmSource } from './_llm.js'
+import { llmTitles, llmError, llmSource, fromCache } from './_llm.js'
 import { withTimeout } from './_http.js'
 import { cleanAlbumTitle } from '../src/data/albumTitle.js'
 
@@ -37,18 +37,18 @@ const ALBUM_INSTRUCTION = [
 
 async function applyAlbumTitles(albums) {
   const names = [...new Set(albums.map((a) => a.name).filter(Boolean))]
-  const cached = names.filter((n) => albumTitleCache.has(n)).length
+  let cached = names.filter((n) => albumTitleCache.has(n)).length
   const need = names.filter((n) => !albumTitleCache.has(n)).slice(0, 120)
   // Title in small chunks — one giant batch makes the model drop/merge items and the
   // strict count check then rejects the whole thing. Chunks keep each call reliable.
   for (let i = 0; i < need.length; i += 20) {
     const chunk = need.slice(i, i + 20)
     const titles = await llmTitles(chunk, ALBUM_INSTRUCTION)
-    if (titles) chunk.forEach((n, j) => { if (titles[j]) albumTitleCache.set(n, titles[j]) })
+    if (titles) chunk.forEach((n, j) => { if (titles[j]) { albumTitleCache.set(n, titles[j]); if (fromCache(titles, j)) cached++ } })
   }
   // Same cleanup as the client fallback, so an LLM title can't keep a stray date either.
   const out = albums.map((a) => { const t = albumTitleCache.get(a.name); return { ...a, title: t ? cleanAlbumTitle(t) : '' } })
-  // Diagnostics: a title from an earlier call on this instance counts as 'cache', not 'heuristic'.
+  // Diagnostics: a title from an earlier call (this instance or the shared cache) counts as 'cache'.
   const fallback = names.filter((n) => !albumTitleCache.has(n)).length
   out.titleSource = llmSource({ fresh: names.length - cached - fallback, cached, fallback })
   out.titleFallbacks = fallback

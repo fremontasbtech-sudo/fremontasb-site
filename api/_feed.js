@@ -10,7 +10,7 @@
 // pulled out separately, so a brand-new episode looks curated without a media.json
 // edit. Cached by raw title; no key / any failure falls back to the heuristic parse.
 
-import { llmTitles, llmError, llmSource } from './_llm.js'
+import { llmTitles, llmError, llmSource, fromCache } from './_llm.js'
 import { withTimeout } from './_http.js'
 
 function decodeEntities(s) {
@@ -190,11 +190,12 @@ export async function applyEpisodeTitles(videos) {
   const raws = [...new Set(videos.map((v) => v.title).filter(Boolean))]
   const titlesCached = raws.filter((t) => titleCache.has(t)).length
   const kindsCached = raws.filter((t) => kindCache.has(t)).length
+  let shared = 0 // values served by the shared Runtime Cache (computed on an earlier call)
   const need = raws.filter((t) => !titleCache.has(t)).slice(0, 60)
   for (let i = 0; i < need.length; i += 20) {
     const chunk = need.slice(i, i + 20)
     const titles = await llmTitles(chunk, TITLE_INSTRUCTION)
-    if (titles) chunk.forEach((raw, j) => { if (titles[j]) titleCache.set(raw, titles[j]) })
+    if (titles) chunk.forEach((raw, j) => { if (titles[j]) { titleCache.set(raw, titles[j]); if (fromCache(titles, j)) shared++ } })
   }
   for (const v of videos) { if (titleCache.has(v.title)) v.cleanTitle = titleCache.get(v.title) }
 
@@ -204,8 +205,8 @@ export async function applyEpisodeTitles(videos) {
   const kneed = raws.filter((t) => !kindCache.has(t)).slice(0, 60)
   for (let i = 0; i < kneed.length; i += 20) {
     const chunk = kneed.slice(i, i + 20)
-    const kinds = await llmTitles(chunk, KIND_INSTRUCTION)
-    if (kinds) chunk.forEach((raw, j) => { const k = String(kinds[j] || '').trim(); if (VALID_KINDS.has(k)) kindCache.set(raw, k) })
+    const kinds = await llmTitles(chunk, KIND_INSTRUCTION, (v) => VALID_KINDS.has(String(v).trim()))
+    if (kinds) chunk.forEach((raw, j) => { const k = String(kinds[j] || '').trim(); if (VALID_KINDS.has(k)) { kindCache.set(raw, k); if (fromCache(kinds, j)) shared++ } })
   }
   for (const v of videos) { if (kindCache.has(v.title)) v.kind = kindCache.get(v.title) }
 
@@ -218,7 +219,7 @@ export async function applyEpisodeTitles(videos) {
   // Diagnostics: count titles and kinds served from earlier calls, from this request's calls,
   // and from the heuristic, so a warm cache reads 'cache' rather than 'heuristic'.
   const fallback = raws.filter((t) => !titleCache.has(t)).length + raws.filter((t) => !kindCache.has(t)).length
-  const cached = titlesCached + kindsCached
+  const cached = titlesCached + kindsCached + shared
   videos.titleSource = llmSource({ fresh: raws.length * 2 - cached - fallback, cached, fallback })
   videos.titleFallbacks = fallback
   videos.titleError = fallback ? llmError() : ''

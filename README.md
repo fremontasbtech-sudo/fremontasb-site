@@ -134,8 +134,9 @@ site fast without recomputing for every visitor.
 
 ### LLM titles (announcements + Flickr albums)
 
-`api/_llm.js` turns messy source text into short, clean titles in one batched call, cached by the
-source text. It auto-detects an API key from the environment (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`,
+`api/_llm.js` turns messy source text into short, clean titles in one batched call. Each title is
+kept in the Vercel Runtime Cache for 7 days, so it's made once, and when the Gemini quota runs out the
+site stops asking until midnight Pacific. It auto-detects an API key from the environment (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`,
 or `GEMINI_API_KEY`, in that order) and uses stable model aliases so it keeps working as providers
 retire versions. If no key is set or a call fails, it falls back to a built-in heuristic, so titles
 are always reasonable.
@@ -152,6 +153,7 @@ are always reasonable.
 | Variable | Used by | Notes |
 |---|---|---|
 | `GEMINI_API_KEY` | announcement + album titles | Google AI Studio key made on the ASB Gmail. Optional; without it the site uses the heuristic. `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` also work. |
+| `SITE_GEMINI_API_KEY` | announcement + album titles | Optional. Used instead of `GEMINI_API_KEY` when set. Make it in a separate Google Cloud project so the website never uses up the quota the app's Ask Felipe needs. |
 | `FLICKR_API_KEY` | Photos | Read-only, non-commercial Flickr key. A default is baked into `api/_flickr.js`, so this is only an override. |
 | `VITE_GA_MEASUREMENT_ID` | Google Analytics (browser) | The GA4 measurement ID, `G-…`. See **Analytics** below. |
 

@@ -1,4 +1,4 @@
-import { llmTitles, llmError } from './_llm.js'
+import { llmTitles, llmError, llmSource, fromCache } from './_llm.js'
 // Shared server-side helper: pull the ASB morning-announcements Google Sheet and
 // parse its weekly Wed/Fri grid into flat { date, text } items.
 // Used by api/announcements.js (Vercel) and the dev middleware in vite.config.js.
@@ -238,7 +238,7 @@ async function fetchTabRows(id, { name, gid }) {
 // ── Clean topic titles via an LLM (optional) ──────────────────────────────────
 // The raw announcement is a full paragraph; titleOf() above is a keyword heuristic
 // (guesses, and falls back to the first few words). If an LLM key is set as a Vercel
-// env var — ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY (whichever exists) —
+// env var — ANTHROPIC_API_KEY, OPENAI_API_KEY, or SITE_GEMINI_API_KEY / GEMINI_API_KEY —
 // we generate a clean 2–5 word topic title per blurb in ONE batched call, cached by
 // blurb text. No key ⇒ we keep the heuristic. Failures never break the feed.
 const titleCache = new Map()
@@ -281,13 +281,13 @@ async function applyTitles(items, now = new Date()) {
   const cut = isoOf(tomorrow)
   // newest-first; the ones already read (or read tomorrow) are what visitors see
   const newest = new Set(items.filter((it) => it.date <= cut).slice(0, LLM_NEWEST).map((it) => it.text))
-  const need = [...new Set(items.filter((it) => !it.xtitle && newest.has(it.text)).map((it) => it.text).filter((t) => !titleCache.has(t)))]
-  let usedLLM = false
+  const wanted = [...new Set(items.filter((it) => !it.xtitle && newest.has(it.text)).map((it) => it.text))]
+  const need = wanted.filter((t) => !titleCache.has(t))
+  let cached = wanted.length - need.length // titled by an earlier call on this instance
   if (need.length) {
-    const titles = await llmTitles(need, TITLE_INSTRUCTION)
+    const titles = await llmTitles(need, TITLE_INSTRUCTION, (t) => t.length <= 60)
     if (titles) {
-      usedLLM = true
-      need.forEach((t, i) => { if (titles[i] && titles[i].length <= 60) titleCache.set(t, titles[i]) })
+      need.forEach((t, i) => { if (titles[i] && titles[i].length <= 60) { titleCache.set(t, titles[i]); if (fromCache(titles, i)) cached++ } })
     }
   }
   let fallbacks = 0
@@ -297,7 +297,9 @@ async function applyTitles(items, now = new Date()) {
     return { ...it, title: title || it.title }
   })
   out = mergeSameDayTitle(out)
-  out.titleSource = fallbacks === 0 ? 'llm' : usedLLM ? 'mixed' : 'heuristic'
+  // 'cache' when every title came from earlier calls (this instance or the shared Runtime Cache).
+  const missed = wanted.filter((t) => !titleCache.has(t)).length
+  out.titleSource = llmSource({ fresh: wanted.length - cached - missed, cached, fallback: missed })
   out.titleFallbacks = fallbacks
   out.titleError = fallbacks ? llmError() : ''
   return out
