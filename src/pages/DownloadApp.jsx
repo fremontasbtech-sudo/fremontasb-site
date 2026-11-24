@@ -25,7 +25,6 @@ const APP = [
   { t: 'Club form submissions', d: 'Submit club forms in the app.' },
   { t: 'Spirit points tracking', d: 'Points are tracked and updated automatically.' },
   { t: 'Bell schedules', d: 'Today’s bell schedule.' },
-  { t: 'Teacher bonuses', d: 'Teachers award bonus spirit points.' },
 ]
 
 export default function DownloadApp() {
@@ -36,7 +35,7 @@ export default function DownloadApp() {
       <PageHero
         title="Download the App"
         eyebrow="In development"
-        subtext="The Fremont ASB app is being built by ASB Tech. It will handle the parts of ASB that need a sign-in, like club forms, spirit points, bell schedules, and teacher bonuses."
+        subtext="The Fremont ASB app is being built by ASB Tech. It will handle the parts of ASB that need a sign-in, like club forms, spirit points, and bell schedules."
       />
 
       <section className="section-space">

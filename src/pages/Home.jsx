@@ -839,7 +839,7 @@ function AppBanner() {
             Use the app for things that need a sign-in
           </h2>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/90 sm:text-lg">
-            In the app, you can submit club forms, check spirit points, see today’s bell schedule, and log teacher bonuses. You sign in with your school Google account.
+            In the app, you can submit club forms, check spirit points, and see today’s bell schedule. You sign in with your school Google account.
           </p>
         </div>
         <div className="lg:col-span-4 lg:justify-self-end">
