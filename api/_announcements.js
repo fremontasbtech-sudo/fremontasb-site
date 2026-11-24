@@ -70,7 +70,7 @@ export function titleOf(text) {
   mm = t.match(/^for\s+([^,.!?]{2,40}?)\s+there\s+(?:will\s+be|is|are)\b/i)
   if (mm && mm[1]) return tc(mm[1])
   // "The Sunnyvale Library will be outside …" → "Sunnyvale Library"
-  mm = t.match(/^(?:[Tt]he\s+)?([A-Z][^.!?,\n]{2,40}?)\s+(?:will\s+be|will\s+have|is\b|are\b|meets\b|returns\b|opens\b)/)
+  mm = t.match(/^(?:[Tt]he\s+)?(?!(?:There|This|That|These|Those|It|We|You|They|He|She|Here|Today|Tomorrow)\b)([A-Z][^.!?,\n]{2,40}?)\s+(?:will\s+be|will\s+have|is\b|are\b|meets\b|returns\b|opens\b)/)
   if (mm && mm[1]) return tc(mm[1])
   const m = text.match(/join (?:the |our )?([A-Z][A-Za-z&'\u2019 ]+?(?:Club|Team|Society|Program|Council|Committee|Choir|Band))/)
   if (m) return m[1].replace(/\s+/g, ' ').trim()
